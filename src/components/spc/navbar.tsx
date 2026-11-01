@@ -9,10 +9,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BRAND, CONTACT, NAV_LINKS, WA_MESSAGES, waLink } from "@/lib/site-config";
 import { WhatsappCta, WhatsAppIcon } from "./whatsapp-cta";
+import { openSpcAi } from "./spc-ai-widget";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -93,13 +94,13 @@ export function Navbar() {
           </a>
 
           {/* Links escritorio */}
-          <ul className="hidden items-center gap-1 lg:flex">
+          <ul className="hidden items-center gap-0.5 xl:flex">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
                   className={cn(
-                    "relative rounded-full px-4 py-2 text-[13.5px] font-semibold tracking-wide transition-colors duration-300",
+                    "relative rounded-full px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-300",
                     scrolled ? "text-spc-800/75 hover:text-spc-600" : "text-white/80 hover:text-white"
                   )}
                 >
@@ -120,7 +121,23 @@ export function Navbar() {
           </ul>
 
           {/* CTA + acciones */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openSpcAi}
+              className={cn(
+                "group hidden h-11 items-center gap-2 rounded-full pl-1.5 pr-4 text-[13px] font-bold transition-all duration-300 sm:flex",
+                scrolled
+                  ? "bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-spc-900 shadow-[0_6px_20px_-6px_rgba(255,179,28,0.6)] hover:-translate-y-0.5"
+                  : "bg-white/12 text-white ring-1 ring-white/30 backdrop-blur-md hover:bg-white/20"
+              )}
+              aria-label="Hablar con SPC AI, la recepcionista inteligente"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-spc-900">
+                <Sparkles className="h-4 w-4" aria-hidden />
+              </span>
+              SPC AI
+            </button>
             <a
               href={CONTACT.phoneHref}
               className={cn(
@@ -144,7 +161,7 @@ export function Navbar() {
             <button
               onClick={() => setOpen(!open)}
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full transition-colors lg:hidden",
+                "flex h-11 w-11 items-center justify-center rounded-full transition-colors xl:hidden",
                 scrolled ? "text-spc-800 ring-1 ring-spc-600/20" : "text-white ring-1 ring-white/30"
               )}
               aria-expanded={open}
@@ -164,7 +181,7 @@ export function Navbar() {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="glass-nav overflow-hidden lg:hidden"
+              className="glass-nav overflow-hidden xl:hidden"
               id="menu-movil"
             >
               <ul className="space-y-1 px-6 pb-6 pt-2">
@@ -185,6 +202,19 @@ export function Navbar() {
                     </a>
                   </motion.li>
                 ))}
+                <li className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      openSpcAi();
+                    }}
+                    className="flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_28px_-8px_rgba(255,179,28,0.6)]"
+                  >
+                    <Sparkles className="h-4.5 w-4.5" aria-hidden />
+                    Preguntar a SPC AI
+                  </button>
+                </li>
                 <li className="pt-3">
                   <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="md" className="w-full">
                     Cotizar por WhatsApp

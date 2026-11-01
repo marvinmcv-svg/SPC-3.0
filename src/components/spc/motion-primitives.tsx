@@ -16,9 +16,13 @@ import {
   useSpring,
   useTransform,
   useScroll,
+  animate,
+  AnimatePresence,
   type MotionValue,
 } from "framer-motion";
-import React, { useEffect, useRef, useState, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ────────────────────────────────────────────────────────────────
@@ -269,5 +273,374 @@ export function Eyebrow({ children, dark = false }: { children: ReactNode; dark?
         <span className={cn("h-px w-8", dark ? "bg-gold-500/70" : "bg-spc-600/40")} aria-hidden />
       </span>
     </Reveal>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   MAGNETIC — el botón se deja atraer sutilmente por el cursor
+   (efecto premium de landings de referencia mundial)
+   ──────────────────────────────────────────────────────────────── */
+export function Magnetic({
+  children,
+  className,
+  strength = 0.32,
+}: {
+  children: ReactNode;
+  className?: string;
+  strength?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 17, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 220, damping: 17, mass: 0.4 });
+
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    x.set((e.clientX - (rect.left + rect.width / 2)) * strength);
+    y.set((e.clientY - (rect.top + rect.height / 2)) * strength);
+  }
+  function onLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ x: sx, y: sy }}
+      className={cn("inline-block", className)}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   RING CAROUSEL 3D — anillo giratorio estilo Apple:
+   • tarjetas distribuidas en círculo real (rotateY + translateZ)
+   • auto-rotación con pausa al interactuar
+   • arrastre con pointer events (mouse + touch) y snap elástico
+   • clic en tarjeta lateral la trae al frente
+   ──────────────────────────────────────────────────────────────── */
+export type CarouselItem = {
+  id: string;
+  title: string;
+  badge?: string;
+  image: string;
+};
+
+/* Normaliza un ángulo al rango (-180, 180] */
+function shortestAngle(a: number): number {
+  let d = a % 360;
+  if (d > 180) d -= 360;
+  if (d <= -180) d += 360;
+  return d;
+}
+
+function CarouselCard({
+  item,
+  angle,
+  rot,
+  active,
+  onSelect,
+}: {
+  item: CarouselItem;
+  angle: number;
+  rot: MotionValue<number>;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  /* distancia angular de esta tarjeta al frente (−180…180) */
+  const dist = useTransform(rot, (r) => shortestAngle(angle + r));
+  const opacity = useTransform(
+    dist,
+    [-180, -110, -55, 0, 55, 110, 180],
+    [0.16, 0.34, 0.82, 1, 0.82, 0.34, 0.16]
+  );
+  const filter = useTransform(
+    dist,
+    [-180, -90, 0, 90, 180],
+    ["brightness(0.4) saturate(0.6)", "brightness(0.66) saturate(0.8)", "brightness(1.08) saturate(1.08)", "brightness(0.66) saturate(0.8)", "brightness(0.4) saturate(0.6)"]
+  );
+  const ring = useTransform(
+    dist,
+    [-180, -45, -12, 0, 12, 45, 180],
+    [
+      "0 0 0 rgba(255,196,79,0)",
+      "0 0 0 rgba(255,196,79,0)",
+      "0 0 0 1.5px rgba(255,196,79,0.55)",
+      "0 18px 60px -12px rgba(255,196,79,0.45), 0 0 0 2px rgba(255,196,79,0.9)",
+      "0 0 0 1.5px rgba(255,196,79,0.55)",
+      "0 0 0 rgba(255,196,79,0)",
+      "0 0 0 rgba(255,196,79,0)",
+    ]
+  );
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onSelect}
+      aria-label={`Ver ${item.title}`}
+      aria-current={active}
+      className="ring-card group absolute left-1/2 top-1/2 block cursor-pointer rounded-[1.3rem] focus-visible:outline-none"
+      style={{
+        width: "var(--card-w)",
+        height: "var(--card-h)",
+        transform: `translate(-50%, -50%) rotateY(${angle}deg) translateZ(var(--radius))`,
+        transformStyle: "preserve-3d",
+        backfaceVisibility: "hidden",
+        opacity,
+        filter,
+        boxShadow: ring,
+      }}
+    >
+      <span className="absolute inset-0 block overflow-hidden rounded-[1.3rem] bg-spc-950 ring-1 ring-white/15">
+        <Image
+          src={item.image}
+          alt={item.title}
+          fill
+          sizes="220px"
+          className="object-cover"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-t from-spc-950/90 via-spc-950/15 to-transparent"
+        />
+        {item.badge && (
+          <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.14em] text-spc-800 backdrop-blur-sm">
+            {item.badge}
+          </span>
+        )}
+        <span className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-1 p-3.5 text-left">
+          <span className="font-display text-[13.5px] font-bold leading-tight text-white">
+            {item.title}
+          </span>
+          <span className="flex items-center gap-1 text-[10.5px] font-semibold text-gold-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            {active ? "En pantalla" : "Girar al frente"}
+          </span>
+        </span>
+        {/* línea de luz superior */}
+        <span
+          aria-hidden
+          className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent"
+        />
+      </span>
+    </motion.button>
+  );
+}
+
+export function RingCarousel({
+  items,
+  onSelect,
+  autoMs = 4000,
+  className,
+}: {
+  items: CarouselItem[];
+  /** Se dispara al hacer clic en la tarjeta ACTIVA del frente */
+  onSelect?: (index: number) => void;
+  autoMs?: number;
+  className?: string;
+}) {
+  const n = items.length;
+  const step = 360 / n;
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [cardW, setCardW] = useState(190);
+
+  const rot = useMotionValue(0);
+  const dragRef = useRef({ active: false, startX: 0, startRot: 0, moved: 0 });
+  const indexRef = useRef(0);
+
+  /* radio del anillo a partir del ancho de tarjeta */
+  const radius = Math.round(cardW / 2 / Math.sin(Math.PI / n) + 16);
+  const cardH = Math.round(cardW * 1.32);
+
+  /* mide el contenedor para dimensionar tarjetas (mobile-friendly) */
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      setCardW(Math.max(136, Math.min(206, Math.round(w * 0.38))));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const goTo = useCallback(
+    (i: number, instant = false) => {
+      const norm = ((i % n) + n) % n;
+      setIndex(norm);
+      /* rotación objetivo: camino más corto desde la posición actual */
+      const current = rot.get();
+      let target = -norm * step;
+      while (target - current > 180) target -= 360;
+      while (target - current < -180) target += 360;
+      if (instant) rot.jump(target);
+      else animate(rot, target, { type: "spring", stiffness: 90, damping: 18, mass: 0.9 });
+    },
+    [n, step, rot]
+  );
+
+  /* auto-rotación (pausada en hover/drag/reduced-motion/pestaña oculta) */
+  useEffect(() => {
+    if (paused || dragging || reduce) return;
+    const id = setInterval(() => {
+      if (document.hidden) return;
+      goTo(indexRef.current + 1);
+    }, autoMs);
+    return () => clearInterval(id);
+  }, [paused, dragging, reduce, autoMs, goTo]);
+
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  /* ── drag con pointer events ── */
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    dragRef.current = { active: true, startX: e.clientX, startRot: rot.get(), moved: 0 };
+    setDragging(true);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    const dx = e.clientX - d.startX;
+    d.moved = Math.abs(dx);
+    rot.set(d.startRot + dx * 0.32);
+  };
+  const onPointerUp = () => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    d.active = false;
+    setDragging(false);
+    /* snap al múltiplo de step más cercano */
+    const snapped = Math.round(rot.get() / step) * step;
+    const norm = ((Math.round(-snapped / step) % n) + n) % n;
+    setIndex(norm);
+    animate(rot, snapped, { type: "spring", stiffness: 110, damping: 19, mass: 0.85 });
+  };
+
+  const activeItem = items[index];
+
+  return (
+    <div className={cn("relative select-none", className)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      {/* ── escena 3D ── */}
+      <div
+        ref={wrapRef}
+        role="group"
+        aria-label="Carrusel de servicios SPC"
+        className="relative mx-auto h-[300px] w-full cursor-grab touch-pan-y sm:h-[340px] lg:h-[360px]"
+        style={{
+          perspective: "1200px",
+          "--card-w": `${cardW}px`,
+          "--card-h": `${cardH}px`,
+          "--radius": `${radius}px`,
+        } as React.CSSProperties}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        <motion.div
+          className="absolute left-1/2 top-1/2"
+          style={{
+            rotateY: rot,
+            transformStyle: "preserve-3d",
+            width: 0,
+            height: 0,
+          }}
+        >
+          {items.map((item, i) => (
+            <CarouselCard
+              key={item.id}
+              item={item}
+              angle={i * step}
+              rot={rot}
+              active={i === index}
+              onSelect={() => {
+                if (dragRef.current.moved > 6) return; /* era un drag, no un clic */
+                if (i === index) onSelect?.(i);
+                else goTo(i);
+              }}
+            />
+          ))}
+        </motion.div>
+
+        {/* brillo de piso (sensación de superficie) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-[12%] bottom-1 h-16 rounded-[100%] bg-[radial-gradient(ellipse_at_center,rgba(255,196,79,0.22),transparent_70%)] blur-md"
+        />
+      </div>
+
+      {/* ── controles ── */}
+      <div className="mt-2 flex items-center justify-center gap-4">
+        <button
+          type="button"
+          onClick={() => goTo(index - 1)}
+          aria-label="Servicio anterior"
+          className="glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:scale-105 hover:text-gold-300"
+        >
+          <ChevronLeft className="h-5 w-5" aria-hidden />
+        </button>
+
+        {/* dots */}
+        <div className="flex items-center gap-1.5" role="tablist" aria-label="Seleccionar servicio">
+          {items.map((item, i) => (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={item.title}
+              onClick={() => goTo(i)}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-400",
+                i === index ? "w-7 bg-gold-400" : "w-1.5 bg-white/25 hover:bg-white/45"
+              )}
+            />
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => goTo(index + 1)}
+          aria-label="Siguiente servicio"
+          className="glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:scale-105 hover:text-gold-300"
+        >
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
+      </div>
+
+      {/* ── panel del servicio activo ── */}
+      <div className="relative mt-4 h-[64px] sm:h-[60px]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={activeItem.id}
+            initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -12, filter: "blur(6px)" }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-0 flex flex-col items-center justify-start text-center"
+          >
+            <p className="font-display text-[17px] font-bold leading-tight text-white sm:text-lg">
+              {activeItem.title}
+            </p>
+            <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-300/90">
+              {`0${index + 1} / 0${n} — toca la tarjeta para ver el detalle`}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }

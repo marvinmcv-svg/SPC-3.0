@@ -84,7 +84,7 @@ export function WhatsappWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
             transition={{ type: "spring", stiffness: 320, damping: 24 }}
-            className="fixed bottom-[104px] right-5 z-[60] w-[240px] rounded-2xl rounded-br-md bg-white p-4 pr-5 shadow-[0_24px_60px_-20px_rgba(6,15,46,0.5)] ring-1 ring-spc-900/10 sm:right-6 sm:w-[260px]"
+            className="fixed bottom-[168px] right-5 z-[60] w-[240px] rounded-2xl rounded-br-md bg-white p-4 pr-5 shadow-[0_24px_60px_-20px_rgba(6,15,46,0.5)] ring-1 ring-spc-900/10 sm:right-6 sm:w-[260px]"
           >
             <span className="absolute -bottom-1.5 right-4 h-3.5 w-3.5 rotate-45 bg-white" aria-hidden />
             {/* botón real a pantalla completa: HTML válido + objetivo táctil ≥44px */}

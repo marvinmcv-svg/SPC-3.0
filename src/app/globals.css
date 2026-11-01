@@ -331,7 +331,8 @@
   to { transform: translateX(-50%); }
 }
 .animate-marquee,
-.animate-marquee-slow {
+.animate-marquee-slow,
+.animate-marquee-reverse {
   will-change: transform;
 }
 .animate-marquee {
@@ -339,6 +340,53 @@
 }
 .animate-marquee-slow {
   animation: marquee-x 46s linear infinite;
+}
+@keyframes marquee-x-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.animate-marquee-reverse {
+  animation: marquee-x-reverse 52s linear infinite;
+}
+
+/* — Pulso dorado del FAB de SPC AI — */
+@keyframes gold-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 196, 79, 0.55), 0 16px 40px -10px rgba(255, 179, 28, 0.8); }
+  70% { box-shadow: 0 0 0 16px rgba(255, 196, 79, 0), 0 16px 40px -10px rgba(255, 179, 28, 0.8); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 196, 79, 0), 0 16px 40px -10px rgba(255, 179, 28, 0.8); }
+}
+.animate-gold-pulse {
+  animation: gold-pulse 2.8s ease-out infinite;
+}
+
+/* — Scrollbars finos premium (dialog de servicio / chat SPC AI) — */
+.nice-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #a9c4e8 transparent;
+}
+.nice-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.nice-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nice-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a9c4e8, #2e6eb8);
+  border-radius: 8px;
+}
+.nice-scrollbar-dark {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 196, 79, 0.45) transparent;
+}
+.nice-scrollbar-dark::-webkit-scrollbar {
+  width: 8px;
+}
+.nice-scrollbar-dark::-webkit-scrollbar-track {
+  background: transparent;
+}
+.nice-scrollbar-dark::-webkit-scrollbar-thumb {
+  background: rgba(255, 196, 79, 0.4);
+  border-radius: 8px;
 }
 
 /* — Flotación suave — */
@@ -398,8 +446,10 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
   .animate-marquee-slow,
+  .animate-marquee-reverse,
   .animate-float,
   .animate-wa-pulse,
+  .animate-gold-pulse,
   .animate-ping {
     animation: none !important;
   }

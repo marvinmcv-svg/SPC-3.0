@@ -2,18 +2,20 @@
 
 /**
  * ══════════════════════════════════════════════════════════════════
- *  HERO — cinematográfico: foto con Ken Burns + parallax,
- *  titular palabra por palabra, CTAs del funnel y strip de stats
+ *  HERO — cinematográfico con CARRUSEL 3D ROTATORIO de servicios:
+ *  foto con Ken Burns + parallax, titular palabra por palabra,
+ *  anillo giratorio de las 9 líneas de producto y strip de stats.
  * ══════════════════════════════════════════════════════════════════
  */
 
 import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { BadgeCheck, Clock3, Gauge, Handshake, ChevronDown, Sparkles } from "lucide-react";
-import { BRAND, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { BadgeCheck, Clock3, Gauge, Handshake, Sparkles, MoveHorizontal } from "lucide-react";
+import { BRAND, SERVICES, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
 import { WhatsappCta } from "./whatsapp-cta";
-import { Counter } from "./motion-primitives";
+import { Counter, Magnetic, RingCarousel } from "./motion-primitives";
+import { openServiceDetail } from "./service-detail";
 
 const PILLARS = [
   { icon: BadgeCheck, label: "Calidad", detail: "Estándares de la industria" },
@@ -21,6 +23,14 @@ const PILLARS = [
   { icon: Gauge, label: "Capacidad", detail: "Tecnología de punta" },
   { icon: Handshake, label: "Servicio", detail: "El factor humano" },
 ] as const;
+
+/* Items del carrusel: una tarjeta por línea de producto */
+const CAROUSEL_ITEMS = SERVICES.map((s) => ({
+  id: s.id,
+  title: s.title,
+  badge: s.category,
+  image: s.image,
+}));
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -67,101 +77,129 @@ export function Hero() {
         aria-hidden
         className="absolute inset-0 bg-gradient-to-t from-spc-950 via-transparent to-spc-950/60"
       />
+      {/* halo cálido tras el carrusel (profundidad) */}
       <div
         aria-hidden
-        className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-spc-950 to-transparent"
+        className="absolute right-[-10%] top-1/4 hidden h-[520px] w-[520px] rounded-full bg-gold-500/12 blur-[130px] lg:block"
       />
 
       {/* ── Contenido ── */}
       <motion.div
         style={{ y: contentY, opacity: contentOpacity }}
-        className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-16 pt-36 sm:px-8"
+        className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-10 pt-32 sm:px-8 lg:flex-row lg:items-center lg:gap-10 lg:pt-36"
       >
-        {/* Badge */}
+        {/* ══ Columna izquierda: mensaje + CTAs ══ */}
+        <div className="flex-1">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="glass-dark mb-7 inline-flex w-fit items-center gap-2.5 rounded-full py-2 pl-3 pr-5"
+          >
+            <Sparkles className="h-4 w-4 text-gold-400" aria-hidden />
+            <span className="text-[12px] font-semibold uppercase tracking-[0.22em] text-white/90">
+              Líderes de la industria gráfica · desde {BRAND.foundedYear}
+            </span>
+          </motion.div>
+
+          {/* Titular */}
+          <h1 className="font-display max-w-[13ch] text-[clamp(2.6rem,7.2vw,5.4rem)] font-extrabold leading-[1.02] tracking-tight text-white">
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: "110%" }}
+                animate={{ y: "0%" }}
+                transition={{ duration: 1, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Imprimiendo
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden">
+              <motion.span
+                className="block"
+                initial={{ y: "110%" }}
+                animate={{ y: "0%" }}
+                transition={{ duration: 1, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
+              >
+                lo mejor de
+              </motion.span>
+            </span>
+            <span className="block overflow-hidden pb-2">
+              <motion.span
+                className="text-gradient-gold block"
+                initial={{ y: "110%", filter: "blur(10px)" }}
+                animate={{ y: "0%", filter: "blur(0px)" }}
+                transition={{ duration: 1.05, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}
+              >
+                Bolivia.
+              </motion.span>
+            </span>
+          </h1>
+
+          {/* Subtítulo educativo */}
+          <motion.p
+            initial={{ opacity: 0, y: 22, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.9, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-6 max-w-[52ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-white/75"
+          >
+            Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y
+            soluciones digitales bajo demanda.{" "}
+            <span className="font-semibold text-gold-300">
+              Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.
+            </span>
+          </motion.p>
+
+          {/* CTAs del funnel */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 1.15, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-9 flex flex-wrap items-center gap-3.5"
+          >
+            <Magnetic>
+              <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="lg" arrow>
+                Cotiza por WhatsApp
+              </WhatsappCta>
+            </Magnetic>
+            <WhatsappCta href="#servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
+              Explorar servicios
+            </WhatsappCta>
+          </motion.div>
+
+          {/* micro prueba social */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.5 }}
+            className="mt-5 text-[13px] font-medium text-white/60"
+          >
+            Respuesta en minutos dentro del horario laboral · Asesoría sin costo
+          </motion.p>
+        </div>
+
+        {/* ══ Columna derecha: carrusel 3D rotatorio de servicios ══ */}
         <motion.div
-          initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="glass-dark mb-7 inline-flex w-fit items-center gap-2.5 rounded-full py-2 pl-3 pr-5"
+          initial={{ opacity: 0, x: 60, filter: "blur(10px)" }}
+          animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+          transition={{ duration: 1.2, delay: 1.05, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-14 w-full shrink-0 lg:mt-0 lg:w-[46%] xl:w-[44%]"
         >
-          <Sparkles className="h-4 w-4 text-gold-400" aria-hidden />
-          <span className="text-[12px] font-semibold uppercase tracking-[0.22em] text-white/90">
-            Líderes de la industria gráfica · desde {BRAND.foundedYear}
-          </span>
+          {/* kicker del carrusel */}
+          <div className="mb-1 flex items-center justify-center gap-2.5">
+            <MoveHorizontal className="h-4 w-4 text-gold-400" aria-hidden />
+            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold-300/90">
+              Nuestras 9 líneas · gíralas
+            </p>
+          </div>
+
+          <RingCarousel
+            items={CAROUSEL_ITEMS}
+            autoMs={4200}
+            onSelect={(i) => openServiceDetail(SERVICES[i].id)}
+          />
         </motion.div>
-
-        {/* Titular */}
-        <h1 className="font-display max-w-[13ch] text-[clamp(2.6rem,7.2vw,5.4rem)] font-extrabold leading-[1.02] tracking-tight text-white">
-          <span className="block overflow-hidden">
-            <motion.span
-              className="block"
-              initial={{ y: "110%" }}
-              animate={{ y: "0%" }}
-              transition={{ duration: 1, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Imprimiendo
-            </motion.span>
-          </span>
-          <span className="block overflow-hidden">
-            <motion.span
-              className="block"
-              initial={{ y: "110%" }}
-              animate={{ y: "0%" }}
-              transition={{ duration: 1, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
-            >
-              lo mejor de
-            </motion.span>
-          </span>
-          <span className="block overflow-hidden pb-2">
-            <motion.span
-              className="text-gradient-gold block"
-              initial={{ y: "110%", filter: "blur(10px)" }}
-              animate={{ y: "0%", filter: "blur(0px)" }}
-              transition={{ duration: 1.05, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Bolivia.
-            </motion.span>
-          </span>
-        </h1>
-
-        {/* Subtítulo educativo */}
-        <motion.p
-          initial={{ opacity: 0, y: 22, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.9, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 max-w-[52ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-white/75"
-        >
-          Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y
-          soluciones digitales bajo demanda.{" "}
-          <span className="font-semibold text-gold-300">
-            Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.
-          </span>
-        </motion.p>
-
-        {/* CTAs del funnel */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 1.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-9 flex flex-wrap items-center gap-3.5"
-        >
-          <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="lg" arrow>
-            Cotiza por WhatsApp
-          </WhatsappCta>
-          <WhatsappCta href="#servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
-            Explorar servicios
-          </WhatsappCta>
-        </motion.div>
-
-        {/* micro prueba social */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
-          className="mt-5 text-[13px] font-medium text-white/60"
-        >
-          Respuesta en minutos dentro del horario laboral · Asesoría sin costo
-        </motion.p>
       </motion.div>
 
       {/* ── Strip inferior: pilares + stats ── */}
@@ -213,24 +251,6 @@ export function Hero() {
           ))}
         </div>
       </motion.div>
-
-      {/* ── Indicador de scroll ── */}
-      <motion.a
-        href="#nosotros"
-        aria-label="Bajar a la sección nosotros"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
-        className="absolute bottom-4 left-1/2 z-10 hidden -translate-x-1/2 text-white/40 transition-colors hover:text-gold-400 md:block"
-      >
-        <motion.span
-          animate={{ y: [0, 7, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="flex"
-        >
-          <ChevronDown className="h-5 w-5" />
-        </motion.span>
-      </motion.a>
     </section>
   );
 }
