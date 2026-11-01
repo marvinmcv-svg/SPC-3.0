@@ -19,8 +19,11 @@ import {
 } from "@/components/ui/accordion";
 import { WhatsAppIcon } from "./whatsapp-cta";
 import { openSpcAi } from "./spc-ai-widget";
+import { SiteLink } from "./site-router";
 
-export function Faq() {
+export function Faq({ limit }: { limit?: number } = {}) {
+  const faqs = typeof limit === "number" ? GENERAL_FAQS.slice(0, limit) : GENERAL_FAQS;
+
   return (
     <section
       id="faq"
@@ -52,7 +55,7 @@ export function Faq() {
 
             <Reveal delay={0.15} className="mt-9">
               <Accordion type="single" collapsible className="space-y-3">
-                {GENERAL_FAQS.map((faq, i) => (
+                {faqs.map((faq, i) => (
                   <AccordionItem
                     key={faq.q}
                     value={`faq-${i}`}
@@ -73,11 +76,26 @@ export function Faq() {
                 ))}
               </Accordion>
             </Reveal>
+
+            {/* enlace a la página completa de FAQ (cuando es teaser) */}
+            {typeof limit === "number" && faqs.length < GENERAL_FAQS.length && (
+              <Reveal delay={0.1} className="mt-6">
+                <SiteLink
+                  to="faq"
+                  className="group inline-flex items-center gap-2 rounded-full border border-spc-600/20 bg-white/70 px-6 py-3 text-[13.5px] font-bold text-spc-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-spc-600/40 hover:bg-white"
+                >
+                  Ver las {GENERAL_FAQS.length} preguntas frecuentes
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-spc-600/10 transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
+                    →
+                  </span>
+                </SiteLink>
+              </Reveal>
+            )}
           </div>
 
-          {/* ── Lateral: SPC AI + contacto directo ── */}
+          {/* ── Lateral: SPenCer + contacto directo ── */}
           <div className="space-y-5 lg:pt-24">
-            {/* tarjeta SPC AI */}
+            {/* tarjeta SPenCer */}
             <Reveal y={40}>
               <motion.div
                 whileHover={{ y: -4 }}
@@ -92,12 +110,12 @@ export function Faq() {
                     Nuevo · Inteligencia artificial
                   </span>
                   <h3 className="font-display mt-4 text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold leading-tight text-white">
-                    Conoce a SPC AI, nuestra recepcionista inteligente
+                    Conoce a SPenCer, nuestra recepcionista inteligente
                   </h3>
                   <p className="mt-3 text-[13.5px] leading-relaxed text-white/70">
                     Responde todas estas preguntas — y cualquier otra que tengas — al instante, a
                     cualquier hora. Y cuando tu proyecto esté listo para cotizar, te conecta con
-                    un asesor humano en segundos.
+                    un asesor humano por WhatsApp en segundos.
                   </p>
                   <ul className="mt-5 space-y-2.5 text-[13px] font-medium text-white/80">
                     {[
@@ -117,7 +135,7 @@ export function Faq() {
                     className="shine group mt-6 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-4 text-[14.5px] font-bold text-spc-900 shadow-[0_14px_38px_-10px_rgba(255,179,28,0.65)] transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <Sparkles className="h-5 w-5" aria-hidden />
-                    Preguntar a SPC AI
+                    Preguntar a SPenCer
                   </button>
                 </div>
               </motion.div>

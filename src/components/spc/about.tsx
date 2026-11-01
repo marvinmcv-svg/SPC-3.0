@@ -12,6 +12,7 @@ import { useRef } from "react";
 import { Quote, Target, Eye, MapPin, Award } from "lucide-react";
 import { BRAND, CONTACT } from "@/lib/site-config";
 import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
+import { SiteLink } from "./site-router";
 
 export function About() {
   const ref = useRef<HTMLElement>(null);
@@ -141,13 +142,20 @@ export function About() {
             ))}
           </div>
 
-          {/* dato de contacto en línea */}
+          {/* dato de contacto en línea + enlace a la página completa */}
           <Reveal delay={0.35} className="mt-8">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] font-medium text-spc-800/60">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] font-medium text-spc-800/60">
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-spc-600" aria-hidden />
                 {CONTACT.address}
               </span>
+              <SiteLink
+                to="nosotros"
+                className="group inline-flex items-center gap-2 rounded-full bg-spc-600/10 px-5 py-2.5 text-[12.5px] font-bold text-spc-700 ring-1 ring-spc-600/20 transition-all duration-300 hover:bg-spc-600 hover:text-white hover:ring-spc-600"
+              >
+                Conoce la planta y el equipo
+                <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
+              </SiteLink>
             </div>
           </Reveal>
         </div>

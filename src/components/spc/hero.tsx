@@ -163,7 +163,7 @@ export function Hero() {
                 Cotiza por WhatsApp
               </WhatsappCta>
             </Magnetic>
-            <WhatsappCta href="#servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
+            <WhatsappCta href="#/servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
               Explorar servicios
             </WhatsappCta>
           </motion.div>

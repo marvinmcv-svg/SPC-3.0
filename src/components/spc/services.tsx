@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
 import { openServiceDetail } from "./service-detail";
+import { SiteLink } from "./site-router";
 
 const CATEGORY_STYLES: Record<Service["category"], string> = {
   Packaging: "text-spc-700 ring-spc-600/20",
@@ -137,9 +138,12 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
   );
 }
 
-export function Services() {
+export function Services({ variant = "full" }: { variant?: "full" | "teaser" }) {
   const [filter, setFilter] = useState<Filter>("Todos");
-  const visible = filter === "Todos" ? SERVICES : SERVICES.filter((s) => s.category === filter);
+  const teaser = variant === "teaser";
+  /* teaser: solo los destacados (para el home); full: todas las líneas */
+  const pool = teaser ? SERVICES.filter((s) => s.featured) : SERVICES;
+  const visible = filter === "Todos" ? pool : pool.filter((s) => s.category === filter);
 
   return (
     <section
@@ -152,21 +156,32 @@ export function Services() {
         <div className="mx-auto max-w-2xl text-center">
           <Eyebrow>Servicios · 9 líneas de producto</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="Nueve líneas." />{" "}
+            <WordsReveal text={teaser ? "Los más pedidos." : "Nueve líneas."} />{" "}
             <WordsReveal text="Un solo estándar." wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
             <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-              Del packaging que protege tu producto hasta la revista que cuenta tu historia.
-              Abre cada servicio para conocer especificaciones, tiempos y respuestas —{" "}
-              <strong className="font-semibold text-spc-800">
-                y cotiza por WhatsApp en un clic.
-              </strong>
+              {teaser ? (
+                <>
+                  Packaging de alimentos, impresión digital bajo demanda e impresos comerciales:
+                  los tres servicios que más mueven la industria.{" "}
+                  <strong className="font-semibold text-spc-800">Explora las 9 líneas completas.</strong>
+                </>
+              ) : (
+                <>
+                  Del packaging que protege tu producto hasta la revista que cuenta tu historia.
+                  Abre cada servicio para conocer especificaciones, tiempos y respuestas —{" "}
+                  <strong className="font-semibold text-spc-800">
+                    y cotiza por WhatsApp en un clic.
+                  </strong>
+                </>
+              )}
             </p>
           </Reveal>
         </div>
 
-        {/* filtros por categoría */}
+        {/* filtros por categoría (solo página completa) */}
+        {!teaser && (
         <Reveal delay={0.15} className="mt-9">
           <div className="flex flex-wrap items-center justify-center gap-2" role="tablist" aria-label="Filtrar servicios por categoría">
             {FILTERS.map((f) => {
@@ -200,6 +215,7 @@ export function Services() {
             })}
           </div>
         </Reveal>
+        )}
 
         {/* grid */}
         <motion.div layout className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -209,6 +225,24 @@ export function Services() {
             ))}
           </AnimatePresence>
         </motion.div>
+
+        {/* CTA a la página completa de servicios (solo teaser del home) */}
+        {teaser && (
+          <Reveal delay={0.1} className="mt-12 text-center">
+            <SiteLink
+              to="servicios"
+              className="group inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-spc-700 to-spc-500 px-8 py-4 text-[14.5px] font-bold text-white shadow-[0_14px_40px_-12px_rgba(0,60,141,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_56px_-14px_rgba(0,60,141,0.7)]"
+            >
+              Explorar las 9 líneas de producto
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
+                →
+              </span>
+            </SiteLink>
+            <p className="mt-3.5 text-[12.5px] font-medium text-spc-900/50">
+              Packaging · Impresión comercial · Digital — con especificaciones y FAQs por servicio
+            </p>
+          </Reveal>
+        )}
 
         {/* CTA de asesoría (funnel educativo) */}
         <Reveal delay={0.1} className="mt-14">

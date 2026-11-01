@@ -56,3 +56,7 @@ server.log
 .env
 .zscripts/dev.pid
 tool-results/
+upload/
+logo_*.json
+fetch_logos*.py
+download_wiki_logos.py

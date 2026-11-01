@@ -22,8 +22,9 @@ export const BRAND = {
 } as const;
 
 export const CONTACT = {
-  phone: "+591 2 2111121",
-  phoneHref: "tel:+5912211121",
+  phone: "+591 77165787",
+  phoneHref: "tel:+59177165787",
+  whatsapp: "+591 77165787",
   email: "graficaindustrial@spc.com.bo",
   address: "Av. Saavedra N.º 2411 (Final), Zona Miraflores",
   addressFull: "Edificio SPC, Av. Saavedra N.º 2411, Zona Miraflores, La Paz — Bolivia",
@@ -34,7 +35,7 @@ export const CONTACT = {
 /** ─── FUNNEL DE WHATSAPP ───────────────────────────────────────────
  *  Cambia aquí el número y todos los CTA del sitio se actualizan.
  */
-export const WHATSAPP_NUMBER = "5912211121"; // ← REEMPLAZAR con la línea WhatsApp real (ej. 591XXXXXXXX)
+export const WHATSAPP_NUMBER = "59177165787";
 
 export function waLink(message: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -73,6 +74,8 @@ export type Service = {
   image: string;
   waMessage: string;
   featured?: boolean;
+  /** Galería extra para la página de detalle del servicio */
+  gallery?: string[];
   /** Detalle profundo (sección "página completa" por servicio) */
   minRun: string; // tiraje mínimo orientativo
   turnaround: string; // tiempo de producción orientativo
@@ -93,6 +96,7 @@ export const SERVICES: Service[] = [
     image: "/images/services/food-packaging.jpg",
     waMessage: WA_MESSAGES.quote("Packaging de Alimentos"),
     featured: true,
+    gallery: ["/images/services/gallery-food.jpg", "/images/services/paper-bags.jpg"],
     minRun: "1.000 unidades (orientativo)",
     turnaround: "7 – 12 días hábiles según acabados",
     specs: [
@@ -128,6 +132,7 @@ export const SERVICES: Service[] = [
     insight: "El troquel de precisión garantiza que cada estuche se doble perfecto, sin variaciones en línea.",
     image: "/images/services/pharma-packaging.jpg",
     waMessage: WA_MESSAGES.quote("Packaging Farmacéutico"),
+    gallery: ["/images/services/gallery-pharma.jpg", "/images/services/stationery.jpg"],
     minRun: "5.000 unidades (orientativo)",
     turnaround: "10 – 15 días hábiles con validación",
     specs: [
@@ -269,6 +274,7 @@ export const SERVICES: Service[] = [
     insight: "El adhesivo PUR soporta ±60 °C y humedad: las páginas aguantan miles de aperturas sin despegarse.",
     image: "/images/services/books.jpg",
     waMessage: WA_MESSAGES.quote("Libros Emblocados HotMelt/PUR"),
+    gallery: ["/images/services/gallery-books.jpg", "/images/services/magazines.jpg"],
     minRun: "300 ejemplares (orientativo)",
     turnaround: "10 – 15 días hábiles",
     specs: [
@@ -452,15 +458,17 @@ export const STATS = [
   { value: 100, suffix: "%", label: "Compromiso", detail: "El factor humano marca la diferencia" },
 ] as const;
 
-/** ─── NAV ────────────────────────────────────────────────────────── */
+/** ─── NAV ──────────────────────────────────────────────────────────
+ *  Rutas del sitio web multipágina (hash router, ver site-router.tsx)
+ */
 export const NAV_LINKS = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#nosotros", label: "Nosotros" },
-  { href: "#servicios", label: "Servicios" },
-  { href: "#proceso", label: "Proceso" },
-  { href: "#clientes", label: "Clientes" },
-  { href: "#faq", label: "Preguntas" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "#/", label: "Inicio", page: "home" },
+  { href: "#/nosotros", label: "Nosotros", page: "nosotros" },
+  { href: "#/servicios", label: "Servicios", page: "servicios" },
+  { href: "#/proceso", label: "Proceso", page: "proceso" },
+  { href: "#/clientes", label: "Clientes", page: "clientes" },
+  { href: "#/faq", label: "Preguntas", page: "faq" },
+  { href: "#/contacto", label: "Contacto", page: "contacto" },
 ] as const;
 
 /** ─── CLIENTES — marcas nacionales que imprimen con SPC ──────────────
@@ -474,25 +482,29 @@ export type Client = {
   initials: string;
   color: string;
   note: string;
+  /** Logo oficial (PNG en /images/clients). Si falta, se usa el monograma. */
+  logo?: string;
+  /** Logo claro sobre fondo oscuro (duplicado con fondo blanco si hace falta) */
+  logoDark?: string;
 };
 
 export const CLIENTS = [
-  { id: "cbn", name: "Cervecería Boliviana Nacional", sector: "Alimentos & Bebidas", initials: "CBN", color: "#d6001c", note: "Cajas y cartones para sus marcas Paceña y Taquiña" },
+  { id: "cbn", name: "Cervecería Boliviana Nacional", sector: "Alimentos & Bebidas", initials: "CBN", color: "#d6001c", note: "Cajas y cartones para sus marcas Paceña y Taquiña", logo: "/images/clients/cbn.png" },
   { id: "pil-andina", name: "Pil Andina", sector: "Alimentos & Bebidas", initials: "PA", color: "#004b93", note: "Etiquetas y envases para bebidas Pepsico" },
   { id: "delicia", name: "Delicia", sector: "Alimentos & Bebidas", initials: "D", color: "#e30613", note: "Packaging de galletas, chocolates y confitería" },
-  { id: "arcor", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas" },
+  { id: "arcor", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas", logo: "/images/clients/arcor.png" },
   { id: "coripati", name: "Fideos Coripati", sector: "Alimentos & Bebidas", initials: "FC", color: "#f5a300", note: "Envases para líneas de pastas alimenticias" },
   { id: "bago", name: "Laboratorios Bagó", sector: "Farmacéutica", initials: "B", color: "#00539f", note: "Estuches de medicamentos con validación técnica" },
-  { id: "inti", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote" },
-  { id: "terbol", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica" },
+  { id: "inti", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote", logo: "/images/clients/inti.png" },
+  { id: "terbol", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica", logo: "/images/clients/terbol.png" },
   { id: "vita", name: "Laboratorios Vita", sector: "Farmacéutica", initials: "V", color: "#009640", note: "Envases y prospectos farmacéuticos" },
-  { id: "hipermaxi", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca" },
-  { id: "icnorte", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada" },
-  { id: "copacabana", name: "Pollos Copacabana", sector: "Retail & QSR", initials: "PC", color: "#ed1c24", note: "Envases e impresos para puntos de venta" },
-  { id: "lostiempos", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales" },
-  { id: "eldeber", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas" },
+  { id: "hipermaxi", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca", logo: "/images/clients/hipermaxi.png" },
+  { id: "icnorte", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada", logo: "/images/clients/icnorte.png" },
+  { id: "copacabana", name: "Pollos Copacabana", sector: "Retail & QSR", initials: "PC", color: "#ed1c24", note: "Envases e impresos para puntos de venta", logo: "/images/clients/copacabana.png" },
+  { id: "lostiempos", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales", logo: "/images/clients/lostiempos.png" },
+  { id: "eldeber", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas", logo: "/images/clients/eldeber.png" },
   { id: "gisbert", name: "Editorial Gisbert", sector: "Editorial & Medios", initials: "EG", color: "#8a4b2a", note: "Libros de texto emblocados HotMelt/PUR" },
-  { id: "bnb", name: "Banco Nacional de Bolivia", sector: "Banca & Finanzas", initials: "BNB", color: "#0033a0", note: "Papelería corporativa homologada y documentos" },
+  { id: "bnb", name: "Banco Nacional de Bolivia", sector: "Banca & Finanzas", initials: "BNB", color: "#0033a0", note: "Papelería corporativa homologada y documentos", logo: "/images/clients/bnb.png" },
 ] as const satisfies readonly Client[];
 
 /** ─── TESTIMONIOS de clientes ──────────────────────────────────────
@@ -623,18 +635,18 @@ export const GENERAL_FAQS = [
   },
 ] as const;
 
-/** ─── SPC AI — recepcionista inteligente ─────────────────────────── */
+/** ─── SPenCer — recepcionista inteligente (AI receptionist) ─────── */
 export const AI_RECEPTIONIST = {
-  name: "SPC AI",
+  name: "SPenCer",
   role: "Recepcionista inteligente",
-  tagline: "Responde al instante, 24/7",
+  tagline: "Te guía de la idea al WhatsApp, 24/7",
   greeting:
-    "¡Hola! 👋 Soy **SPC AI**, la recepcionista inteligente de SPC Impresores. Puedo explicarte nuestros servicios, tiempos, tirajes y cómo cotizar. ¿Qué necesitas imprimir hoy?",
+    "¡Hola! 👋 Soy **SPenCer**, la recepcionista inteligente de SPC Impresores. Te ayudo a encontrar el servicio perfecto para tu proyecto y te conecto con un asesor por WhatsApp. Para empezar: **¿qué necesitas imprimir?**",
   quickQuestions: [
-    "¿Qué servicios tienen?",
-    "¿Cómo pido una cotización?",
+    "Quiero cotizar packaging",
+    "Necesito imprimir libros",
+    "Tiraje corto / urgente",
     "¿Qué archivos debo enviar?",
-    "¿Hacen envíos al interior del país?",
   ],
-  disclaimer: "SPC AI orienta y educa. Para cifras exactas y cerrar tu pedido, un asesor humano te espera en WhatsApp.",
+  disclaimer: "SPenCer orienta y educa. Para cifras exactas y cerrar tu pedido, un asesor humano te espera en WhatsApp.",
 } as const;

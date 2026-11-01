@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Phone, Mail, MapPin, Clock3 } from "lucide-react";
 import { BRAND, CONTACT, NAV_LINKS, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
 import { WhatsAppIcon } from "./whatsapp-cta";
-import { openServiceDetail } from "./service-detail";
+import { SiteLink } from "./site-router";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -84,13 +84,12 @@ export function Footer() {
             <ul className="mt-5 space-y-2.5">
               {SERVICES.map((s) => (
                 <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => openServiceDetail(s.id)}
+                  <SiteLink
+                    to={`servicios/${s.id}`}
                     className="text-left text-[13.5px] font-medium text-white/65 transition-colors hover:text-white"
                   >
                     {s.title}
-                  </button>
+                  </SiteLink>
                 </li>
               ))}
             </ul>
