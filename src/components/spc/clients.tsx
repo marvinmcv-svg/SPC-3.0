@@ -8,61 +8,12 @@
  */
 
 import { motion } from "framer-motion";
-import { Star, BadgeCheck, MapPin, ShieldCheck, Truck, Factory, Sparkles, MessageSquareQuote } from "lucide-react";
-import { CLIENTS, TESTIMONIALS, type Client } from "@/lib/site-config";
-import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
+import { Star, BadgeCheck, MapPin, ShieldCheck, Truck, Factory, MessageSquareQuote } from "lucide-react";
+import { CLIENTS, TESTIMONIALS } from "@/lib/site-config";
+import { Reveal, WordsReveal, CharReveal, Eyebrow, TiltCard, Stagger, StaggerItem } from "./motion-primitives";
+import { ClientLogo, LogoMarquee } from "./client-logo";
+import { SpencerAvatar } from "./spencer-avatar";
 import { openSpcAi } from "./spc-ai-widget";
-
-/* ── Marca tipográfica premium (mientras se cargan los logos oficiales) ── */
-function ClientBadge({ client }: { client: Client }) {
-  return (
-    <div
-      className="group flex shrink-0 items-center gap-3.5 rounded-2xl border border-spc-900/8 bg-white/85 px-5 py-3.5 shadow-[0_2px_12px_-4px_rgba(12,27,77,0.08)] backdrop-blur-sm transition-all duration-500 hover:-translate-y-1 hover:border-spc-900/15 hover:shadow-[0_16px_36px_-12px_rgba(12,27,77,0.22)]"
-      title={client.note}
-    >
-      <span
-        aria-hidden
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl font-display text-[13px] font-extrabold tracking-tight text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_16px_-6px_rgba(6,15,46,0.35)] transition-transform duration-500 group-hover:scale-110"
-        style={{
-          background: `linear-gradient(140deg, ${client.color}e6, ${client.color})`,
-        }}
-      >
-        {client.initials}
-      </span>
-      <span className="flex min-w-0 flex-col">
-        <span className="font-display truncate text-[14px] font-bold tracking-tight text-spc-900">
-          {client.name}
-        </span>
-        <span className="truncate text-[10.5px] font-semibold uppercase tracking-[0.14em] text-spc-500">
-          {client.sector}
-        </span>
-      </span>
-    </div>
-  );
-}
-
-/* ── Fila infinita: contenido duplicado para loop perfecto ── */
-function MarqueeRow({ clients, reverse = false, slow = false }: { clients: readonly Client[]; reverse?: boolean; slow?: boolean }) {
-  const doubled = [...clients, ...clients];
-  return (
-    <div className="group relative overflow-hidden py-2.5" role="presentation">
-      {/* veladuras laterales */}
-      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-spc-50 via-spc-50/70 to-transparent sm:w-32" />
-      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-spc-50 via-spc-50/70 to-transparent sm:w-32" />
-      <div
-        className={
-          reverse
-            ? "animate-marquee-reverse flex w-max gap-4 group-hover:[animation-play-state:paused]"
-            : "animate-marquee-slow flex w-max gap-4 group-hover:[animation-play-state:paused]"
-        }
-      >
-        {doubled.map((client, i) => (
-          <ClientBadge key={`${client.id}-${i}`} client={client} />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 /* ── Tarjeta de reseña ── */
 function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index: number }) {
@@ -133,10 +84,50 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
 const TRUST_STATS = [
   { icon: Truck, value: "9 / 9", label: "Departamentos con entregas" },
   { icon: Factory, value: "+1.000", label: "Proyectos productivos al año" },
-  { icon: ShieldCheck, value: "24/7", label: "Atención vía SPC AI y WhatsApp" },
+  { icon: ShieldCheck, value: "24/7", label: "Atención vía SPenCer y WhatsApp" },
 ] as const;
 
-export function Clients() {
+const SECTOR_ORDER = ["Alimentos & Bebidas", "Farmacéutica", "Retail & QSR", "Editorial & Medios", "Banca & Finanzas"] as const;
+
+/** Muro completo de logos agrupado por sector (página /clientes) */
+export function LogoWall() {
+  return (
+    <div className="space-y-12">
+      {SECTOR_ORDER.map((sector) => {
+        const list = CLIENTS.filter((c) => c.sector === sector);
+        return (
+          <div key={sector}>
+            <Reveal y={16}>
+              <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.26em] text-spc-500">
+                <span className="h-px w-8 bg-spc-500/40" aria-hidden />
+                {sector}
+                <span className="text-spc-300">· {list.length}</span>
+              </p>
+            </Reveal>
+            <Stagger className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" stagger={0.07}>
+              {list.map((c) => (
+                <StaggerItem key={c.id}>
+                  <TiltCard maxTilt={10} scale={1.04} className="h-full">
+                    <div className="glossy-card flex h-full flex-col items-center gap-4 rounded-[1.4rem] p-5 text-center">
+                      <span aria-hidden className="glossy-sheen" />
+                      <ClientLogo client={c} size="md" mono={false} bare className="w-full" />
+                      <div>
+                        <p className="font-display text-[14px] font-bold text-spc-900">{c.name}</p>
+                        <p className="mt-1 text-[12px] leading-snug text-spc-900/55">{c.note}</p>
+                      </div>
+                    </div>
+                  </TiltCard>
+                </StaggerItem>
+              ))}
+            </Stagger>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function Clients({ showWall = false }: { showWall?: boolean }) {
   const half = Math.ceil(CLIENTS.length / 2);
   const rowA = CLIENTS.slice(0, half);
   const rowB = CLIENTS.slice(half);
@@ -158,7 +149,7 @@ export function Clients() {
         <div className="mx-auto max-w-2xl text-center">
           <Eyebrow>Clientes · toda Bolivia</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="Las marcas que Bolivia consume" />{" "}
+            <CharReveal text="Las marcas que Bolivia consume" stagger={0.018} />{" "}
             <WordsReveal text="imprimen con SPC." wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
@@ -174,8 +165,8 @@ export function Clients() {
         {/* marquee doble de marcas */}
         <Reveal delay={0.15} className="mt-12">
           <div className="relative">
-            <MarqueeRow clients={rowA} />
-            <MarqueeRow clients={rowB} reverse />
+            <LogoMarquee clients={rowA} fade="from-spc-50" />
+            <LogoMarquee clients={rowB} reverse fade="from-spc-50" />
           </div>
         </Reveal>
 
@@ -198,6 +189,12 @@ export function Clients() {
           ))}
         </div>
 
+        {showWall && (
+          <div className="mt-20">
+            <LogoWall />
+          </div>
+        )}
+
         {/* reseñas */}
         <div className="mt-16">
           <div className="mx-auto max-w-2xl text-center">
@@ -216,28 +213,27 @@ export function Clients() {
             ))}
           </div>
 
-          {/* puente al funnel: SPC AI */}
+          {/* puente al funnel: SPenCer */}
           <Reveal delay={0.1} className="mt-10">
             <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-[1.8rem] bg-gradient-to-r from-spc-900 via-spc-800 to-spc-900 p-7 text-center shadow-[0_30px_70px_-30px_rgba(6,15,46,0.6)] sm:flex-row sm:text-left">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-gold-400 to-gold-600 shadow-[0_12px_30px_-8px_rgba(255,179,28,0.65)]">
-                <Sparkles className="h-7 w-7 text-spc-900" aria-hidden />
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-spc-950 ring-1 ring-gold-400/50 shadow-[0_12px_30px_-8px_rgba(255,179,28,0.45)]">
+                <SpencerAvatar className="h-11 w-11" />
               </span>
               <div className="flex-1">
                 <p className="font-display text-[16px] font-bold text-white">
                   ¿Quieres ser la próxima historia de éxito?
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed text-white/70">
-                  Pregunta a <strong className="font-semibold text-gold-300">SPC AI</strong>, nuestra
-                  recepcionista inteligente: te explica servicios, tiempos y cómo empezar.
+                  Pregunta a <strong className="font-semibold text-gold-300">SPenCer</strong>, nuestro
+                  recepcionista con IA: arma tu cotización en 60 segundos y te conecta por WhatsApp.
                 </p>
               </div>
               <button
                 type="button"
-                onClick={openSpcAi}
+                onClick={() => openSpcAi()}
                 className="shine inline-flex shrink-0 items-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_30px_-8px_rgba(255,179,28,0.6)] transition-all duration-300 hover:-translate-y-0.5"
               >
-                <Sparkles className="h-4 w-4" aria-hidden />
-                Hablar con SPC AI
+                Hablar con SPenCer
               </button>
             </div>
           </Reveal>

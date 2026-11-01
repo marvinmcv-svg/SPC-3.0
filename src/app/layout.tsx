@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Sora, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SiteShell } from "@/components/spc/site-shell";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -21,7 +22,11 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SPC Impresores S.A. — Gráfica Industrial | Imprimiendo lo mejor de Bolivia",
+  metadataBase: new URL("https://www.spc.net.bo"),
+  title: {
+    default: "SPC Impresores S.A. — Gráfica Industrial | Imprimiendo lo mejor de Bolivia",
+    template: "%s · SPC Impresores",
+  },
   description:
     "Líderes de la industria gráfica en Bolivia desde 2001. Packaging de alimentos, farmacéutico y promocional, impresión comercial, libros HotMelt/PUR, revistas e impresión digital bajo demanda. Cotiza por WhatsApp.",
   keywords: [
@@ -62,7 +67,7 @@ export default function RootLayout({
         className={`${sora.variable} ${inter.variable} ${jetbrains.variable} antialiased bg-background text-foreground`}
         style={{ fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif" }}
       >
-        {children}
+        <SiteShell>{children}</SiteShell>
         <Toaster />
       </body>
     </html>

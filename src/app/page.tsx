@@ -1,43 +1,27 @@
-import { Navbar } from "@/components/spc/navbar";
 import { Hero } from "@/components/spc/hero";
 import { PillarsMarquee } from "@/components/spc/pillars-marquee";
 import { About } from "@/components/spc/about";
 import { Services } from "@/components/spc/services";
 import { Process } from "@/components/spc/process";
-import { Technology } from "@/components/spc/technology";
-import { Sectors } from "@/components/spc/sectors";
 import { Clients } from "@/components/spc/clients";
 import { Faq } from "@/components/spc/faq";
-import { FinalCta } from "@/components/spc/final-cta";
-import { Footer } from "@/components/spc/footer";
-import { WhatsappWidget } from "@/components/spc/whatsapp-widget";
-import { SpcAiWidget } from "@/components/spc/spc-ai-widget";
-import { ServiceDetail } from "@/components/spc/service-detail";
-import { MotionProvider } from "@/components/spc/motion-primitives";
+import { SpencerSection } from "@/components/spc/spencer-section";
+import { QuoteBuilder } from "@/components/spc/quote-builder";
+import { Manifesto } from "@/components/spc/manifesto";
 
 export default function Home() {
   return (
-    <MotionProvider>
-      <div className="flex min-h-svh flex-col bg-white">
-        <Navbar />
-        <main className="flex-1">
-          <Hero />
-          <PillarsMarquee />
-          <About />
-          <Services />
-          <Process />
-          <Technology />
-          <Sectors />
-          <Clients />
-          <Faq />
-          <FinalCta />
-        </main>
-        <Footer />
-        {/* Capa de conversión: widgets flotantes + páginas de detalle */}
-        <WhatsappWidget />
-        <SpcAiWidget />
-        <ServiceDetail />
-      </div>
-    </MotionProvider>
+    <>
+      <Hero />
+      <PillarsMarquee />
+      <Manifesto />
+      <Services limit={6} />
+      <SpencerSection />
+      <About />
+      <Clients />
+      <Process />
+      <QuoteBuilder />
+      <Faq />
+    </>
   );
 }

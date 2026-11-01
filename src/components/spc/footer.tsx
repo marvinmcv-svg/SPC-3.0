@@ -10,7 +10,7 @@ import Image from "next/image";
 import { Phone, Mail, MapPin, Clock3 } from "lucide-react";
 import { BRAND, CONTACT, NAV_LINKS, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
 import { WhatsAppIcon } from "./whatsapp-cta";
-import { openServiceDetail } from "./service-detail";
+import Link from "next/link";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -67,12 +67,12 @@ export function Footer() {
             <ul className="mt-5 space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-[13.5px] font-medium text-white/65 transition-colors hover:text-white"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -84,13 +84,12 @@ export function Footer() {
             <ul className="mt-5 space-y-2.5">
               {SERVICES.map((s) => (
                 <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => openServiceDetail(s.id)}
+                  <Link
+                    href={`/servicios/${s.id}`}
                     className="text-left text-[13.5px] font-medium text-white/65 transition-colors hover:text-white"
                   >
                     {s.title}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -100,6 +99,12 @@ export function Footer() {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">Contacto</p>
             <ul className="mt-5 space-y-3.5 text-[13.5px] text-white/65">
+              <li className="flex gap-3">
+                <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-gold-500" />
+                <a href={CONTACT.whatsappHref} target="_blank" rel="noopener noreferrer" className="font-semibold text-white/85 transition-colors hover:text-white">
+                  {CONTACT.whatsapp}
+                </a>
+              </li>
               <li className="flex gap-3">
                 <Phone className="mt-0.5 h-4 w-4 shrink-0 text-gold-500" aria-hidden />
                 <a href={CONTACT.phoneHref} className="transition-colors hover:text-white">

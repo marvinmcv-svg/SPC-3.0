@@ -2,229 +2,328 @@
 
 /**
  * ══════════════════════════════════════════════════════════════════
- *  NAVBAR — fija, transparente sobre hero → glass al hacer scroll
+ *  NAVBAR — fija, transparente sobre los heroes oscuros → glass al
+ *  hacer scroll. Mega-menú de servicios con imagen de producto y
+ *  menú móvil a pantalla completa con cascada animada.
  * ══════════════════════════════════════════════════════════════════
  */
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
-import { Menu, X, Phone, Sparkles } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BRAND, CONTACT, NAV_LINKS, WA_MESSAGES, waLink } from "@/lib/site-config";
-import { WhatsappCta, WhatsAppIcon } from "./whatsapp-cta";
-import { openSpcAi } from "./spc-ai-widget";
+import { BRAND, CONTACT, NAV_LINKS, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { WhatsappCta } from "./whatsapp-cta";
+import { openSpencer } from "./spencer";
+import { SpencerAvatar } from "./spencer-avatar";
+
+function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
+  const [hover, setHover] = useState(SERVICES[0].id);
+  const active = SERVICES.find((s) => s.id === hover) ?? SERVICES[0];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14, rotateX: -8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+      style={{ transformPerspective: 1200, transformOrigin: "top center" }}
+      className="absolute left-1/2 top-full mt-3 w-[min(880px,calc(100vw-48px))] -translate-x-1/2"
+    >
+      <div className="glossy-card grid grid-cols-[1.25fr_1fr] gap-2 overflow-hidden rounded-[1.6rem] p-2.5">
+        <ul className="grid grid-cols-1 gap-0.5 p-1.5">
+          {SERVICES.map((s, i) => (
+            <motion.li
+              key={s.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.03 * i }}
+            >
+              <Link
+                href={`/servicios/${s.id}`}
+                onMouseEnter={() => setHover(s.id)}
+                onFocus={() => setHover(s.id)}
+                onClick={onNavigate}
+                className={cn(
+                  "group flex items-center justify-between rounded-xl px-3.5 py-2.5 transition-colors",
+                  hover === s.id ? "bg-spc-50 text-spc-700" : "text-spc-900/80 hover:bg-spc-50/60"
+                )}
+              >
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate text-[13.5px] font-bold">{s.title}</span>
+                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-spc-400">{s.category}</span>
+                </span>
+                <ArrowUpRight
+                  className={cn("h-4 w-4 shrink-0 transition-all", hover === s.id ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0")}
+                  aria-hidden
+                />
+              </Link>
+            </motion.li>
+          ))}
+        </ul>
+        <div className="relative min-h-[360px] overflow-hidden rounded-[1.2rem] bg-spc-950">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.div
+              key={active.id}
+              initial={{ opacity: 0, scale: 1.12 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0"
+            >
+              <Image src={active.gallery[0].src} alt={active.gallery[0].alt} fill sizes="380px" className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-spc-950 via-spc-950/30 to-transparent" />
+            </motion.div>
+          </AnimatePresence>
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <p className="font-display text-[17px] font-bold text-white">{active.title}</p>
+                <p className="mt-1.5 line-clamp-3 text-[12.5px] leading-relaxed text-white/70">{active.description}</p>
+                <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gold-300">
+                  Desde {active.minRun.split(" (")[0]} · {active.turnaround.split(" según")[0]}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("#inicio");
+  const [mega, setMega] = useState(false);
 
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 24);
-      // sección activa
-      const ids = NAV_LINKS.map((l) => l.href.slice(1));
-      let current = ids[0];
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (el && window.scrollY >= el.offsetTop - 140) current = id;
-      }
-      setActive(`#${current}`);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Escape cierra el menú móvil (accesibilidad teclado)
+  // cerrar menús al cambiar de ruta (ajuste de estado durante el render)
+  const [lastPath, setLastPath] = useState(pathname);
+  if (lastPath !== pathname) {
+    setLastPath(pathname);
+    setOpen(false);
+    setMega(false);
+  }
+
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    if (!open && !mega) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setMega(false);
+      }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, mega]);
+
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+  const solid = scrolled || open;
 
   return (
-    <>
-      <motion.header
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-          scrolled ? "glass-nav shadow-[0_8px_32px_-16px_rgba(6,15,46,0.25)]" : "bg-transparent"
-        )}
-      >
-        {/* barra de progreso de lectura */}
-        <motion.div
-          style={{ scaleX: progress }}
-          className="scroll-progress absolute inset-x-0 top-0 h-[3px] origin-left bg-gradient-to-r from-gold-600 via-gold-500 to-gold-300"
-        />
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        solid ? "glass-nav shadow-[0_8px_32px_-16px_rgba(6,15,46,0.25)]" : "bg-transparent"
+      )}
+    >
+      <motion.div
+        style={{ scaleX: progress }}
+        className="scroll-progress absolute inset-x-0 top-0 h-[3px] origin-left bg-gradient-to-r from-gold-600 via-gold-500 to-gold-300"
+      />
 
-        <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8" aria-label="Principal">
-          {/* Logo */}
-          <a href="#inicio" className="flex shrink-0 items-center gap-3" aria-label={`${BRAND.name} — inicio`}>
-            <span
-              className={cn(
-                "flex items-center rounded-2xl p-1.5 transition-all duration-500",
-                scrolled ? "bg-white/95 shadow-[0_4px_20px_-6px_rgba(0,60,141,0.35)]" : "bg-white shadow-[0_6px_28px_-10px_rgba(0,0,0,0.45)]"
-              )}
-            >
-              <Image
-                src="/images/site/spc-logo.jpg"
-                alt={`Logo ${BRAND.name}`}
-                width={68}
-                height={36}
-                className="h-9 w-auto rounded-xl object-contain"
-                priority
-              />
+      <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8" aria-label="Principal">
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label={`${BRAND.name} — inicio`}>
+          <motion.span
+            whileHover={{ rotate: -4, scale: 1.05 }}
+            className={cn(
+              "flex items-center rounded-2xl p-1.5 transition-all duration-500",
+              solid ? "bg-white/95 shadow-[0_4px_20px_-6px_rgba(0,60,141,0.35)]" : "bg-white shadow-[0_6px_28px_-10px_rgba(0,0,0,0.45)]"
+            )}
+          >
+            <Image src="/images/site/spc-logo.jpg" alt={`Logo ${BRAND.name}`} width={68} height={36} className="h-9 w-auto rounded-xl object-contain" priority />
+          </motion.span>
+          <span className="hidden flex-col leading-tight md:flex">
+            <span className={cn("font-display text-[15px] font-bold tracking-tight transition-colors", solid ? "text-spc-800" : "text-white")}>
+              SPC <span className="sr-only">Impresores S.A.</span>
             </span>
-            <span className="hidden flex-col leading-tight md:flex">
-              <span className={cn("font-display text-[15px] font-bold tracking-tight transition-colors", scrolled ? "text-spc-800" : "text-white")}>
-                SPC <span className="sr-only">Impresores S.A.</span>
-              </span>
-              <span className={cn("text-[10px] font-semibold uppercase tracking-[0.24em] transition-colors", scrolled ? "text-gold-700" : "text-gold-300")}>
-                Gráfica Industrial
-              </span>
+            <span className={cn("text-[10px] font-semibold uppercase tracking-[0.24em] transition-colors", solid ? "text-gold-700" : "text-gold-300")}>
+              Gráfica Industrial
             </span>
-          </a>
+          </span>
+        </Link>
 
-          {/* Links escritorio */}
-          <ul className="hidden items-center gap-0.5 xl:flex">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
+        {/* escritorio */}
+        <ul className="hidden items-center gap-0.5 lg:flex">
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            const isMega = "mega" in link && link.mega;
+            return (
+              <li
+                key={link.href}
+                className="relative"
+                onMouseEnter={() => isMega && setMega(true)}
+                onMouseLeave={() => isMega && setMega(false)}
+              >
+                <Link
                   href={link.href}
+                  aria-expanded={isMega ? mega : undefined}
                   className={cn(
-                    "relative rounded-full px-3.5 py-2 text-[13px] font-semibold tracking-wide transition-colors duration-300",
-                    scrolled ? "text-spc-800/75 hover:text-spc-600" : "text-white/80 hover:text-white"
+                    "relative flex items-center gap-1 rounded-full px-4 py-2 text-[13.5px] font-semibold tracking-wide transition-colors duration-300",
+                    solid ? "text-spc-800/75 hover:text-spc-600" : "text-white/80 hover:text-white"
                   )}
                 >
-                  {active === link.href && (
+                  {active && (
                     <motion.span
                       layoutId="nav-pill"
-                      className={cn(
-                        "absolute inset-0 -z-10 rounded-full",
-                        scrolled ? "bg-spc-50 ring-1 ring-spc-600/15" : "bg-white/15 ring-1 ring-white/20"
-                      )}
+                      className={cn("absolute inset-0 -z-10 rounded-full", solid ? "bg-spc-50 ring-1 ring-spc-600/15" : "bg-white/15 ring-1 ring-white/20")}
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
                     />
                   )}
                   {link.label}
-                </a>
+                  {isMega && <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-300", mega && "rotate-180")} aria-hidden />}
+                </Link>
+                {isMega && (
+                  <AnimatePresence>{mega && <MegaMenu onNavigate={() => setMega(false)} />}</AnimatePresence>
+                )}
               </li>
-            ))}
-          </ul>
+            );
+          })}
+        </ul>
 
-          {/* CTA + acciones */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={openSpcAi}
-              className={cn(
-                "group hidden h-11 items-center gap-2 rounded-full pl-1.5 pr-4 text-[13px] font-bold transition-all duration-300 sm:flex",
-                scrolled
-                  ? "bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-spc-900 shadow-[0_6px_20px_-6px_rgba(255,179,28,0.6)] hover:-translate-y-0.5"
-                  : "bg-white/12 text-white ring-1 ring-white/30 backdrop-blur-md hover:bg-white/20"
-              )}
-              aria-label="Hablar con SPC AI, la recepcionista inteligente"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-spc-900">
-                <Sparkles className="h-4 w-4" aria-hidden />
-              </span>
-              SPC AI
-            </button>
-            <a
-              href={CONTACT.phoneHref}
-              className={cn(
-                "hidden h-11 w-11 items-center justify-center rounded-full transition-all duration-300 xl:flex",
-                scrolled
-                  ? "text-spc-700 ring-1 ring-spc-600/20 hover:bg-spc-50"
-                  : "text-white ring-1 ring-white/30 hover:bg-white/15"
-              )}
-              aria-label={`Llamar al ${CONTACT.phone}`}
-            >
-              <Phone className="h-[17px] w-[17px]" />
-            </a>
-            <WhatsappCta
-              href={waLink(WA_MESSAGES.general)}
-              variant="gold"
-              size="sm"
-              className="hidden sm:inline-flex"
-            >
-              Cotizar por WhatsApp
-            </WhatsappCta>
-            <button
-              onClick={() => setOpen(!open)}
-              className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-full transition-colors xl:hidden",
-                scrolled ? "text-spc-800 ring-1 ring-spc-600/20" : "text-white ring-1 ring-white/30"
-              )}
-              aria-expanded={open}
-              aria-controls="menu-movil"
-              aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            >
-              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </nav>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => openSpencer()}
+            className={cn(
+              "group hidden h-11 items-center gap-2 rounded-full pl-1 pr-4 text-[13px] font-bold transition-all duration-300 sm:flex",
+              solid
+                ? "bg-spc-950 text-white shadow-[0_6px_20px_-6px_rgba(6,15,46,0.5)] hover:-translate-y-0.5"
+                : "bg-white/12 text-white ring-1 ring-white/30 backdrop-blur-md hover:bg-white/20"
+            )}
+            aria-label="Hablar con SPenCer, el recepcionista con IA"
+          >
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-spc-800 ring-1 ring-gold-400/50">
+              <SpencerAvatar className="h-7 w-7" />
+            </span>
+            SPenCer
+          </button>
+          <a
+            href={CONTACT.phoneHref}
+            className={cn(
+              "hidden h-11 w-11 items-center justify-center rounded-full transition-all duration-300 xl:flex",
+              solid ? "text-spc-700 ring-1 ring-spc-600/20 hover:bg-spc-50" : "text-white ring-1 ring-white/30 hover:bg-white/15"
+            )}
+            aria-label={`Llamar al ${CONTACT.phone}`}
+          >
+            <Phone className="h-[17px] w-[17px]" />
+          </a>
+          <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="sm" className="hidden md:inline-flex">
+            Cotizar
+          </WhatsappCta>
+          <button
+            onClick={() => setOpen(!open)}
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-full transition-colors lg:hidden",
+              solid ? "text-spc-800 ring-1 ring-spc-600/20" : "text-white ring-1 ring-white/30"
+            )}
+            aria-expanded={open}
+            aria-controls="menu-movil"
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </nav>
 
-        {/* Menú móvil */}
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="glass-nav overflow-hidden xl:hidden"
-              id="menu-movil"
-            >
-              <ul className="space-y-1 px-6 pb-6 pt-2">
+      {/* móvil */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden lg:hidden"
+            id="menu-movil"
+          >
+            <div className="max-h-[calc(100svh-72px)] overflow-y-auto px-5 pb-8 pt-2">
+              <ul className="space-y-1">
                 {NAV_LINKS.map((link, i) => (
                   <motion.li
                     key={link.href}
-                    initial={{ x: -18, opacity: 0 }}
+                    initial={{ x: -24, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.05 * i, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ delay: 0.05 * i, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <a
+                    <Link
                       href={link.href}
-                      onClick={() => setOpen(false)}
-                      className="flex min-h-11 items-center justify-between rounded-xl px-4 py-3 text-[15px] font-semibold text-spc-800 transition-colors hover:bg-spc-50"
+                      className={cn(
+                        "flex min-h-12 items-center justify-between rounded-xl px-4 py-3 font-display text-[19px] font-bold transition-colors",
+                        isActive(link.href) ? "bg-spc-50 text-spc-600" : "text-spc-900 hover:bg-spc-50"
+                      )}
                     >
                       {link.label}
-                      <WhatsAppIcon className="h-4 w-4 text-spc-300" />
-                    </a>
+                      <ArrowUpRight className="h-4 w-4 text-spc-300" aria-hidden />
+                    </Link>
                   </motion.li>
                 ))}
-                <li className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpen(false);
-                      openSpcAi();
-                    }}
-                    className="flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_28px_-8px_rgba(255,179,28,0.6)]"
-                  >
-                    <Sparkles className="h-4.5 w-4.5" aria-hidden />
-                    Preguntar a SPC AI
-                  </button>
-                </li>
-                <li className="pt-3">
-                  <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="md" className="w-full">
-                    Cotizar por WhatsApp
-                  </WhatsappCta>
-                </li>
               </ul>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.header>
-    </>
+              <p className="mt-5 px-4 text-[10.5px] font-bold uppercase tracking-[0.2em] text-spc-400">Servicios</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {SERVICES.map((s, i) => (
+                  <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.03 }}>
+                    <Link href={`/servicios/${s.id}`} className="flex items-center gap-2.5 rounded-xl bg-spc-50/70 p-2 text-[12.5px] font-semibold text-spc-800">
+                      <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg">
+                        <Image src={s.gallery[0].src} alt="" fill sizes="36px" className="object-cover" />
+                      </span>
+                      <span className="leading-tight">{s.shortTitle}</span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-5 grid gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    openSpencer();
+                  }}
+                  className="flex w-full items-center justify-center gap-2.5 rounded-full bg-spc-950 px-6 py-3.5 text-[14px] font-bold text-white"
+                >
+                  <SpencerAvatar className="h-6 w-6" />
+                  Cotizar con SPenCer
+                </button>
+                <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="md" className="w-full">
+                  WhatsApp {CONTACT.whatsapp}
+                </WhatsappCta>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }

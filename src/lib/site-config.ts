@@ -4,10 +4,8 @@
  * ══════════════════════════════════════════════════════════════════
  *  Datos de marca, contacto y funnel de WhatsApp.
  *
- *  ⚠️  IMPORTANTE — NÚMERO DE WHATSAPP:
- *  Reemplaza WHATSAPP_NUMBER con la línea móvil real de la empresa
- *  (formato internacional SIN "+", espacios ni guiones).
- *  Actualmente usa el número publicado de la empresa: +591 2 2111121
+ *  NÚMERO DE WHATSAPP: línea comercial +591 77165787
+ *  (formato internacional SIN "+", espacios ni guiones en WHATSAPP_NUMBER).
  * ══════════════════════════════════════════════════════════════════
  */
 
@@ -29,12 +27,14 @@ export const CONTACT = {
   addressFull: "Edificio SPC, Av. Saavedra N.º 2411, Zona Miraflores, La Paz — Bolivia",
   hours: "Lun – Vie · 8:00 a 18:00",
   website: "www.spc.net.bo",
+  whatsapp: "+591 77165787",
+  whatsappHref: "https://wa.me/59177165787",
 } as const;
 
 /** ─── FUNNEL DE WHATSAPP ───────────────────────────────────────────
  *  Cambia aquí el número y todos los CTA del sitio se actualizan.
  */
-export const WHATSAPP_NUMBER = "5912211121"; // ← REEMPLAZAR con la línea WhatsApp real (ej. 591XXXXXXXX)
+export const WHATSAPP_NUMBER = "59177165787";
 
 export function waLink(message: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -79,9 +79,22 @@ export type Service = {
   specs: string[]; // especificaciones técnicas educativas
   useCases: string[]; // casos de uso
   deepFaqs: ServiceFaq[]; // preguntas frecuentes del servicio
+  /** Galería de producto real (marcas cliente + fotos de producción) */
+  gallery: GalleryImage[];
+  /** Clientes (ids de CLIENTS) que imprimen esta línea con SPC */
+  brands: string[];
 };
 
-export const SERVICES: Service[] = [
+export type GalleryImage = {
+  src: string;
+  alt: string;
+  /** Marca del producto mostrado, si aplica */
+  brand?: string;
+  /** Crédito de la foto (licencias Creative Commons) */
+  credit?: string;
+};
+
+const SERVICE_DATA: Omit<Service, "gallery" | "brands">[] = [
   {
     id: "packaging-alimentos",
     title: "Packaging de Alimentos",
@@ -402,6 +415,74 @@ export const SERVICES: Service[] = [
   },
 ];
 
+/** ─── GALERÍAS DE PRODUCTO REAL POR SERVICIO ─────────────────────
+ *  Fotos de producto de marcas cliente (estuches, libros…) + fotos de
+ *  producción con licencia Creative Commons (crédito en `credit`).
+ */
+const SERVICE_GALLERIES: Record<string, GalleryImage[]> = {
+  "packaging-alimentos": [
+    { src: "/images/services/food-packaging.jpg", alt: "Cajas de alimentos impresas en planta SPC" },
+    { src: "/images/products/food-copacabana-papas.jpg", alt: "Caja de papas fritas de grado alimentario", brand: "Pollos Copacabana" },
+  ],
+  "packaging-farmaceutico": [
+    { src: "/images/products/pharma-vita-azitrovita.jpg", alt: "Estuche AzitroVITA 500 mg", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-alerden.jpg", alt: "Estuche y frasco Alerden VITA", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-calmitol.jpg", alt: "Estuche Calmitol-n con blíster", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-calcio.jpg", alt: "Caja de Calcio Gluconato 10 % inyectable", brand: "Laboratorios Vita" },
+    { src: "/images/services/pharma-packaging.jpg", alt: "Estuches farmacéuticos en producción SPC" },
+  ],
+  "packaging-comercial": [
+    { src: "/images/services/promo-packaging.jpg", alt: "Cajas regalo y packaging promocional SPC" },
+    { src: "/images/products/promo-copacabana-balde.jpg", alt: "Campaña con balde y caja impresos de marca", brand: "Pollos Copacabana" },
+  ],
+  "paper-bags": [
+    { src: "/images/services/paper-bags.jpg", alt: "Bolsas de papel con asas impresas por SPC" },
+  ],
+  "impresos-comerciales": [
+    { src: "/images/services/stationery.jpg", alt: "Papelería corporativa homologada" },
+  ],
+  libros: [
+    { src: "/images/products/book-gisbert-historia-bolivia.jpg", alt: "Historia de Bolivia — Editorial Gisbert", brand: "Editorial Gisbert" },
+    { src: "/images/products/book-gisbert-madidi.jpg", alt: "Madidi — libro de gran formato", brand: "Editorial Gisbert" },
+    { src: "/images/products/book-gisbert-baldor.jpg", alt: "Aritmética de Baldor, 3.ª edición", brand: "Editorial Gisbert" },
+    { src: "/images/products/book-gisbert-politicas.jpg", alt: "Breve historia de las políticas públicas en Bolivia", brand: "Editorial Gisbert" },
+    { src: "/images/products/book-gisbert-esfera.jpg", alt: "La esfera de cristal — literatura infantil", brand: "Editorial Gisbert" },
+    { src: "/images/products/book-gisbert-cuento.jpg", alt: "El cuento que nunca se contó", brand: "Editorial Gisbert" },
+  ],
+  revistas: [
+    { src: "/images/services/magazines.jpg", alt: "Revistas y catálogos en couché" },
+  ],
+  calendarios: [
+    { src: "/images/services/calendars.jpg", alt: "Calendarios corporativos de pared y escritorio" },
+  ],
+  "impresion-digital": [
+    { src: "/images/services/digital-print.jpg", alt: "Impresión digital bajo demanda" },
+  ],
+};
+
+/** Qué marcas cliente imprimen cada línea (ids de CLIENTS) */
+const SERVICE_BRANDS: Record<string, string[]> = {
+  "packaging-alimentos": ["cbn", "pil-andina", "delicia", "arcor", "coripati"],
+  "packaging-farmaceutico": ["vita", "bago", "inti", "terbol"],
+  "packaging-comercial": ["arcor", "cbn", "hipermaxi", "copacabana"],
+  "paper-bags": ["hipermaxi", "icnorte", "copacabana"],
+  "impresos-comerciales": ["bnb", "icnorte", "hipermaxi", "inti"],
+  libros: ["gisbert"],
+  revistas: ["eldeber", "lostiempos", "gisbert"],
+  calendarios: ["bnb", "cbn", "vita", "terbol"],
+  "impresion-digital": ["eldeber", "hipermaxi", "bnb"],
+};
+
+export const SERVICES: Service[] = SERVICE_DATA.map((s) => ({
+  ...s,
+  gallery: SERVICE_GALLERIES[s.id] ?? [{ src: s.image, alt: s.title }],
+  brands: SERVICE_BRANDS[s.id] ?? [],
+}));
+
+export function getService(id: string): Service | undefined {
+  return SERVICES.find((s) => s.id === id);
+}
+
 /** ─── SECTORES ATENDIDOS ─────────────────────────────────────────── */
 export const SECTORS = [
   { id: "alimentos", label: "Alimentos & Bebidas", detail: "Envases con certificación de grado alimentario" },
@@ -454,13 +535,11 @@ export const STATS = [
 
 /** ─── NAV ────────────────────────────────────────────────────────── */
 export const NAV_LINKS = [
-  { href: "#inicio", label: "Inicio" },
-  { href: "#nosotros", label: "Nosotros" },
-  { href: "#servicios", label: "Servicios" },
-  { href: "#proceso", label: "Proceso" },
-  { href: "#clientes", label: "Clientes" },
-  { href: "#faq", label: "Preguntas" },
-  { href: "#contacto", label: "Contacto" },
+  { href: "/", label: "Inicio" },
+  { href: "/servicios", label: "Servicios", mega: true },
+  { href: "/nosotros", label: "Nosotros" },
+  { href: "/clientes", label: "Clientes" },
+  { href: "/contacto", label: "Contacto" },
 ] as const;
 
 /** ─── CLIENTES — marcas nacionales que imprimen con SPC ──────────────
@@ -474,26 +553,32 @@ export type Client = {
   initials: string;
   color: string;
   note: string;
+  /** Logo oficial (en /public/images/clients). Sin logo → monograma de marca */
+  logo?: string;
 };
 
-export const CLIENTS = [
+export const CLIENTS: readonly Client[] = [
   { id: "cbn", name: "Cervecería Boliviana Nacional", sector: "Alimentos & Bebidas", initials: "CBN", color: "#d6001c", note: "Cajas y cartones para sus marcas Paceña y Taquiña" },
   { id: "pil-andina", name: "Pil Andina", sector: "Alimentos & Bebidas", initials: "PA", color: "#004b93", note: "Etiquetas y envases para bebidas Pepsico" },
   { id: "delicia", name: "Delicia", sector: "Alimentos & Bebidas", initials: "D", color: "#e30613", note: "Packaging de galletas, chocolates y confitería" },
-  { id: "arcor", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas" },
+  { id: "arcor", logo: "/images/clients/arcor.png", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas" },
   { id: "coripati", name: "Fideos Coripati", sector: "Alimentos & Bebidas", initials: "FC", color: "#f5a300", note: "Envases para líneas de pastas alimenticias" },
-  { id: "bago", name: "Laboratorios Bagó", sector: "Farmacéutica", initials: "B", color: "#00539f", note: "Estuches de medicamentos con validación técnica" },
-  { id: "inti", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote" },
-  { id: "terbol", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica" },
-  { id: "vita", name: "Laboratorios Vita", sector: "Farmacéutica", initials: "V", color: "#009640", note: "Envases y prospectos farmacéuticos" },
-  { id: "hipermaxi", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca" },
-  { id: "icnorte", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada" },
+  { id: "bago", logo: "/images/clients/bago.svg", name: "Laboratorios Bagó", sector: "Farmacéutica", initials: "B", color: "#00539f", note: "Estuches de medicamentos con validación técnica" },
+  { id: "inti", logo: "/images/clients/inti.png", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote" },
+  { id: "terbol", logo: "/images/clients/terbol.png", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica" },
+  { id: "vita", logo: "/images/clients/vita.png", name: "Laboratorios Vita", sector: "Farmacéutica", initials: "V", color: "#009640", note: "Envases y prospectos farmacéuticos" },
+  { id: "hipermaxi", logo: "/images/clients/hipermaxi.png", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca" },
+  { id: "icnorte", logo: "/images/clients/icnorte.png", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada" },
   { id: "copacabana", name: "Pollos Copacabana", sector: "Retail & QSR", initials: "PC", color: "#ed1c24", note: "Envases e impresos para puntos de venta" },
-  { id: "lostiempos", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales" },
-  { id: "eldeber", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas" },
-  { id: "gisbert", name: "Editorial Gisbert", sector: "Editorial & Medios", initials: "EG", color: "#8a4b2a", note: "Libros de texto emblocados HotMelt/PUR" },
+  { id: "lostiempos", logo: "/images/clients/lostiempos.png", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales" },
+  { id: "eldeber", logo: "/images/clients/eldeber.png", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas" },
+  { id: "gisbert", logo: "/images/clients/gisbert.png", name: "Editorial Gisbert", sector: "Editorial & Medios", initials: "EG", color: "#8a4b2a", note: "Libros de texto emblocados HotMelt/PUR" },
   { id: "bnb", name: "Banco Nacional de Bolivia", sector: "Banca & Finanzas", initials: "BNB", color: "#0033a0", note: "Papelería corporativa homologada y documentos" },
-] as const satisfies readonly Client[];
+];
+
+export function getClient(id: string): Client | undefined {
+  return CLIENTS.find((c) => c.id === id);
+}
 
 /** ─── TESTIMONIOS de clientes ──────────────────────────────────────
  *  ⚠️ Contenido representativo: reemplaza por reseñas verificadas
@@ -623,18 +708,29 @@ export const GENERAL_FAQS = [
   },
 ] as const;
 
-/** ─── SPC AI — recepcionista inteligente ─────────────────────────── */
+/** ─── SPenCer — recepcionista con IA + funnel de ventas ────────────
+ *  SPenCer guía al visitante en 5 pasos (servicio → cantidad → fecha →
+ *  extras → datos) y cierra entregando el brief completo por WhatsApp.
+ */
 export const AI_RECEPTIONIST = {
-  name: "SPC AI",
-  role: "Recepcionista inteligente",
-  tagline: "Responde al instante, 24/7",
+  name: "SPenCer",
+  role: "Recepcionista IA de SPC",
+  tagline: "Cotiza en 60 segundos, 24/7",
   greeting:
-    "¡Hola! 👋 Soy **SPC AI**, la recepcionista inteligente de SPC Impresores. Puedo explicarte nuestros servicios, tiempos, tirajes y cómo cotizar. ¿Qué necesitas imprimir hoy?",
+    "¡Hola! 👋 Soy **SPenCer**, el recepcionista con IA de SPC Impresores. En menos de un minuto armo tu solicitud de cotización y te conecto con un asesor por WhatsApp. **¿Qué te gustaría imprimir?**",
   quickQuestions: [
     "¿Qué servicios tienen?",
     "¿Cómo pido una cotización?",
     "¿Qué archivos debo enviar?",
     "¿Hacen envíos al interior del país?",
   ],
-  disclaimer: "SPC AI orienta y educa. Para cifras exactas y cerrar tu pedido, un asesor humano te espera en WhatsApp.",
+  disclaimer: "SPenCer orienta y arma tu brief. Precios y fechas finales los confirma un asesor humano por WhatsApp.",
+} as const;
+
+/** Opciones del funnel de SPenCer */
+export const FUNNEL = {
+  quantities: ["Menos de 500", "500 – 2.000", "2.000 – 10.000", "Más de 10.000", "Aún no lo sé"],
+  deadlines: ["Esta semana (urgente)", "En 2 semanas", "Este mes", "Sin fecha fija"],
+  extras: ["Necesito diseño", "Muestra / prueba de color", "Acabado premium", "Entrega fuera de La Paz", "Datos variables / numeración"],
+  cities: ["La Paz", "El Alto", "Santa Cruz", "Cochabamba", "Oruro", "Potosí", "Sucre", "Tarija", "Beni", "Pando"],
 } as const;

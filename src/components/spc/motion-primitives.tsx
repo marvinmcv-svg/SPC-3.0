@@ -644,3 +644,251 @@ export function RingCarousel({
     </div>
   );
 }
+
+/* ────────────────────────────────────────────────────────────────
+   CHAR REVEAL — titular letra por letra con giro 3D (rotateX)
+   ──────────────────────────────────────────────────────────────── */
+export function CharReveal({
+  text,
+  className,
+  charClassName,
+  delay = 0,
+  stagger = 0.022,
+  once = true,
+  animateOnMount = false,
+}: {
+  text: string;
+  className?: string;
+  charClassName?: string;
+  delay?: number;
+  stagger?: number;
+  once?: boolean;
+  /** true = anima al montar (heros), false = al entrar en vista */
+  animateOnMount?: boolean;
+}) {
+  const words = text.split(" ");
+  let charIndex = 0;
+  const trigger = animateOnMount
+    ? { initial: "hidden", animate: "visible" }
+    : { initial: "hidden", whileInView: "visible", viewport: { once, margin: "-60px" } };
+  return (
+    <motion.span
+      className={cn("inline-block", className)}
+      style={{ perspective: 600 }}
+      aria-label={text}
+      variants={{ visible: { transition: { staggerChildren: stagger, delayChildren: delay } } }}
+      {...trigger}
+    >
+      {words.map((word, wi) => (
+        <span key={wi} className="inline-block whitespace-nowrap" aria-hidden>
+          {Array.from(word).map((ch) => {
+            charIndex += 1;
+            return (
+              <motion.span
+                key={charIndex}
+                className={cn("inline-block origin-bottom will-change-transform", charClassName)}
+                variants={{
+                  hidden: { opacity: 0, y: "0.6em", rotateX: -80, filter: "blur(6px)" },
+                  visible: {
+                    opacity: 1,
+                    y: "0em",
+                    rotateX: 0,
+                    filter: "blur(0px)",
+                    transition: { type: "spring", stiffness: 260, damping: 22 },
+                  },
+                }}
+              >
+                {ch}
+              </motion.span>
+            );
+          })}
+          {wi < words.length - 1 && <span className="inline-block">{" "}</span>}
+        </span>
+      ))}
+    </motion.span>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SCROLL HIGHLIGHT — párrafo que se "enciende" palabra por palabra
+   mientras haces scroll (efecto keynote de Apple)
+   ──────────────────────────────────────────────────────────────── */
+function HighlightWord({
+  word,
+  progress,
+  range,
+  accent,
+}: {
+  word: string;
+  progress: MotionValue<number>;
+  range: [number, number];
+  accent: boolean;
+}) {
+  const opacity = useTransform(progress, range, [0.14, 1]);
+  const y = useTransform(progress, range, [6, 0]);
+  return (
+    <motion.span style={{ opacity, y }} className={cn("inline-block", accent && "text-gradient-gold")}>
+      {word}
+      {" "}
+    </motion.span>
+  );
+}
+
+export function ScrollHighlight({
+  text,
+  className,
+  accentWords = [],
+}: {
+  text: string;
+  className?: string;
+  /** Palabras que se pintan en dorado al encenderse */
+  accentWords?: string[];
+}) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.85", "end 0.45"] });
+  const words = text.split(" ");
+  return (
+    <p ref={ref} className={cn("flex flex-wrap", className)} aria-label={text}>
+      {words.map((w, i) => {
+        const start = i / words.length;
+        const end = start + 1 / words.length;
+        const clean = w.replace(/[.,;:!?¡¿—]/g, "").toLowerCase();
+        return (
+          <HighlightWord
+            key={i}
+            word={w}
+            progress={scrollYProgress}
+            range={[start, end]}
+            accent={accentWords.some((a) => a.toLowerCase() === clean)}
+          />
+        );
+      })}
+    </p>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   IMAGE REVEAL — imagen que se descubre con barrido (clip-path) +
+   zoom-out cinematográfico al entrar en vista
+   ──────────────────────────────────────────────────────────────── */
+export function ImageReveal({
+  src,
+  alt,
+  className,
+  imgClassName,
+  sizes = "100vw",
+  priority = false,
+  direction = "up",
+  delay = 0,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  sizes?: string;
+  priority?: boolean;
+  direction?: "up" | "left" | "right";
+  delay?: number;
+}) {
+  const hidden =
+    direction === "up"
+      ? "inset(100% 0% 0% 0% round 1.6rem)"
+      : direction === "left"
+        ? "inset(0% 100% 0% 0% round 1.6rem)"
+        : "inset(0% 0% 0% 100% round 1.6rem)";
+  return (
+    <motion.div
+      className={cn("relative overflow-hidden", className)}
+      initial={{ clipPath: hidden }}
+      whileInView={{ clipPath: "inset(0% 0% 0% 0% round 1.6rem)" }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 1.25, delay, ease: [0.77, 0, 0.18, 1] }}
+    >
+      <motion.div
+        className="absolute inset-0"
+        initial={{ scale: 1.28 }}
+        whileInView={{ scale: 1 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 1.8, delay, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className={cn("object-cover", imgClassName)} />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   STAGGER — contenedor + item: los hijos entran en cascada
+   ──────────────────────────────────────────────────────────────── */
+export function Stagger({
+  children,
+  className,
+  stagger = 0.09,
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  stagger?: number;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-70px" }}
+      variants={{ visible: { transition: { staggerChildren: stagger, delayChildren: delay } } }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <motion.div
+      className={className}
+      variants={{
+        hidden: { opacity: 0, y: 46, scale: 0.94, rotateX: 12, filter: "blur(8px)" },
+        visible: {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          rotateX: 0,
+          filter: "blur(0px)",
+          transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] },
+        },
+      }}
+      style={{ transformPerspective: 1000 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
+   GLOSSY CARD — tarjeta 3D estilo Apple lista para usar:
+   TiltCard + superficie glossy (claro u oscuro) + reflejo especular
+   ──────────────────────────────────────────────────────────────── */
+export function GlossyCard({
+  children,
+  className,
+  innerClassName,
+  dark = false,
+  maxTilt = 8,
+}: {
+  children: ReactNode;
+  className?: string;
+  innerClassName?: string;
+  dark?: boolean;
+  maxTilt?: number;
+}) {
+  return (
+    <TiltCard maxTilt={maxTilt} scale={1.02} className={cn("h-full", className)}>
+      <div className={cn(dark ? "glossy-dark" : "glossy-card", "h-full rounded-[1.6rem]", innerClassName)}>
+        <span aria-hidden className="glossy-sheen" />
+        {children}
+      </div>
+    </TiltCard>
+  );
+}
