@@ -48,7 +48,7 @@ export function ClientLogo({
         <span className="relative block h-[62%] w-full">
           <Image
             src={client.logo}
-            alt={`Logo ${client.name}`}
+            alt={client.name}
             fill
             sizes="200px"
             className="object-contain"

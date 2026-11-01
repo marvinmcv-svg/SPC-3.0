@@ -11,26 +11,32 @@ import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { CharReveal } from "./motion-primitives";
+import { pick, useI18n, type Localized } from "@/lib/i18n";
 
 export function PageHero({
-  eyebrow,
-  title,
-  accent,
-  description,
+  eyebrow: eyebrowL,
+  title: titleL,
+  accent: accentL,
+  description: descriptionL,
   image,
   crumbs = [],
   children,
 }: {
-  eyebrow: string;
-  title: string;
+  eyebrow: Localized;
+  title: Localized;
   /** segunda línea del titular, en dorado */
-  accent?: string;
-  description?: string;
+  accent?: Localized;
+  description?: Localized;
   image: string;
-  crumbs?: { href?: string; label: string }[];
+  crumbs?: { href?: string; label: Localized }[];
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
+  const { lang, t } = useI18n();
+  const eyebrow = pick(lang, eyebrowL);
+  const title = pick(lang, titleL);
+  const accent = accentL ? pick(lang, accentL) : undefined;
+  const description = descriptionL ? pick(lang, descriptionL) : undefined;
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "25%"]);
@@ -54,24 +60,24 @@ export function PageHero({
 
       <motion.div style={{ opacity: fade }} className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
         <motion.nav
-          aria-label="Migas de pan"
+          aria-label={t("Migas de pan", "Breadcrumb")}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="flex flex-wrap items-center gap-1.5 text-[12px] font-semibold text-white/55"
         >
           <Link href="/" className="hover:text-white">
-            Inicio
+            {t("Inicio", "Home")}
           </Link>
-          {crumbs.map((c) => (
-            <span key={c.label} className="flex items-center gap-1.5">
+          {crumbs.map((c, k) => (
+            <span key={k} className="flex items-center gap-1.5">
               <ChevronRight className="h-3.5 w-3.5" aria-hidden />
               {c.href ? (
                 <Link href={c.href} className="hover:text-white">
-                  {c.label}
+                  {pick(lang, c.label)}
                 </Link>
               ) : (
-                <span className="text-gold-300">{c.label}</span>
+                <span className="text-gold-300">{pick(lang, c.label)}</span>
               )}
             </span>
           ))}

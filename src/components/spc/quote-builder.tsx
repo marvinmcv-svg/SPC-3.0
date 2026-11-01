@@ -11,8 +11,10 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, CheckCheck, ShieldCheck, Clock3, Sparkles } from "lucide-react";
-import { CONTACT, FUNNEL, SERVICES, waLink } from "@/lib/site-config";
-import { buildQuoteMessage, formatDateEs } from "@/lib/quote";
+import { CONTACT, waLink } from "@/lib/site-config";
+import { QUOTE_LABELS, buildQuoteMessage, formatDateEs } from "@/lib/quote";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./whatsapp-cta";
 import { CharReveal, Reveal, Eyebrow } from "./motion-primitives";
@@ -39,6 +41,10 @@ export function QuoteBuilder({
   compactHeading?: boolean;
 }) {
   const uid = useId();
+  const { t, lang } = useI18n();
+  const { services: SERVICES, funnel: FUNNEL } = useContent();
+  const QL = QUOTE_LABELS[lang];
+  const locale = lang === "en" ? "en-US" : "es-BO";
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [serviceId, setServiceId] = useState(defaultServiceId ?? "");
@@ -63,15 +69,15 @@ export function QuoteBuilder({
       name,
       company,
       serviceId: serviceId || undefined,
-      quantity: `${qty.toLocaleString("es-BO")} unidades`,
-      deadline: formatDateEs(date),
+      quantity: `${qty.toLocaleString(locale)} ${QL.units}`,
+      deadline: formatDateEs(date, lang),
       city,
       extras,
       comments,
     }),
-    [name, company, serviceId, qty, date, city, extras, comments]
+    [name, company, serviceId, qty, date, city, extras, comments, lang, locale, QL.units]
   );
-  const message = buildQuoteMessage(brief);
+  const message = buildQuoteMessage(brief, "form", lang);
   const href = waLink(message);
   const service = SERVICES.find((s) => s.id === serviceId);
 
@@ -80,18 +86,18 @@ export function QuoteBuilder({
 
   /* líneas de la vista previa (clave → texto) */
   const preview: [string, string][] = [
-    ["intro", "Hola, SPC Impresores. Me gustaría cotizar un proyecto de impresión."],
+    ["intro", QL.intro],
     ["gap1", ""],
-    ["name", `Nombre: ${name || "…"}`],
-    ["company", `Empresa: ${company || "—"}`],
-    ["service", `Servicio: ${service?.title ?? "…"}`],
-    ["qty", `Cantidad: ${qty.toLocaleString("es-BO")} unidades`],
-    ["date", `Fecha objetivo: ${formatDateEs(date) || "…"}`],
-    ["city", `Ciudad de entrega: ${city}`],
-    ["extras", `Extras: ${extras.length ? extras.join(", ") : "—"}`],
-    ["comments", `Comentarios: ${comments || "—"}`],
+    ["name", `${QL.name}: ${name || "…"}`],
+    ["company", `${QL.company}: ${company || "—"}`],
+    ["service", `${QL.service}: ${service?.title ?? "…"}`],
+    ["qty", `${QL.qty}: ${qty.toLocaleString(locale)} ${QL.units}`],
+    ["date", `${QL.date}: ${formatDateEs(date, lang) || "…"}`],
+    ["city", `${QL.city}: ${city}`],
+    ["extras", `${QL.extras}: ${extras.length ? extras.join(", ") : "—"}`],
+    ["comments", `${QL.comments}: ${comments || "—"}`],
     ["gap2", ""],
-    ["thanks", "¡Gracias!"],
+    ["thanks", QL.thanks],
   ];
 
   const canSend = name.trim().length > 1 && !!serviceId;
@@ -100,7 +106,7 @@ export function QuoteBuilder({
     <section
       id={id}
       className="relative overflow-hidden bg-[#0d0b0a] py-24 text-white sm:py-28"
-      aria-label="Cotiza tu proyecto por WhatsApp"
+      aria-label={t("Cotiza tu proyecto por WhatsApp", "Get a quote for your project on WhatsApp")}
     >
       {/* atmósfera */}
       <div aria-hidden className="aurora -left-40 top-10 h-[420px] w-[420px] bg-spc-600/40" />
@@ -110,15 +116,17 @@ export function QuoteBuilder({
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         {!compactHeading && (
           <div className="mx-auto mb-14 max-w-2xl text-center">
-            <Eyebrow dark>Cotización en 1 minuto</Eyebrow>
+            <Eyebrow dark>{t("Cotización en 1 minuto", "Quote in 1 minute")}</Eyebrow>
             <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight">
-              <CharReveal text="Arma tu pedido." />{" "}
-              <CharReveal text="Envíalo por WhatsApp." charClassName="text-gold-400 [text-shadow:0_0_40px_rgba(255,196,79,0.45)]" delay={0.3} />
+              <CharReveal text={t("Arma tu pedido.", "Build your order.")} />{" "}
+              <CharReveal text={t("Envíalo por WhatsApp.", "Send it on WhatsApp.")} charClassName="text-gold-400 [text-shadow:0_0_40px_rgba(255,196,79,0.45)]" delay={0.3} />
             </h2>
             <Reveal delay={0.2}>
               <p className="mt-5 text-[15.5px] leading-relaxed text-white/65">
-                Completa lo que sepas — mira tu mensaje armarse en vivo — y continúa la conversación
-                con un asesor real. Sin formularios eternos, sin esperas.
+                {t(
+                  "Completa lo que sepas — mira tu mensaje armarse en vivo — y continúa la conversación con un asesor real. Sin formularios eternos, sin esperas.",
+                  "Fill in what you know — watch your message build live — and continue the conversation with a real advisor. No endless forms, no waiting."
+                )}
               </p>
             </Reveal>
           </div>
@@ -136,7 +144,7 @@ export function QuoteBuilder({
             >
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor={`${uid}-name`}>Nombre</Label>
+                  <Label htmlFor={`${uid}-name`}>{QL.name}</Label>
                   <input
                     id={`${uid}-name`}
                     value={name}
@@ -144,25 +152,25 @@ export function QuoteBuilder({
                     autoComplete="name"
                     required
                     className={cn(fieldBase, "h-[60px]")}
-                    placeholder="Tu nombre"
+                    placeholder={t("Tu nombre", "Your name")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor={`${uid}-company`}>Empresa (opcional)</Label>
+                  <Label htmlFor={`${uid}-company`}>{t("Empresa (opcional)", "Company (optional)")}</Label>
                   <input
                     id={`${uid}-company`}
                     value={company}
                     onChange={(e) => { setCompany(e.target.value); touch("company"); }}
                     autoComplete="organization"
                     className={cn(fieldBase, "h-[60px]")}
-                    placeholder="Marca o empresa"
+                    placeholder={t("Marca o empresa", "Brand or company")}
                   />
                 </div>
               </div>
 
               <div className="grid gap-5 sm:grid-cols-3">
                 <div className="sm:col-span-1">
-                  <Label htmlFor={`${uid}-service`}>Servicio</Label>
+                  <Label htmlFor={`${uid}-service`}>{QL.service}</Label>
                   <select
                     id={`${uid}-service`}
                     value={serviceId}
@@ -171,7 +179,7 @@ export function QuoteBuilder({
                     className={cn(fieldBase, "h-[60px] appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22white%22 stroke-width=%222.5%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:14px] bg-[right_1rem_center] bg-no-repeat pr-10 [&>option]:bg-spc-950")}
                   >
                     <option value="" disabled>
-                      Elegir…
+                      {t("Elegir…", "Choose…")}
                     </option>
                     {SERVICES.map((s) => (
                       <option key={s.id} value={s.id}>
@@ -181,7 +189,7 @@ export function QuoteBuilder({
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor={`${uid}-date`}>Fecha objetivo</Label>
+                  <Label htmlFor={`${uid}-date`}>{QL.date}</Label>
                   <input
                     id={`${uid}-date`}
                     type="date"
@@ -192,13 +200,13 @@ export function QuoteBuilder({
                   />
                 </div>
                 <div>
-                  <Label>Cantidad</Label>
+                  <Label>{QL.qty}</Label>
                   <div className={cn(fieldBase, "flex h-[60px] items-center justify-between px-2")}>
                     <button
                       type="button"
                       onClick={() => { setQty((q) => Math.max(1, q - step)); touch("qty"); }}
                       className="flex h-10 w-10 items-center justify-center rounded-xl text-gold-400 transition-colors hover:bg-white/10"
-                      aria-label="Disminuir cantidad"
+                      aria-label={t("Disminuir cantidad", "Decrease quantity")}
                     >
                       <Minus className="h-4 w-4" />
                     </button>
@@ -209,9 +217,9 @@ export function QuoteBuilder({
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 12, opacity: 0 }}
                         transition={{ duration: 0.18 }}
-                        aria-label="Cantidad"
+                        aria-label={QL.qty}
                         inputMode="numeric"
-                        value={qty.toLocaleString("es-BO")}
+                        value={qty.toLocaleString(locale)}
                         onChange={(e) => {
                           const n = Number(e.target.value.replace(/\D/g, ""));
                           setQty(Math.max(1, Math.min(1_000_000, n || 1)));
@@ -224,7 +232,7 @@ export function QuoteBuilder({
                       type="button"
                       onClick={() => { setQty((q) => Math.min(1_000_000, q + step)); touch("qty"); }}
                       className="flex h-10 w-10 items-center justify-center rounded-xl text-gold-400 transition-colors hover:bg-white/10"
-                      aria-label="Aumentar cantidad"
+                      aria-label={t("Aumentar cantidad", "Increase quantity")}
                     >
                       <Plus className="h-4 w-4" />
                     </button>
@@ -233,7 +241,7 @@ export function QuoteBuilder({
               </div>
 
               <div>
-                <Label>Ciudad de entrega</Label>
+                <Label>{QL.city}</Label>
                 <div className="flex flex-wrap gap-2">
                   {FUNNEL.cities.slice(0, 6).map((c) => (
                     <button
@@ -252,12 +260,12 @@ export function QuoteBuilder({
                     </button>
                   ))}
                   <select
-                    aria-label="Otra ciudad"
+                    aria-label={t("Otra ciudad", "Other city")}
                     value={FUNNEL.cities.slice(0, 6).includes(city as never) ? "" : city}
                     onChange={(e) => { if (e.target.value) { setCity(e.target.value); touch("city"); } }}
                     className="rounded-full border border-white/15 bg-transparent px-4 py-2.5 text-[13.5px] text-white/75 hover:border-white/35 focus:outline-none [&>option]:bg-spc-950"
                   >
-                    <option value="">Otra…</option>
+                    <option value="">{t("Otra…", "Other…")}</option>
                     {FUNNEL.cities.slice(6).map((c) => (
                       <option key={c} value={c}>
                         {c}
@@ -268,7 +276,7 @@ export function QuoteBuilder({
               </div>
 
               <div>
-                <Label>Necesito además</Label>
+                <Label>{t("Necesito además", "I also need")}</Label>
                 <div className="flex flex-wrap gap-2">
                   {FUNNEL.extras.map((x) => {
                     const on = extras.includes(x);
@@ -297,13 +305,13 @@ export function QuoteBuilder({
               </div>
 
               <div>
-                <Label htmlFor={`${uid}-comments`}>Comentarios (opcional)</Label>
+                <Label htmlFor={`${uid}-comments`}>{t("Comentarios (opcional)", "Comments (optional)")}</Label>
                 <textarea
                   id={`${uid}-comments`}
                   rows={4}
                   value={comments}
                   onChange={(e) => { setComments(e.target.value); touch("comments"); }}
-                  placeholder="Medidas, papel, acabados, referencias…"
+                  placeholder={t("Medidas, papel, acabados, referencias…", "Size, paper, finishes, references…")}
                   className={cn(fieldBase, "resize-y py-4")}
                 />
               </div>
@@ -317,7 +325,7 @@ export function QuoteBuilder({
                   className="shine inline-flex items-center gap-3 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-8 py-[18px] text-[13px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_18px_48px_-14px_rgba(37,211,102,0.75),inset_0_1px_0_rgba(255,255,255,0.35)] transition-opacity disabled:cursor-not-allowed disabled:opacity-45"
                 >
                   <WhatsAppIcon className="h-5 w-5" />
-                  Continuar en WhatsApp
+                  {t("Continuar en WhatsApp", "Continue on WhatsApp")}
                 </motion.button>
                 <button
                   type="button"
@@ -325,13 +333,13 @@ export function QuoteBuilder({
                   className="inline-flex items-center gap-2 rounded-full px-4 py-3 text-[13px] font-semibold text-gold-300 transition-colors hover:text-gold-200"
                 >
                   <Sparkles className="h-4 w-4" aria-hidden />
-                  ¿Dudas? Pregúntale a SPenCer
+                  {t("¿Dudas? Pregúntale a SPenCer", "Questions? Ask SPenCer")}
                 </button>
               </div>
               <p className="text-[13px] text-white/50">
                 {canSend
-                  ? "Tu cotización queda confirmada cuando nuestro equipo te responde por WhatsApp."
-                  : "Completa tu nombre y el servicio para continuar."}
+                  ? t("Tu cotización queda confirmada cuando nuestro equipo te responde por WhatsApp.", "Your quote is confirmed once our team replies on WhatsApp.")
+                  : t("Completa tu nombre y el servicio para continuar.", "Enter your name and the service to continue.")}
               </p>
             </form>
           </Reveal>
@@ -353,7 +361,7 @@ export function QuoteBuilder({
                   <p className="truncate text-[14px] font-semibold text-white">SPC Impresores · La Paz</p>
                   <p className="flex items-center gap-1.5 text-[12px] text-white/55">
                     <span className="h-1.5 w-1.5 rounded-full bg-[#4ce083]" aria-hidden />
-                    {CONTACT.whatsapp} · en línea
+                    {CONTACT.whatsapp} · {t("en línea", "online")}
                   </p>
                 </div>
               </div>
@@ -380,7 +388,7 @@ export function QuoteBuilder({
                     )
                   )}
                   <span className="mt-1.5 flex items-center justify-end gap-1 text-[10.5px] text-white/55">
-                    {new Date().toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date().toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
                     <CheckCheck className="h-3.5 w-3.5 text-[#53bdeb]" aria-hidden />
                   </span>
                 </div>
@@ -388,10 +396,10 @@ export function QuoteBuilder({
 
               <div className="mt-5 grid grid-cols-2 gap-3 text-[12px] text-white/65">
                 <span className="flex items-center gap-2">
-                  <Clock3 className="h-4 w-4 text-gold-400" aria-hidden /> Respuesta en minutos
+                  <Clock3 className="h-4 w-4 text-gold-400" aria-hidden /> {t("Respuesta en minutos", "Replies in minutes")}
                 </span>
                 <span className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-gold-400" aria-hidden /> Cotización gratuita
+                  <ShieldCheck className="h-4 w-4 text-gold-400" aria-hidden /> {t("Cotización gratuita", "Free quote")}
                 </span>
               </div>
             </motion.div>

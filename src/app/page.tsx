@@ -8,14 +8,17 @@ import { Faq } from "@/components/spc/faq";
 import { SpencerSection } from "@/components/spc/spencer-section";
 import { QuoteBuilder } from "@/components/spc/quote-builder";
 import { Manifesto } from "@/components/spc/manifesto";
+import { ProductWall, TrustBar } from "@/components/spc/social-proof";
 
 export default function Home() {
   return (
     <>
       <Hero />
       <PillarsMarquee />
+      <TrustBar />
       <Manifesto />
       <Services limit={6} />
+      <ProductWall />
       <SpencerSection />
       <About />
       <Clients />

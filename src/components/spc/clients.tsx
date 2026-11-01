@@ -9,14 +9,17 @@
 
 import { motion } from "framer-motion";
 import { Star, BadgeCheck, MapPin, ShieldCheck, Truck, Factory, MessageSquareQuote } from "lucide-react";
-import { CLIENTS, TESTIMONIALS } from "@/lib/site-config";
+import { type Client } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent, type SiteContent } from "@/lib/use-content";
 import { Reveal, WordsReveal, CharReveal, Eyebrow, TiltCard, Stagger, StaggerItem } from "./motion-primitives";
 import { ClientLogo, LogoMarquee } from "./client-logo";
 import { SpencerAvatar } from "./spencer-avatar";
 import { openSpcAi } from "./spc-ai-widget";
 
 /* ── Tarjeta de reseña ── */
-function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index: number }) {
+function TestimonialCard({ t, index }: { t: SiteContent["testimonials"][number]; index: number }) {
+  const { t: tr } = useI18n();
   const initials = t.name
     .split(" ")
     .map((w) => w[0])
@@ -33,7 +36,7 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
           </span>
 
           {/* estrellas */}
-          <div className="flex items-center gap-1" aria-label={`${t.stars} de 5 estrellas`}>
+          <div className="flex items-center gap-1" aria-label={`${t.stars} ${tr("de 5 estrellas", "out of 5 stars")}`}>
             {Array.from({ length: t.stars }).map((_, i) => (
               <motion.span
                 key={i}
@@ -63,7 +66,7 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 text-[13.5px] font-bold text-spc-900">
                 {t.name}
-                <BadgeCheck className="h-4 w-4 shrink-0 text-spc-500" aria-label="Cliente verificado" />
+                <BadgeCheck className="h-4 w-4 shrink-0 text-spc-500" aria-label={tr("Cliente", "Client")} />
               </p>
               <p className="truncate text-[11.5px] font-medium text-spc-900/55">
                 {t.role} · {t.company}
@@ -82,15 +85,16 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
 
 /* ── Cifras de confianza ── */
 const TRUST_STATS = [
-  { icon: Truck, value: "9 / 9", label: "Departamentos con entregas" },
-  { icon: Factory, value: "+1.000", label: "Proyectos productivos al año" },
-  { icon: ShieldCheck, value: "24/7", label: "Atención vía SPenCer y WhatsApp" },
+  { icon: Truck, value: "9 / 9", label: ["Departamentos con entregas", "Departments we deliver to"] },
+  { icon: Factory, value: "+1.000", label: ["Proyectos productivos al año", "Production projects per year"] },
+  { icon: ShieldCheck, value: "24/7", label: ["Atención vía SPenCer y WhatsApp", "Support via SPenCer and WhatsApp"] },
 ] as const;
 
-const SECTOR_ORDER = ["Alimentos & Bebidas", "Farmacéutica", "Retail & QSR", "Editorial & Medios", "Banca & Finanzas"] as const;
+const SECTOR_ORDER: Client["sector"][] = ["Alimentos & Bebidas", "Farmacéutica", "Retail & QSR", "Editorial & Medios", "Banca & Finanzas"];
 
 /** Muro completo de logos agrupado por sector (página /clientes) */
 export function LogoWall() {
+  const { clients: CLIENTS, sectorLabel } = useContent();
   return (
     <div className="space-y-12">
       {SECTOR_ORDER.map((sector) => {
@@ -100,7 +104,7 @@ export function LogoWall() {
             <Reveal y={16}>
               <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.26em] text-spc-500">
                 <span className="h-px w-8 bg-spc-500/40" aria-hidden />
-                {sector}
+                {sectorLabel(sector)}
                 <span className="text-spc-300">· {list.length}</span>
               </p>
             </Reveal>
@@ -128,6 +132,8 @@ export function LogoWall() {
 }
 
 export function Clients({ showWall = false }: { showWall?: boolean }) {
+  const { t, lang } = useI18n();
+  const { clients: CLIENTS, testimonials: TESTIMONIALS } = useContent();
   const half = Math.ceil(CLIENTS.length / 2);
   const rowA = CLIENTS.slice(0, half);
   const rowB = CLIENTS.slice(half);
@@ -136,7 +142,7 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
     <section
       id="clientes"
       className="relative overflow-hidden bg-gradient-to-b from-spc-50 via-white to-white py-24 sm:py-32"
-      aria-label="Clientes y reseñas"
+      aria-label={t("Clientes y reseñas", "Clients and reviews")}
     >
       {/* textura de fondo */}
       <div
@@ -147,16 +153,16 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* encabezado */}
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Clientes · toda Bolivia</Eyebrow>
+          <Eyebrow>{t("Clientes · toda Bolivia", "Clients · all of Bolivia")}</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <CharReveal text="Las marcas que Bolivia consume" stagger={0.018} />{" "}
-            <WordsReveal text="imprimen con SPC." wordClassName="text-gradient-spc" delay={0.14} />
+            <CharReveal text={t("Las marcas que Bolivia consume", "The brands Bolivia consumes")} stagger={0.018} />{" "}
+            <WordsReveal text={t("imprimen con SPC.", "print with SPC.")} wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
             <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-              Del snacks que compras en el kiosco hasta el medicamento de tu farmacia:{" "}
+              {t("Del snack que compras en el kiosco hasta el medicamento de tu farmacia:", "From the snack you buy at the kiosk to the medicine at your pharmacy:")}{" "}
               <strong className="font-semibold text-spc-800">
-                la industria boliviana confía su imagen en nuestra planta.
+                {t("la industria boliviana confía su imagen en nuestra planta.", "Bolivian industry trusts its image to our plant.")}
               </strong>
             </p>
           </Reveal>
@@ -173,7 +179,7 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
         {/* cifras de confianza */}
         <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
           {TRUST_STATS.map((stat, i) => (
-            <Reveal key={stat.label} delay={i * 0.1} y={20}>
+            <Reveal key={stat.value} delay={i * 0.1} y={20}>
               <div className="flex items-center gap-3.5 rounded-2xl bg-spc-50/80 px-5 py-4 ring-1 ring-spc-600/10">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-spc-600/10 text-spc-600">
                   <stat.icon className="h-5 w-5" aria-hidden />
@@ -181,7 +187,7 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
                 <div>
                   <p className="font-display text-lg font-extrabold leading-none text-spc-900">{stat.value}</p>
                   <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-spc-900/55">
-                    {stat.label}
+                    {lang === "en" ? stat.label[1] : stat.label[0]}
                   </p>
                 </div>
               </div>
@@ -199,11 +205,13 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
         <div className="mt-16">
           <div className="mx-auto max-w-2xl text-center">
             <h3 className="font-display text-[clamp(1.5rem,3vw,2.1rem)] font-extrabold leading-tight tracking-tight text-spc-900">
-              Lo que dicen quienes ya imprimen con nosotros
+              {t("Lo que dicen quienes ya imprimen con nosotros", "What our clients say")}
             </h3>
             <p className="mt-3 text-[14px] leading-relaxed text-spc-900/60">
-              Marcas de alimentos, farmacia, retail y editorial que repiten tiraje tras tiraje —
-              la mejor reseña de una imprenta es el pedido que vuelve.
+              {t(
+                "Marcas de alimentos, farmacia, retail y editorial que repiten tiraje tras tiraje — la mejor reseña de una imprenta es el pedido que vuelve.",
+                "Food, pharma, retail and publishing brands that come back run after run — the best review a printer can get is a repeat order."
+              )}
             </p>
           </div>
 
@@ -221,11 +229,14 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
               </span>
               <div className="flex-1">
                 <p className="font-display text-[16px] font-bold text-white">
-                  ¿Quieres ser la próxima historia de éxito?
+                  {t("¿Quieres ser la próxima historia de éxito?", "Want to be the next success story?")}
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed text-white/70">
-                  Pregunta a <strong className="font-semibold text-gold-300">SPenCer</strong>, nuestro
-                  recepcionista con IA: arma tu cotización en 60 segundos y te conecta por WhatsApp.
+                  {t("Pregunta a", "Ask")} <strong className="font-semibold text-gold-300">SPenCer</strong>
+                  {t(
+                    ", nuestro recepcionista con IA: arma tu cotización en 60 segundos y te conecta por WhatsApp.",
+                    ", our AI receptionist: it builds your quote in 60 seconds and connects you on WhatsApp."
+                  )}
                 </p>
               </div>
               <button
@@ -233,7 +244,7 @@ export function Clients({ showWall = false }: { showWall?: boolean }) {
                 onClick={() => openSpcAi()}
                 className="shine inline-flex shrink-0 items-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_30px_-8px_rgba(255,179,28,0.6)] transition-all duration-300 hover:-translate-y-0.5"
               >
-                Hablar con SPenCer
+                {t("Hablar con SPenCer", "Talk to SPenCer")}
               </button>
             </div>
           </Reveal>

@@ -14,12 +14,15 @@ export default function ServiciosPage() {
   return (
     <>
       <PageHero
-        eyebrow="9 líneas de producto"
-        title="Todo lo que tu marca"
-        accent="necesita imprimir."
-        description="Del estuche farmacéutico con braille al libro que se abre plano: explora cada línea, mira producto real de nuestros clientes y cotiza en un clic."
+        eyebrow={{ es: "9 líneas de producto", en: "9 product lines" }}
+        title={{ es: "Todo lo que tu marca", en: "Everything your brand" }}
+        accent={{ es: "necesita imprimir.", en: "needs to print." }}
+        description={{
+          es: "Del estuche farmacéutico con braille al libro que se abre plano: explora cada línea, mira producto real de nuestros clientes y cotiza en un clic.",
+          en: "From braille pharma cartons to books that open flat: explore each line, see real products from our clients and get a quote in one click.",
+        }}
         image="/images/site/packaging-line.jpg"
-        crumbs={[{ label: "Servicios" }]}
+        crumbs={[{ label: { es: "Servicios", en: "Services" } }]}
       />
       <Services showHeader={false} />
       <Sectors />

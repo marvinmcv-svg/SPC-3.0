@@ -15,12 +15,15 @@ export default function NosotrosPage() {
   return (
     <>
       <PageHero
-        eyebrow="Desde 2001 · La Paz, Bolivia"
-        title="Gente, máquinas"
-        accent="y oficio gráfico."
-        description="Somos SPC Impresores: una planta de gráfica industrial donde la tecnología de punta se encuentra con el factor humano que marca la diferencia."
+        eyebrow={{ es: "Desde 2001 · La Paz, Bolivia", en: "Since 2001 · La Paz, Bolivia" }}
+        title={{ es: "Gente, máquinas", en: "People, machines" }}
+        accent={{ es: "y oficio gráfico.", en: "and printing craft." }}
+        description={{
+          es: "Somos SPC Impresores: una planta de gráfica industrial donde la tecnología de punta se encuentra con el factor humano que marca la diferencia.",
+          en: "We are SPC Impresores: an industrial printing plant where cutting-edge technology meets the human factor that makes the difference.",
+        }}
         image="/images/site/spc-building.jpg"
-        crumbs={[{ label: "Nosotros" }]}
+        crumbs={[{ label: { es: "Nosotros", en: "About" } }]}
       />
       <Manifesto />
       <About />

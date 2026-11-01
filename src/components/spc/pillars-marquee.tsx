@@ -7,15 +7,22 @@
  */
 
 import { Sparkle } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
-const ITEMS = ["Calidad", "Puntualidad", "Capacidad", "Servicio"];
-const PHRASE =
-  "Imprimiendo lo mejor de Bolivia — Calidad · Puntualidad · Capacidad · Servicio — Líderes de la industria gráfica desde 2001 — ";
+const ITEMS = {
+  es: ["Calidad", "Puntualidad", "Capacidad", "Servicio"],
+  en: ["Quality", "Punctuality", "Capacity", "Service"],
+};
+const PHRASE = {
+  es: "Imprimiendo lo mejor de Bolivia — Calidad · Puntualidad · Capacidad · Servicio — Líderes de la industria gráfica desde 2001 — ",
+  en: "Printing the best of Bolivia — Quality · Punctuality · Capacity · Service — Leaders in Bolivian printing since 2001 — ",
+};
 
 function Row() {
+  const { lang } = useI18n();
   return (
     <span className="flex shrink-0 items-center" aria-hidden>
-      {ITEMS.map((item) => (
+      {ITEMS[lang].map((item) => (
         <span key={item} className="flex items-center">
           <span className="font-display px-7 text-[15px] font-bold uppercase tracking-[0.28em] text-spc-50 sm:text-lg">
             {item}
@@ -24,7 +31,7 @@ function Row() {
         </span>
       ))}
       <span className="font-display px-7 text-[15px] font-semibold uppercase tracking-[0.2em] text-gold-200/80 sm:text-base">
-        {PHRASE}
+        {PHRASE[lang]}
       </span>
     </span>
   );

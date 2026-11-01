@@ -419,26 +419,41 @@ const SERVICE_DATA: Omit<Service, "gallery" | "brands">[] = [
  *  Fotos de producto de marcas cliente (estuches, libros…) + fotos de
  *  producción con licencia Creative Commons (crédito en `credit`).
  */
+const CBN_CREDIT_PACENA = "Foto: Erik Cleves Kristensen · CC BY 2.0 (Wikimedia Commons)";
+const CBN_CREDIT_TAQUINA = "Foto: Sasha India · CC BY 2.0 (Wikimedia Commons)";
+
 const SERVICE_GALLERIES: Record<string, GalleryImage[]> = {
   "packaging-alimentos": [
-    { src: "/images/services/food-packaging.jpg", alt: "Cajas de alimentos impresas en planta SPC" },
+    { src: "/images/products/food-cbn-pacena-botella.jpg", alt: "Cerveza Paceña — botella y etiqueta de marca", brand: "Paceña · CBN", credit: CBN_CREDIT_PACENA },
+    { src: "/images/products/food-cbn-pacena-lata.jpg", alt: "Lata de cerveza Paceña Pilsener", brand: "Paceña · CBN" },
+    { src: "/images/products/food-cbn-chicha-taquina.jpg", alt: "Chicha de maíz Taquiña — gráfica de lata", brand: "Taquiña · CBN" },
     { src: "/images/products/food-copacabana-papas.jpg", alt: "Caja de papas fritas de grado alimentario", brand: "Pollos Copacabana" },
+    { src: "/images/products/food-cbn-huari.jpg", alt: "Cerveza Huari Lager", brand: "Huari · CBN" },
+    { src: "/images/products/food-cbn-taquina-botella.jpg", alt: "Cerveza Taquiña servida en mesa boliviana", brand: "Taquiña · CBN", credit: CBN_CREDIT_TAQUINA },
   ],
   "packaging-farmaceutico": [
     { src: "/images/products/pharma-vita-azitrovita.jpg", alt: "Estuche AzitroVITA 500 mg", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-alcabol.jpg", alt: "Estuche y frasco Alca Bol granulado", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-jarabe-miel.jpg", alt: "Estuche de jarabe de miel de abejas y eucalipto", brand: "Laboratorios Vita" },
     { src: "/images/products/pharma-vita-alerden.jpg", alt: "Estuche y frasco Alerden VITA", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-nasal.jpg", alt: "Estuche Nasal Fisiológico VITA", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-vita-digestan-sobre.jpg", alt: "Sobre Digestan Compuesto efervescente", brand: "Laboratorios Vita" },
+    { src: "/images/products/pharma-inti-mentisan.jpg", alt: "Potes de Mentisan en línea de producción", brand: "Droguería Inti" },
     { src: "/images/products/pharma-vita-calmitol.jpg", alt: "Estuche Calmitol-n con blíster", brand: "Laboratorios Vita" },
     { src: "/images/products/pharma-vita-calcio.jpg", alt: "Caja de Calcio Gluconato 10 % inyectable", brand: "Laboratorios Vita" },
-    { src: "/images/services/pharma-packaging.jpg", alt: "Estuches farmacéuticos en producción SPC" },
+    { src: "/images/products/pharma-vita-bicarbonato.jpg", alt: "Caja de Bicarbonato de sodio 8 %", brand: "Laboratorios Vita" },
   ],
   "packaging-comercial": [
-    { src: "/images/services/promo-packaging.jpg", alt: "Cajas regalo y packaging promocional SPC" },
+    { src: "/images/products/promo-cbn-portafolio.jpg", alt: "Portafolio de marcas CBN: Paceña, Huari, Pepsi, Somos y más", brand: "CBN" },
+    { src: "/images/products/promo-inti-caja-regalo.jpg", alt: "Caja regalo corporativa INTI", brand: "Droguería Inti" },
+    { src: "/images/products/promo-vita-digestan-linea.jpg", alt: "Línea Digestan: sobres promocionales", brand: "Laboratorios Vita" },
     { src: "/images/products/promo-copacabana-balde.jpg", alt: "Campaña con balde y caja impresos de marca", brand: "Pollos Copacabana" },
   ],
   "paper-bags": [
-    { src: "/images/services/paper-bags.jpg", alt: "Bolsas de papel con asas impresas por SPC" },
+    { src: "/images/services/paper-bags.jpg", alt: "Bolsas de papel con asas" },
   ],
   "impresos-comerciales": [
+    { src: "/images/products/print-inti-muestra-paneles.jpg", alt: "Paneles impresos de la muestra 90 años de INTI", brand: "Droguería Inti" },
     { src: "/images/services/stationery.jpg", alt: "Papelería corporativa homologada" },
   ],
   libros: [
@@ -450,12 +465,15 @@ const SERVICE_GALLERIES: Record<string, GalleryImage[]> = {
     { src: "/images/products/book-gisbert-cuento.jpg", alt: "El cuento que nunca se contó", brand: "Editorial Gisbert" },
   ],
   revistas: [
-    { src: "/images/services/magazines.jpg", alt: "Revistas y catálogos en couché" },
+    { src: "/images/products/mag-lostiempos-oh-nov.jpg", alt: "Revista OH! — portada de noviembre", brand: "Los Tiempos" },
+    { src: "/images/products/mag-lostiempos-oh-oct.jpg", alt: "Revista OH! — portada de octubre", brand: "Los Tiempos" },
+    { src: "/images/products/mag-lostiempos-portada.jpg", alt: "Portada del diario Los Tiempos", brand: "Los Tiempos" },
   ],
   calendarios: [
     { src: "/images/services/calendars.jpg", alt: "Calendarios corporativos de pared y escritorio" },
   ],
   "impresion-digital": [
+    { src: "/images/products/digital-inti-backdrop-evento.jpg", alt: "Backdrop impreso para evento corporativo INTI", brand: "Droguería Inti" },
     { src: "/images/services/digital-print.jpg", alt: "Impresión digital bajo demanda" },
   ],
 };

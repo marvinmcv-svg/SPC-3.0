@@ -12,31 +12,46 @@ import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { BadgeCheck, Clock3, Gauge, Handshake, Sparkles, MoveHorizontal } from "lucide-react";
-import { BRAND, SERVICES, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { BRAND, waLink } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { WhatsappCta } from "./whatsapp-cta";
 import { CharReveal, Counter, Magnetic, RingCarousel } from "./motion-primitives";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const PILLARS = [
-  { icon: BadgeCheck, label: "Calidad", detail: "Estándares de la industria" },
-  { icon: Clock3, label: "Puntualidad", detail: "Tu fecha, compromiso" },
-  { icon: Gauge, label: "Capacidad", detail: "Tecnología de punta" },
-  { icon: Handshake, label: "Servicio", detail: "El factor humano" },
+  { icon: BadgeCheck, label: ["Calidad", "Quality"], detail: ["Estándares de la industria", "Industry standards"] },
+  { icon: Clock3, label: ["Puntualidad", "Punctuality"], detail: ["Tu fecha, compromiso", "Your date, our commitment"] },
+  { icon: Gauge, label: ["Capacidad", "Capacity"], detail: ["Tecnología de punta", "Cutting-edge technology"] },
+  { icon: Handshake, label: ["Servicio", "Service"], detail: ["El factor humano", "The human factor"] },
 ] as const;
-
-/* Items del carrusel: una tarjeta por línea de producto */
-const CAROUSEL_ITEMS = SERVICES.map((s) => ({
-  id: s.id,
-  title: s.title,
-  badge: s.category,
-  image: s.gallery[0].src,
-}));
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
   const router = useRouter();
   const reduce = useReducedMotion();
+  const { t, lang } = useI18n();
+  const { services: SERVICES, stats: STATS, wa } = useContent();
+  /* Items del carrusel: una tarjeta por línea de producto, con su producto real */
+  const CAROUSEL_ITEMS = SERVICES.map((s) => ({
+    id: s.id,
+    title: s.title,
+    badge: s.categoryLabel,
+    image: s.gallery[0].src,
+    contain: Boolean(s.gallery[0].brand),
+    brand: s.gallery[0].brand,
+  }));
+  const ringLabels = {
+    region: t("Carrusel de servicios SPC", "SPC services carousel"),
+    prev: t("Servicio anterior", "Previous service"),
+    next: t("Siguiente servicio", "Next service"),
+    select: t("Seleccionar servicio", "Select service"),
+    view: t("Ver", "View"),
+    onScreen: t("En pantalla", "On screen"),
+    rotate: t("Girar al frente", "Bring to front"),
+    hint: t("toca la tarjeta para ver el detalle", "tap the card for details"),
+  };
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   /* Parallax desactivado si el usuario prefiere menos movimiento */
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", reduce ? "0%" : "22%"]);
@@ -49,7 +64,7 @@ export function Hero() {
       id="inicio"
       ref={ref}
       className="grain relative flex min-h-[100svh] flex-col overflow-hidden bg-spc-950"
-      aria-label="Presentación de SPC"
+      aria-label={t("Presentación de SPC", "SPC introduction")}
     >
       {/* ── Fondo cinematográfico: parallax de scroll + Ken Burns lento ── */}
       <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
@@ -61,7 +76,7 @@ export function Hero() {
         >
           <Image
             src="/images/site/hero-press.jpg"
-            alt="Planta industrial de impresión de SPC con prensa offset"
+            alt={t("Planta industrial de impresión con prensa offset", "Industrial printing plant with offset press")}
             fill
             priority
             sizes="100vw"
@@ -101,17 +116,17 @@ export function Hero() {
           >
             <Sparkles className="h-4 w-4 text-gold-400" aria-hidden />
             <span className="text-[12px] font-semibold uppercase tracking-[0.22em] text-white/90">
-              Líderes de la industria gráfica · desde {BRAND.foundedYear}
+              {t("Líderes de la industria gráfica", "Leaders in Bolivian printing")} · {t("desde", "since")} {BRAND.foundedYear}
             </span>
           </motion.div>
 
           {/* Titular — letra por letra con giro 3D */}
-          <h1 className="font-display max-w-[13ch] text-[clamp(2.6rem,7.2vw,5.4rem)] font-extrabold leading-[1.02] tracking-tight text-white">
+          <h1 key={lang} className="font-display max-w-[13ch] text-[clamp(2.6rem,7.2vw,5.4rem)] font-extrabold leading-[1.02] tracking-tight text-white">
             <span className="block">
-              <CharReveal text="Imprimiendo" animateOnMount delay={0.45} stagger={0.03} />
+              <CharReveal text={t("Imprimiendo", "Printing")} animateOnMount delay={0.45} stagger={0.03} />
             </span>
             <span className="block">
-              <CharReveal text="lo mejor de" animateOnMount delay={0.75} stagger={0.03} />
+              <CharReveal text={t("lo mejor de", "the best of")} animateOnMount delay={0.75} stagger={0.03} />
             </span>
             <span className="block pb-2">
               <CharReveal text="Bolivia." animateOnMount delay={1.05} stagger={0.05} charClassName="text-gold-400 [text-shadow:0_0_40px_rgba(255,196,79,0.45)]" />
@@ -125,10 +140,15 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 max-w-[52ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-white/75"
           >
-            Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y
-            soluciones digitales bajo demanda.{" "}
+            {t(
+              "Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y soluciones digitales bajo demanda.",
+              "Food and pharma packaging, commercial printing for books and magazines, and on-demand digital solutions."
+            )}{" "}
             <span className="font-semibold text-gold-300">
-              Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.
+              {t(
+                "Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.",
+                "You tell us your idea — we print it with the quality you can count on."
+              )}
             </span>
           </motion.p>
 
@@ -140,15 +160,15 @@ export function Hero() {
             className="mt-9 flex flex-wrap items-center gap-3.5"
           >
             <Magnetic>
-              <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="lg" arrow>
-                Cotiza por WhatsApp
+              <WhatsappCta href={waLink(wa.general)} variant="gold" size="lg" arrow>
+                {t("Cotiza por WhatsApp", "Get a quote on WhatsApp")}
               </WhatsappCta>
             </Magnetic>
             <Link
               href="/servicios"
               className="shine inline-flex items-center justify-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/20"
             >
-              Explorar servicios
+              {t("Explorar servicios", "Explore services")}
             </Link>
           </motion.div>
 
@@ -159,7 +179,10 @@ export function Hero() {
             transition={{ duration: 1, delay: 1.5 }}
             className="mt-5 text-[13px] font-medium text-white/60"
           >
-            Respuesta en minutos dentro del horario laboral · Asesoría sin costo
+            {t(
+              "Respuesta en minutos dentro del horario laboral · Asesoría sin costo",
+              "Replies within minutes during business hours · Free advice"
+            )}
           </motion.p>
         </div>
 
@@ -174,13 +197,14 @@ export function Hero() {
           <div className="mb-1 flex items-center justify-center gap-2.5">
             <MoveHorizontal className="h-4 w-4 text-gold-400" aria-hidden />
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold-300/90">
-              Nuestras 9 líneas · gíralas
+              {t("Producto real · 9 líneas · gíralas", "Real products · 9 lines · spin them")}
             </p>
           </div>
 
           <RingCarousel
             items={CAROUSEL_ITEMS}
             autoMs={4200}
+            labels={ringLabels}
             onSelect={(i) => router.push(`/servicios/${SERVICES[i].id}`)}
           />
         </motion.div>
@@ -196,7 +220,7 @@ export function Hero() {
         <div className="glass-dark grid grid-cols-2 gap-px overflow-hidden rounded-3xl md:grid-cols-4">
           {PILLARS.map((p, i) => (
             <motion.div
-              key={p.label}
+              key={p.label[0]}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.5 + i * 0.09, duration: 0.6 }}
@@ -207,9 +231,9 @@ export function Hero() {
               </span>
               <span className="min-w-0">
                 <span className="font-display block text-[15px] font-bold leading-tight text-white">
-                  {p.label}
+                  {lang === "en" ? p.label[1] : p.label[0]}
                 </span>
-                <span className="block truncate text-[11.5px] font-medium text-white/60">{p.detail}</span>
+                <span className="block truncate text-[11.5px] font-medium text-white/60">{lang === "en" ? p.detail[1] : p.detail[0]}</span>
               </span>
             </motion.div>
           ))}

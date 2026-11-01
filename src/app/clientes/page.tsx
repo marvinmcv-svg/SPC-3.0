@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/spc/page-hero";
 import { Clients } from "@/components/spc/clients";
 import { QuoteBuilder } from "@/components/spc/quote-builder";
+import { ProductWall } from "@/components/spc/social-proof";
 
 export const metadata: Metadata = {
   title: "Clientes",
@@ -12,14 +13,18 @@ export default function ClientesPage() {
   return (
     <>
       <PageHero
-        eyebrow="Clientes · toda Bolivia"
-        title="Marcas que confían"
-        accent="tiraje tras tiraje."
-        description="Alimentos, farmacéuticas, retail, editoriales y banca: la industria boliviana imprime su imagen en nuestra planta."
+        eyebrow={{ es: "Clientes · toda Bolivia", en: "Clients · all of Bolivia" }}
+        title={{ es: "Marcas que confían", en: "Brands that trust us" }}
+        accent={{ es: "tiraje tras tiraje.", en: "run after run." }}
+        description={{
+          es: "Alimentos, farmacéuticas, retail, editoriales y banca: la industria boliviana imprime su imagen en nuestra planta.",
+          en: "Food, pharma, retail, publishing and banking: Bolivian industry prints its image at our plant.",
+        }}
         image="/images/site/qc-human.jpg"
-        crumbs={[{ label: "Clientes" }]}
+        crumbs={[{ label: { es: "Clientes", en: "Clients" } }]}
       />
       <Clients showWall />
+      <ProductWall />
       <QuoteBuilder />
     </>
   );

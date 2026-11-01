@@ -96,6 +96,7 @@ export function WordsReveal({
   const MotionTag = MOTION_TAGS[Tag];
   return (
     <MotionTag
+      key={text}
       className={cn("inline-block", className)}
       initial="hidden"
       whileInView="visible"
@@ -332,6 +333,32 @@ export type CarouselItem = {
   title: string;
   badge?: string;
   image: string;
+  /** foto de producto sobre fondo blanco → se muestra completa */
+  contain?: boolean;
+  /** marca del producto real mostrado */
+  brand?: string;
+};
+
+export type RingCarouselLabels = {
+  region: string;
+  prev: string;
+  next: string;
+  select: string;
+  view: string;
+  onScreen: string;
+  rotate: string;
+  hint: string;
+};
+
+const RING_LABELS_ES: RingCarouselLabels = {
+  region: "Carrusel de servicios SPC",
+  prev: "Servicio anterior",
+  next: "Siguiente servicio",
+  select: "Seleccionar servicio",
+  view: "Ver",
+  onScreen: "En pantalla",
+  rotate: "Girar al frente",
+  hint: "toca la tarjeta para ver el detalle",
 };
 
 /* Normaliza un ángulo al rango (-180, 180] */
@@ -348,12 +375,14 @@ function CarouselCard({
   rot,
   active,
   onSelect,
+  labels,
 }: {
   item: CarouselItem;
   angle: number;
   rot: MotionValue<number>;
   active: boolean;
   onSelect: () => void;
+  labels: RingCarouselLabels;
 }) {
   /* distancia angular de esta tarjeta al frente (−180…180) */
   const dist = useTransform(rot, (r) => shortestAngle(angle + r));
@@ -385,7 +414,7 @@ function CarouselCard({
     <motion.button
       type="button"
       onClick={onSelect}
-      aria-label={`Ver ${item.title}`}
+      aria-label={`${labels.view} ${item.title}`}
       aria-current={active}
       className="ring-card group absolute left-1/2 top-1/2 block cursor-pointer rounded-[1.3rem] focus-visible:outline-none"
       style={{
@@ -405,11 +434,11 @@ function CarouselCard({
           alt={item.title}
           fill
           sizes="220px"
-          className="object-cover"
+          className={item.contain ? "bg-white object-contain px-3 pb-16 pt-9" : "object-cover"}
         />
         <span
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-spc-950/90 via-spc-950/15 to-transparent"
+          className={cn("absolute inset-0 bg-gradient-to-t to-transparent", item.contain ? "from-spc-950 via-spc-950/0 via-45%" : "from-spc-950/90 via-spc-950/15")}
         />
         {item.badge && (
           <span className="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.14em] text-spc-800 backdrop-blur-sm">
@@ -417,11 +446,16 @@ function CarouselCard({
           </span>
         )}
         <span className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-1 p-3.5 text-left">
+          {item.brand && (
+            <span className="rounded-full bg-gold-400/95 px-2 py-0.5 text-[8.5px] font-extrabold uppercase tracking-[0.12em] text-spc-950">
+              {item.brand}
+            </span>
+          )}
           <span className="font-display text-[13.5px] font-bold leading-tight text-white">
             {item.title}
           </span>
           <span className="flex items-center gap-1 text-[10.5px] font-semibold text-gold-300 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-            {active ? "En pantalla" : "Girar al frente"}
+            {active ? labels.onScreen : labels.rotate}
           </span>
         </span>
         {/* línea de luz superior */}
@@ -439,8 +473,10 @@ export function RingCarousel({
   onSelect,
   autoMs = 4000,
   className,
+  labels = RING_LABELS_ES,
 }: {
   items: CarouselItem[];
+  labels?: RingCarouselLabels;
   /** Se dispara al hacer clic en la tarjeta ACTIVA del frente */
   onSelect?: (index: number) => void;
   autoMs?: number;
@@ -537,7 +573,7 @@ export function RingCarousel({
       <div
         ref={wrapRef}
         role="group"
-        aria-label="Carrusel de servicios SPC"
+        aria-label={labels.region}
         className="relative mx-auto h-[300px] w-full cursor-grab touch-pan-y sm:h-[340px] lg:h-[360px]"
         style={{
           perspective: "1200px",
@@ -566,6 +602,7 @@ export function RingCarousel({
               angle={i * step}
               rot={rot}
               active={i === index}
+              labels={labels}
               onSelect={() => {
                 if (dragRef.current.moved > 6) return; /* era un drag, no un clic */
                 if (i === index) onSelect?.(i);
@@ -587,14 +624,14 @@ export function RingCarousel({
         <button
           type="button"
           onClick={() => goTo(index - 1)}
-          aria-label="Servicio anterior"
+          aria-label={labels.prev}
           className="glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:scale-105 hover:text-gold-300"
         >
           <ChevronLeft className="h-5 w-5" aria-hidden />
         </button>
 
         {/* dots */}
-        <div className="flex items-center gap-1.5" role="tablist" aria-label="Seleccionar servicio">
+        <div className="flex items-center gap-1.5" role="tablist" aria-label={labels.select}>
           {items.map((item, i) => (
             <button
               key={item.id}
@@ -614,7 +651,7 @@ export function RingCarousel({
         <button
           type="button"
           onClick={() => goTo(index + 1)}
-          aria-label="Siguiente servicio"
+          aria-label={labels.next}
           className="glass-dark flex h-11 w-11 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:scale-105 hover:text-gold-300"
         >
           <ChevronRight className="h-5 w-5" aria-hidden />
@@ -636,7 +673,7 @@ export function RingCarousel({
               {activeItem.title}
             </p>
             <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-300/90">
-              {`0${index + 1} / 0${n} — toca la tarjeta para ver el detalle`}
+              {`0${index + 1} / 0${n} — ${labels.hint}`}
             </p>
           </motion.div>
         </AnimatePresence>
@@ -673,6 +710,7 @@ export function CharReveal({
     : { initial: "hidden", whileInView: "visible", viewport: { once, margin: "-60px" } };
   return (
     <motion.span
+      key={text}
       className={cn("inline-block", className)}
       style={{ perspective: 600 }}
       aria-label={text}

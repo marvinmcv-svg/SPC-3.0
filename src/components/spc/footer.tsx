@@ -8,12 +8,16 @@
 
 import Image from "next/image";
 import { Phone, Mail, MapPin, Clock3 } from "lucide-react";
-import { BRAND, CONTACT, NAV_LINKS, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { CONTACT, waLink } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { WhatsAppIcon } from "./whatsapp-cta";
 import Link from "next/link";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useI18n();
+  const { brand: BRAND, nav: NAV_LINKS, services: SERVICES, wa, contact } = useContent();
 
   return (
     <footer className="relative mt-auto overflow-hidden bg-spc-950 text-white" role="contentinfo">
@@ -44,26 +48,28 @@ export function Footer() {
               </div>
             </div>
             <p className="mt-5 max-w-xs text-[13.5px] leading-relaxed text-white/60">
-              {BRAND.slogan}. Empresa líder en la industria gráfica de Bolivia desde{" "}
-              {BRAND.foundedYear}, con tecnología de punta, insumos de primera calidad y el factor
-              humano que marca la diferencia.
+              {BRAND.slogan}.{" "}
+              {t(
+                `Empresa líder en la industria gráfica de Bolivia desde ${BRAND.foundedYear}, con tecnología de punta, insumos de primera calidad y el factor humano que marca la diferencia.`,
+                `A leading company in Bolivia's printing industry since ${BRAND.foundedYear}, with cutting-edge technology, premium supplies and the human factor that makes the difference.`
+              )}
             </p>
             {/* CTA del footer */}
             <a
-              href={waLink(WA_MESSAGES.general)}
+              href={waLink(wa.general)}
               target="_blank"
               rel="noopener noreferrer"
               className="shine group mt-6 inline-flex items-center gap-3 rounded-full bg-wa px-5 py-3 text-[13.5px] font-bold text-white shadow-[0_12px_32px_-10px_rgba(37,211,102,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1fbe5d]"
-              aria-label="Escribir por WhatsApp"
+              aria-label={t("Escribir por WhatsApp", "Message on WhatsApp")}
             >
               <WhatsAppIcon className="h-4.5 w-4.5" />
-              Escríbenos
+              {t("Escríbenos", "Message us")}
             </a>
           </div>
 
           {/* navegación */}
-          <nav aria-label="Enlaces del sitio">
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">Sitio</p>
+          <nav aria-label={t("Enlaces del sitio", "Site links")}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">{t("Sitio", "Site")}</p>
             <ul className="mt-5 space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
@@ -79,8 +85,8 @@ export function Footer() {
           </nav>
 
           {/* servicios */}
-          <nav aria-label="Servicios">
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">Servicios</p>
+          <nav aria-label={t("Servicios", "Services")}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">{t("Servicios", "Services")}</p>
             <ul className="mt-5 space-y-2.5">
               {SERVICES.map((s) => (
                 <li key={s.id}>
@@ -97,7 +103,7 @@ export function Footer() {
 
           {/* contacto */}
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">Contacto</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-gold-400">{t("Contacto", "Contact")}</p>
             <ul className="mt-5 space-y-3.5 text-[13.5px] text-white/65">
               <li className="flex gap-3">
                 <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-gold-500" />
@@ -123,7 +129,7 @@ export function Footer() {
               </li>
               <li className="flex gap-3">
                 <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-gold-500" aria-hidden />
-                <span>{CONTACT.hours}</span>
+                <span>{contact.hours}</span>
               </li>
             </ul>
           </div>
@@ -132,10 +138,10 @@ export function Footer() {
         {/* línea legal */}
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 sm:flex-row">
           <p className="text-[12px] text-white/45">
-            © {BRAND.foundedYear}–{year} {BRAND.name}. Todos los derechos reservados.
+            © {BRAND.foundedYear}–{year} {BRAND.name}. {t("Todos los derechos reservados.", "All rights reserved.")}
           </p>
           <p className="font-display text-[12px] font-semibold uppercase tracking-[0.2em] text-white/40">
-            Calidad · Puntualidad · Capacidad · Servicio
+            {BRAND.pillars.join(" · ")}
           </p>
         </div>
       </div>

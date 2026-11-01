@@ -13,7 +13,9 @@ import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ClipboardCheck, Hash, Timer, PackageCheck, Layers } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { SERVICES, getClient, waLink, type Service } from "@/lib/site-config";
+import { waLink, type Service } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { cn } from "@/lib/utils";
 import { PageHero } from "./page-hero";
 import { WhatsappCta } from "./whatsapp-cta";
@@ -25,6 +27,7 @@ import { openSpencer } from "./spencer";
 import { SpencerAvatar } from "./spencer-avatar";
 
 function Gallery({ service }: { service: Service }) {
+  const { t } = useI18n();
   const [i, setI] = useState(0);
   const n = service.gallery.length;
   const go = useCallback((d: number) => setI((v) => (v + d + n) % n), [n]);
@@ -62,32 +65,37 @@ function Gallery({ service }: { service: Service }) {
             </AnimatePresence>
             {img.brand && (
               <span className="absolute left-4 top-4 rounded-full bg-spc-950/85 px-3.5 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-gold-300 backdrop-blur-md">
-                Producto real · {img.brand}
+                {t("Producto real", "Real product")} · {img.brand}
               </span>
             )}
             {n > 1 && (
               <>
-                <button type="button" onClick={() => go(-1)} aria-label="Imagen anterior" className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-spc-800 shadow-lg backdrop-blur-md transition hover:scale-105">
+                <button type="button" onClick={() => go(-1)} aria-label={t("Imagen anterior", "Previous image")} className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-spc-800 shadow-lg backdrop-blur-md transition hover:scale-105">
                   <ChevronLeft className="h-5 w-5" />
                 </button>
-                <button type="button" onClick={() => go(1)} aria-label="Imagen siguiente" className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-spc-800 shadow-lg backdrop-blur-md transition hover:scale-105">
+                <button type="button" onClick={() => go(1)} aria-label={t("Imagen siguiente", "Next image")} className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-spc-800 shadow-lg backdrop-blur-md transition hover:scale-105">
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </>
             )}
           </div>
-          <p className="px-3 pb-1.5 pt-3 text-[12.5px] font-medium text-spc-900/60">{img.alt}</p>
+          <p className="px-3 pb-1.5 pt-3 text-[12.5px] font-medium text-spc-900/60">
+            {img.alt}
+            {img.credit && <span className="block text-[10.5px] text-spc-900/40">{img.credit}</span>}
+          </p>
         </div>
       </TiltCard>
 
       <div>
-        <Eyebrow>Galería de producto</Eyebrow>
+        <Eyebrow>{t("Galería de producto", "Product gallery")}</Eyebrow>
         <h2 className="font-display mt-4 text-[clamp(1.7rem,3vw,2.4rem)] font-extrabold leading-tight tracking-tight text-spc-900">
-          <CharReveal text="Así se ve" /> <CharReveal text="en la vida real." charClassName="text-spc-600" delay={0.2} />
+          <CharReveal text={t("Así se ve", "This is how it looks")} /> <CharReveal text={t("en la vida real.", "in real life.")} charClassName="text-spc-600" delay={0.2} />
         </h2>
         <p className="mt-4 text-[14.5px] leading-relaxed text-spc-900/65">
-          Producto de marcas que imprimen esta línea con nosotros y tomas de nuestra planta. Toca una
-          miniatura para verla en grande.
+          {t(
+            "Producto real de marcas que imprimen esta línea con nosotros. Toca una miniatura para verla en grande.",
+            "Real products from brands that print this line with us. Tap a thumbnail to see it larger."
+          )}
         </p>
         <Stagger className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-3" stagger={0.06}>
           {service.gallery.map((g, k) => (
@@ -95,7 +103,7 @@ function Gallery({ service }: { service: Service }) {
               <button
                 type="button"
                 onClick={() => setI(k)}
-                aria-label={`Ver ${g.alt}`}
+                aria-label={`${t("Ver", "View")} ${g.alt}`}
                 aria-current={k === i}
                 className={cn(
                   "relative block aspect-square w-full overflow-hidden rounded-2xl bg-white ring-2 transition-all duration-300 hover:-translate-y-1",
@@ -112,7 +120,10 @@ function Gallery({ service }: { service: Service }) {
   );
 }
 
-export function ServicePage({ service }: { service: Service }) {
+export function ServicePage({ service: base }: { service: Service }) {
+  const { t } = useI18n();
+  const { services: SERVICES, getService, getClient } = useContent();
+  const service = getService(base.id) ?? { ...base, categoryLabel: base.category };
   const brands = service.brands.map(getClient).filter(Boolean);
   const related = SERVICES.filter((s) => s.id !== service.id && s.category === service.category)
     .concat(SERVICES.filter((s) => s.category !== service.category))
@@ -121,15 +132,15 @@ export function ServicePage({ service }: { service: Service }) {
   return (
     <>
       <PageHero
-        eyebrow={service.category}
+        eyebrow={service.categoryLabel}
         title={service.title}
         description={service.description}
         image={service.image}
-        crumbs={[{ href: "/servicios", label: "Servicios" }, { label: service.shortTitle }]}
+        crumbs={[{ href: "/servicios", label: t("Servicios", "Services") }, { label: service.shortTitle }]}
       >
         <div className="flex flex-wrap items-center gap-3.5">
           <WhatsappCta href={waLink(service.waMessage)} variant="gold" size="lg" arrow>
-            Cotizar {service.shortTitle.toLowerCase()}
+            {t("Cotizar", "Quote")} {service.shortTitle.toLowerCase()}
           </WhatsappCta>
           <button
             type="button"
@@ -139,15 +150,15 @@ export function ServicePage({ service }: { service: Service }) {
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-spc-800 ring-1 ring-gold-400/50">
               <SpencerAvatar className="h-8 w-8" />
             </span>
-            Armar brief con SPenCer
+            {t("Armar brief con SPenCer", "Build a brief with SPenCer")}
           </button>
         </div>
         <div className="mt-7 flex flex-wrap gap-3">
           <span className="glass-dark inline-flex items-center gap-2.5 rounded-2xl px-4 py-3 text-[13px] text-white/85">
-            <Hash className="h-4 w-4 text-gold-400" aria-hidden /> Tiraje mínimo: <strong className="text-white">{service.minRun}</strong>
+            <Hash className="h-4 w-4 text-gold-400" aria-hidden /> {t("Tiraje mínimo", "Minimum run")}: <strong className="text-white">{service.minRun}</strong>
           </span>
           <span className="glass-dark inline-flex items-center gap-2.5 rounded-2xl px-4 py-3 text-[13px] text-white/85">
-            <Timer className="h-4 w-4 text-gold-400" aria-hidden /> Producción: <strong className="text-white">{service.turnaround}</strong>
+            <Timer className="h-4 w-4 text-gold-400" aria-hidden /> {t("Producción", "Production")}: <strong className="text-white">{service.turnaround}</strong>
           </span>
         </div>
       </PageHero>
@@ -163,8 +174,9 @@ export function ServicePage({ service }: { service: Service }) {
       <section className="relative overflow-hidden bg-spc-950 py-24 sm:py-32">
         <div aria-hidden className="aurora left-1/4 top-0 h-[380px] w-[380px] bg-spc-500/40" />
         <div className="relative mx-auto max-w-5xl px-5 sm:px-8">
-          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-gold-400">💡 ¿Sabías que…?</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-gold-400">💡 {t("¿Sabías que…?", "Did you know?")}</p>
           <ScrollHighlight
+            key={service.insight}
             text={service.insight}
             className="font-display mt-6 text-[clamp(1.6rem,3.6vw,2.9rem)] font-bold leading-[1.25] tracking-tight text-white"
           />
@@ -175,10 +187,10 @@ export function ServicePage({ service }: { service: Service }) {
       <section className="bg-white py-20 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <Eyebrow>Especificaciones</Eyebrow>
+            <Eyebrow>{t("Especificaciones", "Specifications")}</Eyebrow>
             <h2 className="font-display mt-4 flex items-center gap-3 text-[clamp(1.6rem,3vw,2.3rem)] font-extrabold tracking-tight text-spc-900">
               <Layers className="h-7 w-7 text-spc-600" aria-hidden />
-              <CharReveal text="Lo técnico, explicado" />
+              <CharReveal text={t("Lo técnico, explicado", "The technical side, explained")} />
             </h2>
             <Stagger className="mt-7 space-y-3" stagger={0.08}>
               {service.specs.map((spec, k) => (
@@ -194,10 +206,10 @@ export function ServicePage({ service }: { service: Service }) {
             </Stagger>
           </div>
           <div>
-            <Eyebrow>Casos de uso</Eyebrow>
+            <Eyebrow>{t("Casos de uso", "Use cases")}</Eyebrow>
             <h2 className="font-display mt-4 flex items-center gap-3 text-[clamp(1.6rem,3vw,2.3rem)] font-extrabold tracking-tight text-spc-900">
               <PackageCheck className="h-7 w-7 text-spc-600" aria-hidden />
-              <CharReveal text="¿Para qué se usa?" />
+              <CharReveal text={t("¿Para qué se usa?", "What is it used for?")} />
             </h2>
             <Stagger className="mt-7 space-y-3" stagger={0.1}>
               {service.useCases.map((uc) => (
@@ -217,7 +229,7 @@ export function ServicePage({ service }: { service: Service }) {
       {brands.length > 0 && (
         <section className="border-y border-spc-900/5 bg-spc-50/60 py-16">
           <div className="mx-auto max-w-7xl px-5 text-center sm:px-8">
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-spc-500">Marcas que imprimen esta línea con SPC</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-spc-500">{t("Marcas que imprimen esta línea con SPC", "Brands that print this line with SPC")}</p>
             <Stagger className="mt-8 flex flex-wrap items-center justify-center gap-4" stagger={0.08}>
               {brands.map((c) => (
                 <StaggerItem key={c!.id}>
@@ -235,9 +247,9 @@ export function ServicePage({ service }: { service: Service }) {
       <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-3xl px-5 sm:px-8">
           <div className="text-center">
-            <Eyebrow>Preguntas frecuentes</Eyebrow>
+            <Eyebrow>{t("Preguntas frecuentes", "FAQ")}</Eyebrow>
             <h2 className="font-display mt-4 text-[clamp(1.6rem,3vw,2.3rem)] font-extrabold tracking-tight text-spc-900">
-              <CharReveal text="Lo que más nos preguntan" />
+              <CharReveal text={t("Lo que más nos preguntan", "What people ask us most")} />
             </h2>
           </div>
           <Reveal className="mt-9">
@@ -259,9 +271,9 @@ export function ServicePage({ service }: { service: Service }) {
       <section className="bg-gradient-to-b from-white to-spc-50 py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="text-center">
-            <Eyebrow>Sigue explorando</Eyebrow>
+            <Eyebrow>{t("Sigue explorando", "Keep exploring")}</Eyebrow>
             <h2 className="font-display mt-4 text-[clamp(1.6rem,3vw,2.3rem)] font-extrabold tracking-tight text-spc-900">
-              <CharReveal text="Otras líneas que te pueden servir" />
+              <CharReveal text={t("Otras líneas que te pueden servir", "Other lines you might need")} />
             </h2>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

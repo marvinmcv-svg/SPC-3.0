@@ -15,7 +15,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, ArrowUpRight, Flame, Images } from "lucide-react";
-import { SERVICES, WA_MESSAGES, getClient, waLink, type Service } from "@/lib/site-config";
+import { SERVICES, waLink, type Service } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent, type LocalizedService } from "@/lib/use-content";
 import { cn } from "@/lib/utils";
 import { Reveal, WordsReveal, CharReveal, Eyebrow, TiltCard } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
@@ -28,9 +30,12 @@ const CATEGORY_STYLES: Record<Service["category"], string> = {
 
 type Filter = "Todos" | Service["category"];
 const FILTERS: Filter[] = ["Todos", "Packaging", "Impresión Comercial", "Digital"];
+/* referencia estable para contar por categoría */
+const ALL = SERVICES;
 
 /** Imagen que recorre la galería mientras el cursor está encima */
 function CyclingImage({ service, active }: { service: Service; active: boolean }) {
+  const { t } = useI18n();
   const [i, setI] = useState(0);
   const n = service.gallery.length;
   useEffect(() => {
@@ -69,7 +74,7 @@ function CyclingImage({ service, active }: { service: Service; active: boolean }
           animate={{ opacity: 1, y: 0 }}
           className="absolute bottom-3.5 left-3.5 rounded-full bg-spc-950/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-300 backdrop-blur-md"
         >
-          Producto real · {img.brand}
+          {t("Producto real", "Real product")} · {img.brand}
         </motion.span>
       )}
       {n > 1 && (
@@ -83,8 +88,10 @@ function CyclingImage({ service, active }: { service: Service; active: boolean }
   );
 }
 
-export function ServiceCard({ service, index }: { service: Service; index: number }) {
+export function ServiceCard({ service, index }: { service: LocalizedService; index: number }) {
   const [hover, setHover] = useState(false);
+  const { t } = useI18n();
+  const { getClient } = useContent();
   const brands = service.brands.map(getClient).filter(Boolean).slice(0, 4);
   return (
     <motion.div
@@ -104,17 +111,17 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
           <Link
             href={`/servicios/${service.id}`}
             className="relative block aspect-[4/3] w-full overflow-hidden rounded-t-[calc(1.6rem-1px)] bg-spc-50"
-            aria-label={`Ver ${service.title}`}
+            aria-label={`${t("Ver", "View")} ${service.title}`}
           >
             <CyclingImage service={service} active={hover} />
             <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-spc-950/40 via-transparent to-transparent" />
             <span className={cn("absolute left-4 top-4 rounded-full bg-white/90 px-3.5 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] ring-1 backdrop-blur-md", CATEGORY_STYLES[service.category])}>
-              {service.category}
+              {service.categoryLabel}
             </span>
             {service.featured ? (
               <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-spc-950/70 px-3.5 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.16em] text-gold-300 ring-1 ring-gold-500/40 backdrop-blur-md">
                 <Flame className="h-3 w-3" aria-hidden />
-                Popular
+                {t("Popular", "Popular")}
               </span>
             ) : service.gallery.length > 1 ? (
               <span className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full bg-spc-950/70 px-3 py-1.5 text-[10.5px] font-bold text-white ring-1 ring-white/20 backdrop-blur-md">
@@ -136,14 +143,14 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
             <div className="mt-4 flex gap-3 rounded-2xl bg-gradient-to-br from-gold-100/80 to-gold-500/10 p-3.5 ring-1 ring-gold-600/20">
               <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-gold-700" aria-hidden />
               <p className="text-[12px] leading-relaxed text-[#856629]">
-                <span className="font-bold">¿Sabías que…? </span>
+                <span className="font-bold">{t("¿Sabías que…? ", "Did you know? ")}</span>
                 {service.insight}
               </p>
             </div>
 
             {brands.length > 0 && (
               <div className="mt-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-spc-400">Lo imprimen con nosotros</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-spc-400">{t("Lo imprimen con nosotros", "Brands printing this with us")}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   {brands.map((c) =>
                     c!.logo ? (
@@ -170,7 +177,7 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
                 href={`/servicios/${service.id}`}
                 className="group/cta inline-flex items-center gap-2 rounded-full text-[13.5px] font-bold text-spc-600 transition-colors hover:text-spc-800"
               >
-                Ver servicio completo
+                {t("Ver servicio completo", "View full service")}
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5" aria-hidden />
               </Link>
               <a
@@ -178,12 +185,12 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/wa inline-flex items-center gap-2 rounded-full text-[13px] font-bold text-emerald-700 transition-colors hover:text-emerald-600"
-                aria-label={`Cotizar ${service.title} por WhatsApp`}
+                aria-label={`${t("Cotizar", "Quote")} ${service.title} ${t("por WhatsApp", "on WhatsApp")}`}
               >
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-wa/10 ring-1 ring-wa/25 transition-all duration-300 group-hover/wa:bg-wa">
                   <WhatsAppIcon className="h-4 w-4 transition-colors group-hover/wa:text-white" />
                 </span>
-                Cotizar
+                {t("Cotizar", "Quote")}
               </a>
             </div>
           </div>
@@ -195,35 +202,39 @@ export function ServiceCard({ service, index }: { service: Service; index: numbe
 
 export function Services({ limit, showHeader = true }: { limit?: number; showHeader?: boolean }) {
   const [filter, setFilter] = useState<Filter>("Todos");
+  const { t } = useI18n();
+  const { services: SERVICES, wa, categoryLabel } = useContent();
   const filtered = filter === "Todos" ? SERVICES : SERVICES.filter((s) => s.category === filter);
   const visible = limit ? filtered.slice(0, limit) : filtered;
 
   return (
-    <section id="servicios" className="relative overflow-hidden bg-gradient-to-b from-spc-50 via-white to-white py-24 sm:py-32" aria-label="Servicios y productos">
+    <section id="servicios" className="relative overflow-hidden bg-gradient-to-b from-spc-50 via-white to-white py-24 sm:py-32" aria-label={t("Servicios y productos", "Services and products")}>
       <div aria-hidden className="pointer-events-none absolute -right-40 top-20 h-[460px] w-[460px] rounded-full bg-spc-100/60 blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
         {showHeader && (
           <div className="mx-auto max-w-2xl text-center">
-            <Eyebrow>Servicios · 9 líneas de producto</Eyebrow>
+            <Eyebrow>{t("Servicios · 9 líneas de producto", "Services · 9 product lines")}</Eyebrow>
             <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-              <CharReveal text="Nueve líneas." />{" "}
-              <WordsReveal text="Un solo estándar." wordClassName="text-gradient-spc" delay={0.3} />
+              <CharReveal text={t("Nueve líneas.", "Nine lines.")} />{" "}
+              <WordsReveal text={t("Un solo estándar.", "One standard.")} wordClassName="text-gradient-spc" delay={0.3} />
             </h2>
             <Reveal delay={0.25}>
               <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-                Del packaging que protege tu producto hasta la revista que cuenta tu historia. Pasa el
-                cursor por cada tarjeta para ver producto real —{" "}
-                <strong className="font-semibold text-spc-800">y cotiza por WhatsApp en un clic.</strong>
+                {t(
+                  "Del packaging que protege tu producto hasta la revista que cuenta tu historia. Pasa el cursor por cada tarjeta para ver producto real de marcas que imprimen con nosotros —",
+                  "From the packaging that protects your product to the magazine that tells your story. Hover over each card to see real products from brands that print with us —"
+                )}{" "}
+                <strong className="font-semibold text-spc-800">{t("y cotiza por WhatsApp en un clic.", "and get a WhatsApp quote in one click.")}</strong>
               </p>
             </Reveal>
           </div>
         )}
 
         <Reveal delay={0.15} className="mt-9">
-          <div className="flex flex-wrap items-center justify-center gap-2" role="tablist" aria-label="Filtrar servicios por categoría">
+          <div className="flex flex-wrap items-center justify-center gap-2" role="tablist" aria-label={t("Filtrar servicios por categoría", "Filter services by category")}>
             {FILTERS.map((f) => {
               const active = filter === f;
-              const count = f === "Todos" ? SERVICES.length : SERVICES.filter((s) => s.category === f).length;
+              const count = f === "Todos" ? ALL.length : ALL.filter((s) => s.category === f).length;
               return (
                 <button
                   key={f}
@@ -243,7 +254,7 @@ export function Services({ limit, showHeader = true }: { limit?: number; showHea
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
                     />
                   )}
-                  {f}
+                  {f === "Todos" ? t("Todos", "All") : categoryLabel(f)}
                   <span className={cn("ml-2 text-[11px] font-semibold", active ? "text-white/70" : "text-spc-400")}>{count}</span>
                 </button>
               );
@@ -265,7 +276,7 @@ export function Services({ limit, showHeader = true }: { limit?: number; showHea
               href="/servicios"
               className="shine group inline-flex items-center gap-2.5 rounded-full bg-spc-950 px-7 py-4 text-[14px] font-bold text-white shadow-[0_18px_40px_-16px_rgba(6,15,46,0.6)] transition-all duration-300 hover:-translate-y-0.5"
             >
-              Ver las 9 líneas de producto
+              {t("Ver las 9 líneas de producto", "See all 9 product lines")}
               <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
             </Link>
           </Reveal>
@@ -280,23 +291,25 @@ export function Services({ limit, showHeader = true }: { limit?: number; showHea
             <span className="glossy-sheen" aria-hidden />
             <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
-                <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-spc-600">¿No sabes cuál necesitas?</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-spc-600">{t("¿No sabes cuál necesitas?", "Not sure which one you need?")}</p>
                 <h3 className="font-display mt-2.5 text-[clamp(1.4rem,2.6vw,2rem)] font-extrabold leading-tight text-spc-900">
-                  Cuéntanos tu proyecto y te asesoramos gratis.
+                  {t("Cuéntanos tu proyecto y te asesoramos gratis.", "Tell us about your project and we'll advise you for free.")}
                 </h3>
                 <p className="mt-3 text-[14px] leading-relaxed text-spc-900/65">
-                  No necesitas saber nada de impresión. Descríbenos tu idea por WhatsApp y un especialista
-                  te recomienda la mejor opción: papel, acabado, tiraje y fecha.
+                  {t(
+                    "No necesitas saber nada de impresión. Descríbenos tu idea por WhatsApp y un especialista te recomienda la mejor opción: papel, acabado, tiraje y fecha.",
+                    "You don't need to know anything about printing. Describe your idea on WhatsApp and a specialist will recommend the best option: paper, finish, run size and date."
+                  )}
                 </p>
               </div>
               <a
-                href={waLink(WA_MESSAGES.services)}
+                href={waLink(wa.services)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shine group inline-flex shrink-0 items-center gap-3 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-7 py-4 text-[15px] font-bold text-white shadow-[0_14px_40px_-12px_rgba(37,211,102,0.65),inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-0.5"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-                Pedir asesoría gratis
+                {t("Pedir asesoría gratis", "Get free advice")}
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
               </a>
             </div>

@@ -13,12 +13,15 @@ export default function ContactoPage() {
   return (
     <>
       <PageHero
-        eyebrow="Contacto · WhatsApp +591 77165787"
-        title="Hablemos de"
-        accent="tu próximo proyecto."
-        description="Arma tu brief abajo y continúa por WhatsApp, pregúntale a SPenCer o visítanos en planta. Respondemos en minutos en horario laboral."
+        eyebrow={{ es: "Contacto · WhatsApp +591 77165787", en: "Contact · WhatsApp +591 77165787" }}
+        title={{ es: "Hablemos de", en: "Let's talk about" }}
+        accent={{ es: "tu próximo proyecto.", en: "your next project." }}
+        description={{
+          es: "Arma tu brief abajo y continúa por WhatsApp, pregúntale a SPenCer o visítanos en planta. Respondemos en minutos en horario laboral.",
+          en: "Build your brief below and continue on WhatsApp, ask SPenCer or visit our plant. We reply within minutes during business hours.",
+        }}
         image="/images/site/tech-rollers.jpg"
-        crumbs={[{ label: "Contacto" }]}
+        crumbs={[{ label: { es: "Contacto", en: "Contact" } }]}
       />
       <QuoteBuilder compactHeading />
       <ContactInfo />

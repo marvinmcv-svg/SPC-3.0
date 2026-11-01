@@ -12,35 +12,52 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useRef } from "react";
 import { CheckCircle2, Cpu, Droplets, Ruler, Palette } from "lucide-react";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
-import { WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
 const MARKS = [
   {
     icon: Palette,
-    title: "Color calibrado",
-    body: "Pruebas de color certificadas: lo que ves en la aprobación es lo que recibes en tiraje.",
+    title: ["Color calibrado", "Calibrated color"],
+    body: [
+      "Pruebas de color certificadas: lo que ves en la aprobación es lo que recibes en tiraje.",
+      "Certified color proofs: what you approve is exactly what you get in the run.",
+    ],
   },
   {
     icon: Droplets,
-    title: "Tintas de grado alimentario",
-    body: "Insumos de primera calidad, aptos para envases en contacto directo con alimentos.",
+    title: ["Tintas de grado alimentario", "Food-grade inks"],
+    body: [
+      "Insumos de primera calidad, aptos para envases en contacto directo con alimentos.",
+      "Premium supplies, approved for packaging in direct contact with food.",
+    ],
   },
   {
     icon: Ruler,
-    title: "Troquel de precisión",
-    body: "Cortes exactos en cada estuche: plegado perfecto, sin variaciones en línea de producción.",
+    title: ["Troquel de precisión", "Precision die-cutting"],
+    body: [
+      "Cortes exactos en cada estuche: plegado perfecto, sin variaciones en línea de producción.",
+      "Exact cuts on every carton: perfect folding, zero variation on the production line.",
+    ],
   },
   {
     icon: Cpu,
-    title: "Planta de punta",
-    body: "Maquinaria offset y digital de última generación, con capacidad para tirajes de cualquier escala.",
+    title: ["Planta de punta", "State-of-the-art plant"],
+    body: [
+      "Maquinaria offset y digital de última generación, con capacidad para tirajes de cualquier escala.",
+      "Latest-generation offset and digital presses, with capacity for runs of any scale.",
+    ],
   },
 ] as const;
 
 export function Technology() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const { t, lang } = useI18n();
+  const { wa } = useContent();
+  const L = (v: readonly [string, string]) => (lang === "en" ? v[1] : v[0]);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const yA = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : 60, reduce ? 0 : -60]);
   const yB = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : 110, reduce ? 0 : -40]);
@@ -50,7 +67,7 @@ export function Technology() {
       id="tecnologia"
       ref={ref}
       className="grain relative overflow-hidden bg-spc-950 py-24 sm:py-32"
-      aria-label="Tecnología y calidad"
+      aria-label={t("Tecnología y calidad", "Technology and quality")}
     >
       {/* halos de color */}
       <div aria-hidden className="pointer-events-none absolute -left-48 top-0 h-[560px] w-[560px] rounded-full bg-spc-800/40 blur-3xl" />
@@ -65,7 +82,7 @@ export function Technology() {
                 <div className="overflow-hidden rounded-[2rem] shadow-[0_50px_100px_-40px_rgba(0,0,0,0.8)] ring-1 ring-white/15">
                   <Image
                     src="/images/site/tech-rollers.jpg"
-                    alt="Placas y rodillos de la prensa offset de SPC en plena producción"
+                    alt={t("Rodillos de prensa offset en plena producción", "Offset press rollers in production")}
                     width={1344}
                     height={768}
                     className="h-[320px] w-full object-cover sm:h-[380px]"
@@ -79,7 +96,7 @@ export function Technology() {
                 <div className="glass-dark overflow-hidden rounded-[1.8rem] p-2 shadow-[0_36px_72px_-28px_rgba(0,0,0,0.65)]">
                   <Image
                     src="/images/site/packaging-line.jpg"
-                    alt="Línea de producción de packaging con cajas impresas"
+                    alt={t("Línea de producción de packaging con cajas impresas", "Packaging production line with printed boxes")}
                     width={1344}
                     height={768}
                     className="h-[180px] w-full rounded-[1.4rem] object-cover sm:h-[220px]"
@@ -103,7 +120,7 @@ export function Technology() {
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 </span>
                 <p className="text-[12.5px] font-bold text-white">
-                  Producción en curso <span className="font-medium text-white/60">· La Paz</span>
+                  {t("Producción en curso", "Production in progress")} <span className="font-medium text-white/60">· La Paz</span>
                 </p>
               </div>
             </motion.div>
@@ -111,29 +128,31 @@ export function Technology() {
 
           {/* ── Contenido ── */}
           <div className="order-1 lg:order-2">
-            <Eyebrow dark>Tecnología & Calidad</Eyebrow>
+            <Eyebrow dark>{t("Tecnología & Calidad", "Technology & Quality")}</Eyebrow>
             <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-white">
-              <WordsReveal text="Lo que no se ve" />{" "}
-              <WordsReveal text="se nota." wordClassName="text-gradient-gold" delay={0.14} />
+              <WordsReveal text={t("Lo que no se ve", "What you can't see")} />{" "}
+              <WordsReveal text={t("se nota.", "shows.")} wordClassName="text-gradient-gold" delay={0.14} />
             </h2>
             <Reveal delay={0.2}>
               <p className="mt-5 text-[15.5px] leading-relaxed text-white/65">
-                Detrás de cada caja, libro o revista hay decisiones técnicas que definen el
-                resultado. Estas son las cuatro garantías que aplicamos a{" "}
-                <strong className="font-semibold text-gold-300">todos los proyectos, sin excepción</strong>:
+                {t(
+                  "Detrás de cada caja, libro o revista hay decisiones técnicas que definen el resultado. Estas son las cuatro garantías que aplicamos a",
+                  "Behind every box, book or magazine there are technical decisions that define the result. These are the four guarantees we apply to"
+                )}{" "}
+                <strong className="font-semibold text-gold-300">{t("todos los proyectos, sin excepción", "every project, no exceptions")}</strong>:
               </p>
             </Reveal>
 
             <ul className="mt-8 space-y-3">
               {MARKS.map((mark, i) => (
-                <Reveal key={mark.title} delay={0.1 + i * 0.09} y={24}>
+                <Reveal key={mark.title[0]} delay={0.1 + i * 0.09} y={24}>
                   <li className="glass-dark group flex gap-4 rounded-2xl p-4 transition-all duration-300 hover:bg-white/15 sm:p-5">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-gold-400/30 to-gold-600/10 ring-1 ring-gold-500/30 transition-transform duration-500 group-hover:scale-110">
                       <mark.icon className="h-5 w-5 text-gold-400" aria-hidden />
                     </span>
                     <div>
-                      <h3 className="font-display text-[15.5px] font-bold text-white">{mark.title}</h3>
-                      <p className="mt-1 text-[13px] leading-relaxed text-white/60">{mark.body}</p>
+                      <h3 className="font-display text-[15.5px] font-bold text-white">{L(mark.title)}</h3>
+                      <p className="mt-1 text-[13px] leading-relaxed text-white/60">{L(mark.body)}</p>
                     </div>
                     <CheckCircle2
                       className="ml-auto h-5 w-5 shrink-0 text-emerald-400/80"
@@ -146,7 +165,7 @@ export function Technology() {
 
             <Reveal delay={0.3} className="mt-8">
               <a
-                href={waLink(WA_MESSAGES.process)}
+                href={waLink(wa.process)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 rounded-full py-1.5 text-[14px] font-bold text-gold-300 transition-colors hover:text-gold-200"
@@ -154,7 +173,7 @@ export function Technology() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-wa/15 ring-1 ring-wa/40 transition-all duration-300 group-hover:bg-wa group-hover:ring-wa/60">
                   <WhatsAppIcon className="h-4.5 w-4.5 text-wa transition-colors group-hover:text-white" />
                 </span>
-                ¿Preguntas técnicas? Pregúntanos lo que quieras
+                {t("¿Preguntas técnicas? Pregúntanos lo que quieras", "Technical questions? Ask us anything")}
               </a>
             </Reveal>
           </div>

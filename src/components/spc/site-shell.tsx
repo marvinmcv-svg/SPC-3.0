@@ -11,9 +11,11 @@ import { Footer } from "./footer";
 import { WhatsappWidget } from "./whatsapp-widget";
 import { SpencerWidget } from "./spencer";
 import { MotionProvider } from "./motion-primitives";
+import { I18nProvider } from "@/lib/i18n";
 
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
+    <I18nProvider>
     <MotionProvider>
       <div className="flex min-h-svh flex-col bg-white">
         <Navbar />
@@ -23,5 +25,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
         <SpencerWidget />
       </div>
     </MotionProvider>
+    </I18nProvider>
   );
 }

@@ -5,18 +5,25 @@
  * (estilo keynote) + cifras con contador sobre tarjetas glossy.
  */
 
-import { STATS } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { Counter, GlossyCard, ScrollHighlight, Stagger, StaggerItem } from "./motion-primitives";
 
 export function Manifesto() {
+  const { t, lang } = useI18n();
+  const { stats: STATS } = useContent();
   return (
-    <section className="relative overflow-hidden bg-white py-24 sm:py-32" aria-label="Manifiesto SPC">
+    <section className="relative overflow-hidden bg-white py-24 sm:py-32" aria-label={t("Manifiesto SPC", "SPC manifesto")}>
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-spc-50 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-5 sm:px-8">
-        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-spc-500">Nuestro oficio</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-spc-500">{t("Nuestro oficio", "Our craft")}</p>
         <ScrollHighlight
-          text="Cada caja, cada estuche y cada libro que sale de nuestra planta lleva la marca de alguien que confió en nosotros. Por eso imprimimos con calidad, puntualidad, capacidad y servicio — desde 2001."
-          accentWords={["calidad", "puntualidad", "capacidad", "servicio"]}
+          key={lang}
+          text={t(
+            "Cada caja, cada estuche y cada libro que sale de nuestra planta lleva la marca de alguien que confió en nosotros. Por eso imprimimos con calidad, puntualidad, capacidad y servicio — desde 2001.",
+            "Every box, every carton and every book that leaves our plant carries the brand of someone who trusted us. That's why we print with quality, punctuality, capacity and service — since 2001."
+          )}
+          accentWords={lang === "en" ? ["quality", "punctuality", "capacity", "service"] : ["calidad", "puntualidad", "capacidad", "servicio"]}
           className="font-display mt-6 text-[clamp(1.7rem,3.8vw,3.1rem)] font-bold leading-[1.22] tracking-tight text-spc-900 [&_.text-gradient-gold]:bg-[linear-gradient(100deg,#e09a12,#ffb31c)]"
         />
 

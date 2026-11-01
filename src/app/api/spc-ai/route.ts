@@ -61,7 +61,7 @@ ${processBlock}
 ${faqBlock}
 
 ## Reglas de estilo
-- Responde SIEMPRE en español (contexto boliviano), tono cálido, profesional y resolutivo.
+- Responde SIEMPRE en el idioma indicado en "Idioma de respuesta" (español por defecto, contexto boliviano), tono cálido, profesional y resolutivo.
 - Sé CONCISA: máximo ~120 palabras por respuesta. Ve directo a lo que el usuario necesita.
 - Usa markdown simple: **negritas** para lo clave, listas con "- " cuando ayude.
 - Educa mientras respondes: un dato útil por respuesta (por qué importa el gramaje, qué es un troquel, etc.).
@@ -101,7 +101,11 @@ function validateMessages(raw: unknown): ChatMessage[] | null {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { messages?: unknown; funnel?: unknown };
+    const body = (await request.json()) as { messages?: unknown; funnel?: unknown; lang?: unknown };
+    const langLine =
+      body.lang === "en"
+        ? "\n\n## Idioma de respuesta\nEl visitante navega el sitio en INGLÉS: responde SIEMPRE en inglés."
+        : "\n\n## Idioma de respuesta\nResponde en español.";
     const history = validateMessages(body.messages);
     if (!history) {
       return NextResponse.json(
@@ -114,7 +118,7 @@ export async function POST(request: Request) {
 
     const completion = await zai.chat.completions.create({
       messages: [
-        { role: "assistant", content: buildSystemPrompt() + funnelContext(body.funnel) },
+        { role: "assistant", content: buildSystemPrompt() + funnelContext(body.funnel) + langLine },
         ...history.map((m) => ({ role: m.role, content: m.content })),
       ],
       thinking: { type: "disabled" },

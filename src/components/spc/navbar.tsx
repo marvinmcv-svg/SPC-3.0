@@ -15,12 +15,17 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Menu, X, Phone, ChevronDown, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BRAND, CONTACT, NAV_LINKS, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { BRAND, CONTACT, waLink } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
+import { LangToggle } from "./lang-toggle";
 import { WhatsappCta } from "./whatsapp-cta";
 import { openSpencer } from "./spencer";
 import { SpencerAvatar } from "./spencer-avatar";
 
 function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
+  const { services: SERVICES } = useContent();
+  const { t } = useI18n();
   const [hover, setHover] = useState(SERVICES[0].id);
   const active = SERVICES.find((s) => s.id === hover) ?? SERVICES[0];
   return (
@@ -53,7 +58,7 @@ function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
               >
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate text-[13.5px] font-bold">{s.title}</span>
-                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-spc-400">{s.category}</span>
+                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-spc-400">{s.categoryLabel}</span>
                 </span>
                 <ArrowUpRight
                   className={cn("h-4 w-4 shrink-0 transition-all", hover === s.id ? "translate-x-0 opacity-100" : "-translate-x-1 opacity-0")}
@@ -73,7 +78,7 @@ function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="absolute inset-0"
             >
-              <Image src={active.gallery[0].src} alt={active.gallery[0].alt} fill sizes="380px" className="object-cover" />
+              <Image src={active.gallery[0].src} alt={active.gallery[0].alt} fill sizes="380px" className={active.gallery[0].brand ? "bg-white object-contain p-6" : "object-cover"} />
               <div className="absolute inset-0 bg-gradient-to-t from-spc-950 via-spc-950/30 to-transparent" />
             </motion.div>
           </AnimatePresence>
@@ -89,7 +94,7 @@ function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
                 <p className="font-display text-[17px] font-bold text-white">{active.title}</p>
                 <p className="mt-1.5 line-clamp-3 text-[12.5px] leading-relaxed text-white/70">{active.description}</p>
                 <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gold-300">
-                  Desde {active.minRun.split(" (")[0]} · {active.turnaround.split(" según")[0]}
+                  {t("Desde", "From")} {active.minRun.split(" (")[0]} · {active.turnaround.split(/ según| depending/)[0]}
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -102,6 +107,8 @@ function MegaMenu({ onNavigate }: { onNavigate: () => void }) {
 
 export function Navbar() {
   const pathname = usePathname();
+  const { t } = useI18n();
+  const { nav: NAV_LINKS, services: SERVICES, wa, brand } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
@@ -154,8 +161,8 @@ export function Navbar() {
         className="scroll-progress absolute inset-x-0 top-0 h-[3px] origin-left bg-gradient-to-r from-gold-600 via-gold-500 to-gold-300"
       />
 
-      <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8" aria-label="Principal">
-        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label={`${BRAND.name} — inicio`}>
+      <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8" aria-label={t("Principal", "Main")}>
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label={`${BRAND.name} — ${t("inicio", "home")}`}>
           <motion.span
             whileHover={{ rotate: -4, scale: 1.05 }}
             className={cn(
@@ -170,7 +177,7 @@ export function Navbar() {
               SPC <span className="sr-only">Impresores S.A.</span>
             </span>
             <span className={cn("text-[10px] font-semibold uppercase tracking-[0.24em] transition-colors", solid ? "text-gold-700" : "text-gold-300")}>
-              Gráfica Industrial
+              {brand.tagline}
             </span>
           </span>
         </Link>
@@ -223,7 +230,7 @@ export function Navbar() {
                 ? "bg-spc-950 text-white shadow-[0_6px_20px_-6px_rgba(6,15,46,0.5)] hover:-translate-y-0.5"
                 : "bg-white/12 text-white ring-1 ring-white/30 backdrop-blur-md hover:bg-white/20"
             )}
-            aria-label="Hablar con SPenCer, el recepcionista con IA"
+            aria-label={t("Hablar con SPenCer, el recepcionista con IA", "Talk to SPenCer, the AI receptionist")}
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-spc-800 ring-1 ring-gold-400/50">
               <SpencerAvatar className="h-7 w-7" />
@@ -236,12 +243,13 @@ export function Navbar() {
               "hidden h-11 w-11 items-center justify-center rounded-full transition-all duration-300 xl:flex",
               solid ? "text-spc-700 ring-1 ring-spc-600/20 hover:bg-spc-50" : "text-white ring-1 ring-white/30 hover:bg-white/15"
             )}
-            aria-label={`Llamar al ${CONTACT.phone}`}
+            aria-label={`${t("Llamar al", "Call")} ${CONTACT.phone}`}
           >
             <Phone className="h-[17px] w-[17px]" />
           </a>
-          <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="sm" className="hidden md:inline-flex">
-            Cotizar
+          <LangToggle dark={!solid} className="hidden sm:flex" />
+          <WhatsappCta href={waLink(wa.general)} variant="gold" size="sm" className="hidden md:inline-flex">
+            {t("Cotizar", "Get a quote")}
           </WhatsappCta>
           <button
             onClick={() => setOpen(!open)}
@@ -251,7 +259,7 @@ export function Navbar() {
             )}
             aria-expanded={open}
             aria-controls="menu-movil"
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-label={open ? t("Cerrar menú", "Close menu") : t("Abrir menú", "Open menu")}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -291,13 +299,13 @@ export function Navbar() {
                   </motion.li>
                 ))}
               </ul>
-              <p className="mt-5 px-4 text-[10.5px] font-bold uppercase tracking-[0.2em] text-spc-400">Servicios</p>
+              <p className="mt-5 px-4 text-[10.5px] font-bold uppercase tracking-[0.2em] text-spc-400">{t("Servicios", "Services")}</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {SERVICES.map((s, i) => (
                   <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 + i * 0.03 }}>
                     <Link href={`/servicios/${s.id}`} className="flex items-center gap-2.5 rounded-xl bg-spc-50/70 p-2 text-[12.5px] font-semibold text-spc-800">
                       <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg">
-                        <Image src={s.gallery[0].src} alt="" fill sizes="36px" className="object-cover" />
+                        <Image src={s.gallery[0].src} alt="" fill sizes="36px" className={s.gallery[0].brand ? "bg-white object-contain p-0.5" : "object-cover"} />
                       </span>
                       <span className="leading-tight">{s.shortTitle}</span>
                     </Link>
@@ -314,9 +322,12 @@ export function Navbar() {
                   className="flex w-full items-center justify-center gap-2.5 rounded-full bg-spc-950 px-6 py-3.5 text-[14px] font-bold text-white"
                 >
                   <SpencerAvatar className="h-6 w-6" />
-                  Cotizar con SPenCer
+                  {t("Cotizar con SPenCer", "Quote with SPenCer")}
                 </button>
-                <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="md" className="w-full">
+                <div className="flex justify-center sm:hidden">
+                  <LangToggle id="mobile" />
+                </div>
+                <WhatsappCta href={waLink(wa.general)} variant="gold" size="md" className="w-full">
                   WhatsApp {CONTACT.whatsapp}
                 </WhatsappCta>
               </div>

@@ -9,7 +9,9 @@
 
 import { motion } from "framer-motion";
 import { Sparkles, MessageCircleQuestion, Phone, MapPin, Clock3 } from "lucide-react";
-import { CONTACT, GENERAL_FAQS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useI18n } from "@/lib/i18n";
+import { useContent } from "@/lib/use-content";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
 import {
   Accordion,
@@ -21,11 +23,13 @@ import { WhatsAppIcon } from "./whatsapp-cta";
 import { openSpcAi } from "./spc-ai-widget";
 
 export function Faq() {
+  const { t } = useI18n();
+  const { faqs: GENERAL_FAQS, wa, contact: CONTACT } = useContent();
   return (
     <section
       id="faq"
       className="relative overflow-hidden bg-white py-24 sm:py-32"
-      aria-label="Preguntas frecuentes"
+      aria-label={t("Preguntas frecuentes", "Frequently asked questions")}
     >
       <div
         aria-hidden
@@ -37,15 +41,15 @@ export function Faq() {
           {/* ── Acordeón de preguntas ── */}
           <div>
             <div className="max-w-xl">
-              <Eyebrow>Preguntas frecuentes</Eyebrow>
+              <Eyebrow>{t("Preguntas frecuentes", "FAQ")}</Eyebrow>
               <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-                <WordsReveal text="Todo lo que necesitas saber" />{" "}
-                <WordsReveal text="antes de imprimir." wordClassName="text-gradient-spc" delay={0.14} />
+                <WordsReveal text={t("Todo lo que necesitas saber", "Everything you need to know")} />{" "}
+                <WordsReveal text={t("antes de imprimir.", "before you print.")} wordClassName="text-gradient-spc" delay={0.14} />
               </h2>
               <Reveal delay={0.25}>
                 <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-                  Respondemos las dudas más comunes de quienes imprimen por primera vez —{" "}
-                  <strong className="font-semibold text-spc-800">y de los que ya son expertos.</strong>
+                  {t("Respondemos las dudas más comunes de quienes imprimen por primera vez —", "We answer the most common questions from first-time printers —")}{" "}
+                  <strong className="font-semibold text-spc-800">{t("y de los que ya son expertos.", "and from seasoned pros.")}</strong>
                 </p>
               </Reveal>
             </div>
@@ -54,7 +58,7 @@ export function Faq() {
               <Accordion type="single" collapsible className="space-y-3">
                 {GENERAL_FAQS.map((faq, i) => (
                   <AccordionItem
-                    key={faq.q}
+                    key={i}
                     value={`faq-${i}`}
                     className="glossy-card overflow-hidden rounded-2xl border-none data-[state=open]:border-spc-600/20"
                   >
@@ -89,21 +93,22 @@ export function Faq() {
                 <div className="relative">
                   <span className="inline-flex items-center gap-2 rounded-full bg-gold-500/15 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-gold-300 ring-1 ring-gold-500/40">
                     <Sparkles className="h-3 w-3" aria-hidden />
-                    Nuevo · Inteligencia artificial
+                    {t("Nuevo · Inteligencia artificial", "New · Artificial intelligence")}
                   </span>
                   <h3 className="font-display mt-4 text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold leading-tight text-white">
-                    Conoce a SPenCer, nuestro recepcionista con IA
+                    {t("Conoce a SPenCer, nuestro recepcionista con IA", "Meet SPenCer, our AI receptionist")}
                   </h3>
                   <p className="mt-3 text-[13.5px] leading-relaxed text-white/70">
-                    Responde todas estas preguntas — y cualquier otra que tengas — al instante, a
-                    cualquier hora. Y cuando tu proyecto esté listo para cotizar, te conecta con
-                    un asesor humano en segundos.
+                    {t(
+                      "Responde todas estas preguntas — y cualquier otra que tengas — al instante, a cualquier hora. Y cuando tu proyecto esté listo para cotizar, te conecta con un asesor humano en segundos.",
+                      "Answers all of these questions — and any other you have — instantly, at any hour. And when your project is ready to quote, it connects you with a human advisor in seconds."
+                    )}
                   </p>
                   <ul className="mt-5 space-y-2.5 text-[13px] font-medium text-white/80">
                     {[
-                      "Respuesta inmediata, 24/7",
-                      "Explica servicios, tiempos y tirajes",
-                      "Te deriva a WhatsApp con tu contexto listo",
+                      t("Respuesta inmediata, 24/7", "Instant answers, 24/7"),
+                      t("Explica servicios, tiempos y tirajes", "Explains services, lead times and runs"),
+                      t("Te deriva a WhatsApp con tu contexto listo", "Hands you off to WhatsApp with your context ready"),
                     ].map((point) => (
                       <li key={point} className="flex items-center gap-2.5">
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold-400" aria-hidden />
@@ -117,7 +122,7 @@ export function Faq() {
                     className="shine group mt-6 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-4 text-[14.5px] font-bold text-spc-900 shadow-[0_14px_38px_-10px_rgba(255,179,28,0.65)] transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <Sparkles className="h-5 w-5" aria-hidden />
-                    Preguntar a SPenCer
+                    {t("Preguntar a SPenCer", "Ask SPenCer")}
                   </button>
                 </div>
               </motion.div>
@@ -127,7 +132,7 @@ export function Faq() {
             <Reveal y={40} delay={0.1}>
               <div className="glossy-card rounded-[1.8rem] p-7">
                 <h3 className="font-display text-[16px] font-bold text-spc-900">
-                  ¿Prefieres hablar con una persona?
+                  {t("¿Prefieres hablar con una persona?", "Prefer to talk to a person?")}
                 </h3>
                 <ul className="mt-4 space-y-3 text-[13.5px] text-spc-900/75">
                   <li className="flex items-center gap-3">
@@ -146,13 +151,13 @@ export function Faq() {
                   </li>
                 </ul>
                 <a
-                  href={waLink(WA_MESSAGES.general)}
+                  href={waLink(wa.general)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shine mt-5 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_12px_32px_-10px_rgba(37,211,102,0.6)] transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <WhatsAppIcon className="h-4.5 w-4.5" />
-                  Escríbenos por WhatsApp
+                  {t("Escríbenos por WhatsApp", "Message us on WhatsApp")}
                 </a>
               </div>
             </Reveal>
