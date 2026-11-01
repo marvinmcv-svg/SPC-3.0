@@ -3,7 +3,7 @@
 /**
  * ══════════════════════════════════════════════════════════════════
  *  FAQ — preguntas frecuentes educativas en acordeón premium.
- *  Lateral: tarjeta de SPC AI (la IA responde estas y más preguntas).
+ *  Lateral: tarjeta de SPenCer (la IA responde estas y más preguntas).
  * ══════════════════════════════════════════════════════════════════
  */
 
@@ -75,9 +75,9 @@ export function Faq() {
             </Reveal>
           </div>
 
-          {/* ── Lateral: SPC AI + contacto directo ── */}
+          {/* ── Lateral: SPenCer + contacto directo ── */}
           <div className="space-y-5 lg:pt-24">
-            {/* tarjeta SPC AI */}
+            {/* tarjeta SPenCer */}
             <Reveal y={40}>
               <motion.div
                 whileHover={{ y: -4 }}
@@ -92,7 +92,7 @@ export function Faq() {
                     Nuevo · Inteligencia artificial
                   </span>
                   <h3 className="font-display mt-4 text-[clamp(1.4rem,2.6vw,1.9rem)] font-extrabold leading-tight text-white">
-                    Conoce a SPC AI, nuestra recepcionista inteligente
+                    Conoce a SPenCer, nuestro recepcionista con IA
                   </h3>
                   <p className="mt-3 text-[13.5px] leading-relaxed text-white/70">
                     Responde todas estas preguntas — y cualquier otra que tengas — al instante, a
@@ -113,11 +113,11 @@ export function Faq() {
                   </ul>
                   <button
                     type="button"
-                    onClick={openSpcAi}
+                    onClick={() => openSpcAi()}
                     className="shine group mt-6 inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-4 text-[14.5px] font-bold text-spc-900 shadow-[0_14px_38px_-10px_rgba(255,179,28,0.65)] transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <Sparkles className="h-5 w-5" aria-hidden />
-                    Preguntar a SPC AI
+                    Preguntar a SPenCer
                   </button>
                 </div>
               </motion.div>

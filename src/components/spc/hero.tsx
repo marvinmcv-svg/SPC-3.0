@@ -14,8 +14,9 @@ import { useRef } from "react";
 import { BadgeCheck, Clock3, Gauge, Handshake, Sparkles, MoveHorizontal } from "lucide-react";
 import { BRAND, SERVICES, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
 import { WhatsappCta } from "./whatsapp-cta";
-import { Counter, Magnetic, RingCarousel } from "./motion-primitives";
-import { openServiceDetail } from "./service-detail";
+import { CharReveal, Counter, Magnetic, RingCarousel } from "./motion-primitives";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const PILLARS = [
   { icon: BadgeCheck, label: "Calidad", detail: "Estándares de la industria" },
@@ -29,11 +30,12 @@ const CAROUSEL_ITEMS = SERVICES.map((s) => ({
   id: s.id,
   title: s.title,
   badge: s.category,
-  image: s.image,
+  image: s.gallery[0].src,
 }));
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
+  const router = useRouter();
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   /* Parallax desactivado si el usuario prefiere menos movimiento */
@@ -103,37 +105,16 @@ export function Hero() {
             </span>
           </motion.div>
 
-          {/* Titular */}
+          {/* Titular — letra por letra con giro 3D */}
           <h1 className="font-display max-w-[13ch] text-[clamp(2.6rem,7.2vw,5.4rem)] font-extrabold leading-[1.02] tracking-tight text-white">
-            <span className="block overflow-hidden">
-              <motion.span
-                className="block"
-                initial={{ y: "110%" }}
-                animate={{ y: "0%" }}
-                transition={{ duration: 1, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              >
-                Imprimiendo
-              </motion.span>
+            <span className="block">
+              <CharReveal text="Imprimiendo" animateOnMount delay={0.45} stagger={0.03} />
             </span>
-            <span className="block overflow-hidden">
-              <motion.span
-                className="block"
-                initial={{ y: "110%" }}
-                animate={{ y: "0%" }}
-                transition={{ duration: 1, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
-              >
-                lo mejor de
-              </motion.span>
+            <span className="block">
+              <CharReveal text="lo mejor de" animateOnMount delay={0.75} stagger={0.03} />
             </span>
-            <span className="block overflow-hidden pb-2">
-              <motion.span
-                className="text-gradient-gold block"
-                initial={{ y: "110%", filter: "blur(10px)" }}
-                animate={{ y: "0%", filter: "blur(0px)" }}
-                transition={{ duration: 1.05, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}
-              >
-                Bolivia.
-              </motion.span>
+            <span className="block pb-2">
+              <CharReveal text="Bolivia." animateOnMount delay={1.05} stagger={0.05} charClassName="text-gold-400 [text-shadow:0_0_40px_rgba(255,196,79,0.45)]" />
             </span>
           </h1>
 
@@ -163,9 +144,12 @@ export function Hero() {
                 Cotiza por WhatsApp
               </WhatsappCta>
             </Magnetic>
-            <WhatsappCta href="#servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
+            <Link
+              href="/servicios"
+              className="shine inline-flex items-center justify-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-8 py-4 text-base font-semibold text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/20"
+            >
               Explorar servicios
-            </WhatsappCta>
+            </Link>
           </motion.div>
 
           {/* micro prueba social */}
@@ -197,7 +181,7 @@ export function Hero() {
           <RingCarousel
             items={CAROUSEL_ITEMS}
             autoMs={4200}
-            onSelect={(i) => openServiceDetail(SERVICES[i].id)}
+            onSelect={(i) => router.push(`/servicios/${SERVICES[i].id}`)}
           />
         </motion.div>
       </motion.div>
