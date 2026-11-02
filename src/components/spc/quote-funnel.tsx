@@ -19,16 +19,11 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CalendarDays, CheckCheck, Minus, Plus, Send, User } from "lucide-react";
-import { BRAND, CONTACT, SERVICES, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, useLang, L } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
-
-/* Etiquetas de pills de servicio (cortas para caber) */
-const SERVICE_OPTIONS = [
-  ...SERVICES.map((s) => s.shortTitle),
-  "Otro / no estoy seguro",
-] as const;
 
 type FormState = {
   name: string;
@@ -60,25 +55,47 @@ const inputBase =
 
 export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
   const [form, setForm] = useState<FormState>(INITIAL);
+  const t = useT();
+  const { lang } = useLang();
+  const { BRAND, CONTACT, SERVICES } = useSiteData();
+
+  /* Etiquetas de pills de servicio (cortas para caber) */
+  const SERVICE_OPTIONS = [
+    ...SERVICES.map((s) => s.shortTitle),
+    t(L("Otro / no estoy seguro", "Other / not sure yet")),
+  ];
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
 
   /* ── Mensaje en vivo (lo que llegará a WhatsApp) ── */
+  const es = lang === "es";
   const message = useMemo(() => {
     const dash = (v: string | number) => (v === "" || v === 0 ? "---" : String(v));
-    return [
-      `Hola ${BRAND.shortName}! Quiero cotizar un proyecto de impresión.`,
-      "",
-      `Nombre: ${dash(form.name)}`,
-      `Servicio: ${dash(form.service)}`,
-      `Cantidad aprox.: ${dash(form.quantity)}`,
-      `Fecha deseada: ${dash(form.date)}`,
-      `Comentarios: ${dash(form.comments)}`,
-      "",
-      "¡Gracias!",
-    ].join("\n");
-  }, [form]);
+    return es
+      ? [
+          `Hola ${BRAND.shortName}! Quiero cotizar un proyecto de impresión.`,
+          "",
+          `Nombre: ${dash(form.name)}`,
+          `Servicio: ${dash(form.service)}`,
+          `Cantidad aprox.: ${dash(form.quantity)}`,
+          `Fecha deseada: ${dash(form.date)}`,
+          `Comentarios: ${dash(form.comments)}`,
+          "",
+          "¡Gracias!",
+        ].join("\n")
+      : [
+          `Hi ${BRAND.shortName}! I'd like a quote for a printing project.`,
+          "",
+          `Name: ${dash(form.name)}`,
+          `Service: ${dash(form.service)}`,
+          `Approx. quantity: ${dash(form.quantity)}`,
+          `Desired date: ${dash(form.date)}`,
+          `Comments: ${dash(form.comments)}`,
+          "",
+          "Thank you!",
+        ].join("\n");
+  }, [form, BRAND.shortName, es]);
 
   const link = waLink(message);
   const filled =
@@ -88,7 +105,7 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
     <section
       id="contacto"
       className="grain relative overflow-hidden bg-[#10131d] py-24 sm:py-32"
-      aria-label="Cotiza tu proyecto por WhatsApp"
+      aria-label={t(L("Cotiza tu proyecto por WhatsApp", "Quote your project on WhatsApp"))}
     >
       {/* halos de fondo */}
       <div aria-hidden className="pointer-events-none absolute -left-40 top-0 h-[420px] w-[420px] rounded-full bg-emerald-500/10 blur-[120px]" />
@@ -98,17 +115,16 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
         {/* ── Encabezado ── */}
         {!compact && (
           <div className="mx-auto max-w-2xl text-center">
-            <Eyebrow dark>Cotización en 1 minuto</Eyebrow>
+            <Eyebrow dark>{t(L("Cotización en 1 minuto", "Quote in 1 minute"))}</Eyebrow>
             <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-white">
-              <WordsReveal text="Cuéntanos tu proyecto" />{" "}
-              <WordsReveal text="y lo llevamos a WhatsApp" wordClassName="text-gradient-gold" delay={0.14} />
+              <WordsReveal text={t(L("Cuéntanos tu proyecto", "Tell us about your project"))} />{" "}
+              <WordsReveal text={t(L("y lo llevamos a WhatsApp", "and we'll take it to WhatsApp"))} wordClassName="text-gradient-gold" delay={0.14} />
             </h2>
             <Reveal delay={0.25}>
               <p className="mt-5 text-[15.5px] leading-relaxed text-white/65">
-                Completa el formulario y mira en vivo el mensaje que recibirá nuestro equipo.
-                Un asesor especializado te responde{" "}
-                <strong className="font-semibold text-gold-300">el mismo día</strong> con
-                propuesta de papel, acabados, tiempos y precio.
+                {t(L("Completa el formulario y mira en vivo el mensaje que recibirá nuestro equipo. Un asesor especializado te responde", "Fill in the form and watch live the message our team will receive. A specialized advisor replies"))}{" "}
+                <strong className="font-semibold text-gold-300">{t(L("el mismo día", "the same day"))}</strong>{" "}
+                {t(L("con propuesta de papel, acabados, tiempos y precio.", "with a proposal for paper, finishes, timeline and price."))}
               </p>
             </Reveal>
           </div>
@@ -121,25 +137,25 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
             <div className="rounded-[1.8rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-8">
               {/* nombre */}
               <div>
-                <FieldLabel>Nombre / Empresa</FieldLabel>
+                <FieldLabel>{t(L("Nombre / Empresa", "Name / Company"))}</FieldLabel>
                 <div className="relative">
                   <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" aria-hidden />
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => set("name", e.target.value)}
-                    placeholder="Ej.: Marcela Rojas — Pastelería Delicia"
+                    placeholder={t(L("Ej.: Marcela Rojas — Pastelería Delicia", "e.g. Marcela Rojas — Delicia Bakery"))}
                     className={cn(inputBase, "pl-11")}
                     maxLength={80}
-                    aria-label="Tu nombre o empresa"
+                    aria-label={t(L("Tu nombre o empresa", "Your name or company"))}
                   />
                 </div>
               </div>
 
               {/* servicio (pills) */}
               <div className="mt-6">
-                <FieldLabel>Servicio</FieldLabel>
-                <div className="flex flex-wrap gap-2" role="group" aria-label="Selecciona un servicio">
+                <FieldLabel>{t(L("Servicio", "Service"))}</FieldLabel>
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t(L("Selecciona un servicio", "Select a service"))}>
                   {SERVICE_OPTIONS.map((opt) => {
                     const active = form.service === opt;
                     return (
@@ -166,14 +182,14 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
               {/* cantidad + fecha */}
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
                 <div>
-                  <FieldLabel>Cantidad aprox.</FieldLabel>
+                  <FieldLabel>{t(L("Cantidad aprox.", "Approx. quantity"))}</FieldLabel>
                   <div className="flex items-center gap-2">
                     <motion.button
                       type="button"
                       whileTap={{ scale: 0.92 }}
                       onClick={() => set("quantity", Math.max(0, form.quantity - 250))}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 text-white/70 transition-colors hover:border-gold-500/50 hover:text-gold-300"
-                      aria-label="Reducir cantidad en 250"
+                      aria-label={t(L("Reducir cantidad en 250", "Decrease quantity by 250"))}
                     >
                       <Minus className="h-4 w-4" />
                     </motion.button>
@@ -185,21 +201,21 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                       onChange={(e) => set("quantity", Math.max(0, Number(e.target.value) || 0))}
                       placeholder="500"
                       className={cn(inputBase, "text-center tabular-nums")}
-                      aria-label="Cantidad aproximada de unidades"
+                      aria-label={t(L("Cantidad aproximada de unidades", "Approximate number of units"))}
                     />
                     <motion.button
                       type="button"
                       whileTap={{ scale: 0.92 }}
                       onClick={() => set("quantity", form.quantity + 250)}
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/15 text-white/70 transition-colors hover:border-gold-500/50 hover:text-gold-300"
-                      aria-label="Aumentar cantidad en 250"
+                      aria-label={t(L("Aumentar cantidad en 250", "Increase quantity by 250"))}
                     >
                       <Plus className="h-4 w-4" />
                     </motion.button>
                   </div>
                 </div>
                 <div>
-                  <FieldLabel>Fecha deseada</FieldLabel>
+                  <FieldLabel>{t(L("Fecha deseada", "Desired date"))}</FieldLabel>
                   <div className="relative">
                     <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" aria-hidden />
                     <input
@@ -207,7 +223,7 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                       value={form.date}
                       onChange={(e) => set("date", e.target.value)}
                       className={cn(inputBase, "pl-11 [color-scheme:dark]")}
-                      aria-label="Fecha en la que necesitas tu pedido"
+                      aria-label={t(L("Fecha en la que necesitas tu pedido", "Date you need your order"))}
                     />
                   </div>
                 </div>
@@ -215,15 +231,15 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
 
               {/* comentarios */}
               <div className="mt-6">
-                <FieldLabel>Comentarios (opcional)</FieldLabel>
+                <FieldLabel>{t(L("Comentarios (opcional)", "Comments (optional)"))}</FieldLabel>
                 <textarea
                   value={form.comments}
                   onChange={(e) => set("comments", e.target.value)}
-                  placeholder="Medidas, materiales, referencias, acabados que te gustan…"
+                  placeholder={t(L("Medidas, materiales, referencias, acabados que te gustan…", "Sizes, materials, references, finishes you like…"))}
                   rows={3}
                   maxLength={400}
                   className={cn(inputBase, "resize-none")}
-                  aria-label="Comentarios adicionales sobre tu proyecto"
+                  aria-label={t(L("Comentarios adicionales sobre tu proyecto", "Additional comments about your project"))}
                 />
               </div>
 
@@ -236,15 +252,15 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                   whileHover={{ scale: 1.015 }}
                   whileTap={{ scale: 0.985 }}
                   className="shine group flex w-full items-center justify-center gap-3 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] py-4 text-[15px] font-extrabold uppercase tracking-[0.12em] text-white shadow-[0_20px_56px_-16px_rgba(37,211,102,0.7),inset_0_1px_0_rgba(255,255,255,0.4)]"
-                  aria-label="Continuar la conversación en WhatsApp"
+                  aria-label={t(L("Continuar la conversación en WhatsApp", "Continue the conversation on WhatsApp"))}
                 >
                   <WhatsAppIcon className="h-5 w-5" />
-                  Continuar en WhatsApp
+                  {t(L("Continuar en WhatsApp", "Continue on WhatsApp"))}
                   <Send className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" aria-hidden />
                 </motion.a>
                 <p className="mt-3.5 text-center text-[12px] leading-relaxed text-white/45">
-                  Tu cotización avanza cuando nuestro equipo te responde por WhatsApp —{" "}
-                  <strong className="font-semibold text-white/65">asesoría gratuita y sin compromiso.</strong>
+                  {t(L("Tu cotización avanza cuando nuestro equipo te responde por WhatsApp —", "Your quote moves forward when our team replies on WhatsApp —"))}{" "}
+                  <strong className="font-semibold text-white/65">{t(L("asesoría gratuita y sin compromiso.", "free advice, no strings attached."))}</strong>
                 </p>
               </div>
             </div>
@@ -272,7 +288,7 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                       </span>
-                      En vivo
+                      {t(L("En vivo", "Live"))}
                     </span>
                   </div>
 
@@ -293,7 +309,7 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                             {message}
                           </p>
                           <p className="mt-3 flex items-center justify-end gap-1.5 text-[10.5px] font-medium text-emerald-100/70">
-                            {new Date().toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" })}
+                            {new Date().toLocaleTimeString(lang === "es" ? "es-BO" : "en-US", { hour: "2-digit", minute: "2-digit" })}
                             <CheckCheck className="h-3.5 w-3.5" aria-hidden />
                           </p>
                           {/* brillo superior estilo glossy */}
@@ -315,7 +331,7 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                         ))}
                       </span>
                       <p className="text-[11.5px] font-medium text-white/60">
-                        Un asesor real te responderá en minutos…
+                        {t(L("Un asesor real te responderá en minutos…", "A real advisor will reply within minutes…"))}
                       </p>
                     </div>
                   </div>
@@ -324,8 +340,8 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
                   <div className="flex items-center justify-between gap-4 border-t border-white/8 bg-[#111a2b] px-6 py-4">
                     <p className="text-[11.5px] font-semibold text-white/50">
                       {filled >= 4
-                        ? "¡Listo! Tu mensaje se enviará completo."
-                        : `Completa ${4 - filled} campo${4 - filled === 1 ? "" : "s"} para un asesor más rápido`}
+                        ? t(L("¡Listo! Tu mensaje se enviará completo.", "All set! Your message will be sent complete."))
+                        : t(L(`Completa ${4 - filled} campo${4 - filled === 1 ? "" : "s"} para un asesor más rápido`, `Fill in ${4 - filled} more field${4 - filled === 1 ? "" : "s"} for a faster response`))}
                     </p>
                     <div className="flex gap-1.5" aria-hidden>
                       {[0, 1, 2, 3].map((i) => (
@@ -346,9 +362,9 @@ export function QuoteFunnel({ compact = false }: { compact?: boolean }) {
               {/* mini fila de garantías bajo la preview */}
               <div className="mt-5 grid grid-cols-3 gap-3">
                 {[
-                  { icon: "⚡", text: "Respuesta en minutos" },
-                  { icon: "📋", text: "Cotización el mismo día" },
-                  { icon: "🤝", text: "Asesoría sin costo" },
+                  { icon: "⚡", text: t(L("Respuesta en minutos", "Reply in minutes")) },
+                  { icon: "📋", text: t(L("Cotización el mismo día", "Same-day quote")) },
+                  { icon: "🤝", text: t(L("Asesoría sin costo", "Free advice")) },
                 ].map((g) => (
                   <div
                     key={g.text}

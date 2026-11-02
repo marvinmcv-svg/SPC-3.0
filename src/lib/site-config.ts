@@ -1,74 +1,37 @@
 /**
  * ══════════════════════════════════════════════════════════════════
- *  SPC IMPRESORES S.A. — Configuración global del sitio
+ *  SPC IMPRESORES S.A. — Configuración global del sitio (ESPAÑOL)
  * ══════════════════════════════════════════════════════════════════
  *  Datos de marca, contacto y funnel de WhatsApp.
+ *  La versión EN vive en site-config-en.ts (misma interfaz SiteData).
  *
- *  ⚠️  IMPORTANTE — NÚMERO DE WHATSAPP:
- *  Reemplaza WHATSAPP_NUMBER con la línea móvil real de la empresa
- *  (formato internacional SIN "+", espacios ni guiones).
- *  Actualmente usa el número publicado de la empresa: +591 2 2111121
+ *  IMÁGENES: fotos REALES de productos SPC y de marcas cliente
+ *  (Paceña/Taquiña/Huari de CBN, packaging propio de planta).
+ *  Ver public/images/services/CREDITS.md para fuentes y licencias.
  * ══════════════════════════════════════════════════════════════════
  */
 
-export const BRAND = {
-  name: "SPC Impresores S.A.",
-  shortName: "SPC",
-  tagline: "Gráfica Industrial",
-  slogan: "Imprimiendo lo mejor de Bolivia",
-  pillars: ["Calidad", "Puntualidad", "Capacidad", "Servicio"],
-  foundedYear: 2001,
-  city: "La Paz, Bolivia",
-} as const;
-
-export const CONTACT = {
-  phone: "+591 77165787",
-  phoneHref: "tel:+59177165787",
-  whatsapp: "+591 77165787",
-  email: "graficaindustrial@spc.com.bo",
-  address: "Av. Saavedra N.º 2411 (Final), Zona Miraflores",
-  addressFull: "Edificio SPC, Av. Saavedra N.º 2411, Zona Miraflores, La Paz — Bolivia",
-  hours: "Lun – Vie · 8:00 a 18:00",
-  website: "www.spc.net.bo",
-} as const;
-
-/** ─── FUNNEL DE WHATSAPP ───────────────────────────────────────────
- *  Cambia aquí el número y todos los CTA del sitio se actualizan.
- */
+/* ─── WHATSAPP (número único para todo el funnel) ───────────────── */
 export const WHATSAPP_NUMBER = "59177165787";
 
 export function waLink(message: string): string {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
-/** Mensajes pre-cargados del funnel (uno por contexto) */
-export const WA_MESSAGES = {
-  general:
-    "¡Hola SPC Gráfica Industrial! 👋 Vi su sitio web y me gustaría cotizar un proyecto de impresión.",
-  services:
-    "¡Hola SPC! 👋 Estoy explorando sus servicios y me gustaría recibir asesoría para mi proyecto.",
-  quote: (service: string) =>
-    `¡Hola SPC! 👋 Me interesa cotizar *${service}*. ¿Podrían darme más información sobre tiempos y precios?`,
-  process:
-    "¡Hola SPC! 👋 Quiero iniciar un proyecto con ustedes. ¿Me explican cómo funciona el proceso de cotización?",
-  packaging:
-    "¡Hola SPC! 👋 Tengo un proyecto de *packaging* (alimentos / farmacéutico / promocional) y quiero asesoría técnica.",
-  commercial:
-    "¡Hola SPC! 👋 Necesito impresión comercial: libros, revistas, catálogos o material corporativo. ¿Me ayudan con una cotización?",
-  digital:
-    "¡Hola SPC! 👋 Me interesa la *impresión digital bajo demanda* para tirajes cortos. ¿Qué opciones manejan?",
-  final:
-    "¡Hola SPC! 👋 Estoy listo/a para imprimir mi próximo proyecto con ustedes. ¿Cómo empezamos?",
-} as const;
+/* ─── Tipos ─────────────────────────────────────────────────────── */
 
-/** ─── DATOS DE SERVICIOS (9 líneas de producto) ─────────────────── */
 export type ServiceFaq = { q: string; a: string };
+
+/** Clave estable de categoría (no cambia con el idioma) */
+export type ServiceCategory = "packaging" | "commercial" | "digital";
 
 export type Service = {
   id: string;
   title: string;
   shortTitle: string;
-  category: "Packaging" | "Impresión Comercial" | "Digital";
+  category: ServiceCategory;
+  /** Etiqueta visible de la categoría (traducible) */
+  categoryLabel: string;
   description: string;
   insight: string; // dato educativo
   image: string;
@@ -84,433 +47,17 @@ export type Service = {
   deepFaqs: ServiceFaq[]; // preguntas frecuentes del servicio
 };
 
-export const SERVICES: Service[] = [
-  {
-    id: "packaging-alimentos",
-    title: "Packaging de Alimentos",
-    shortTitle: "Alimentos",
-    category: "Packaging",
-    description:
-      "Cajas y envases primarios con tintas de grado alimentario, aptos para contacto directo con alimentos y sellado de frescura.",
-    insight: "Las tintas de grado alimentario cumplen normas de migración: el color jamás pasa al producto.",
-    image: "/images/services/food-packaging.jpg",
-    waMessage: WA_MESSAGES.quote("Packaging de Alimentos"),
-    featured: true,
-    gallery: ["/images/services/gallery-food.jpg", "/images/services/paper-bags.jpg"],
-    minRun: "1.000 unidades (orientativo)",
-    turnaround: "7 – 12 días hábiles según acabados",
-    specs: [
-      "Cartulinas de 250 a 450 g con barreras de grado alimentario",
-           "Tintas y barnices de base agua aptos para contacto directo con alimentos",
-      "Troquelado y hendido de precisión para envasado automático o manual",
-      "Opciones de laminado mate, brillante y soft-touch",
-      "Impresión CMYK + pantones planos de marca",
-    ],
-    useCases: [
-      "Cajas primarias para panificados, galletas y snacks",
-      "Envases para lácteos, conservas y bebidas",
-      "Sleeves y banderolas promocionales de temporada",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Qué significa “grado alimentario” en la tinta?",
-        a: "Son tintas formuladas con pigmentos de baja migración: cumplen normas internacionales que garantizan que ninguna sustancia del impreso pasa al alimento, incluso en contacto directo y a temperatura ambiente o refrigerada.",
-      },
-      {
-        q: "¿Pueden producir para mi línea de envasado automático?",
-        a: "Sí. El troquel de precisión garantiza que cada caja se doble y encaje sin variaciones, requisito para líneas de envasado de alta velocidad. Coordinamos las especificaciones de tu máquina antes de producir.",
-      },
-    ],
-  },
-  {
-    id: "packaging-farmaceutico",
-    title: "Packaging Farmacéutico",
-    shortTitle: "Farmacéutico",
-    category: "Packaging",
-    description:
-      "Estuches con validación técnica para la industria farmacéutica: troquelado de precisión, códigos de lote y braille opcional.",
-    insight: "El troquel de precisión garantiza que cada estuche se doble perfecto, sin variaciones en línea.",
-    image: "/images/services/pharma-packaging.jpg",
-    waMessage: WA_MESSAGES.quote("Packaging Farmacéutico"),
-    gallery: ["/images/services/gallery-pharma.jpg", "/images/services/stationery.jpg"],
-    minRun: "5.000 unidades (orientativo)",
-    turnaround: "10 – 15 días hábiles con validación",
-    specs: [
-      "Estuches con validación técnica y control de lote incorporado",
-      "Numeración y código de serie para trazabilidad",
-      "Braille opcional conforme a normativas de accesibilidad",
-      "Cartulinas blancas de alta blancura para legibilidad médica",
-      "Proof de color certificado antes de tiraje",
-    ],
-    useCases: [
-      "Estuches para medicamentos de venta libre y controlados",
-      "Empaques para suplementos y productos hospitalarios",
-      "Insertos y prospectos informativos (IFU)",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Qué es el braille en estuches y es obligatorio?",
-        a: "El braille impreso en el estuche permite identificar el medicamento a personas con discapacidad visual. En muchos mercados es exigido por normativa farmacéutica; lo integramos en el troquel sin costo adicional de estructura.",
-      },
-      {
-        q: "¿Cómo garantizan la trazabilidad de lotes?",
-        a: "Cada tiraje se produce bajo control de lote: el número se imprime en línea y queda registrado en nuestro sistema de calidad, de modo que todo estuche sea rastreable de principio a fin.",
-      },
-    ],
-  },
-  {
-    id: "packaging-comercial",
-    title: "Packaging Comercial y Promocional",
-    shortTitle: "Comercial",
-    category: "Packaging",
-    description:
-      "Cajas regalo, displays y envases promocionales que elevan la experiencia de marca en retail y campañas.",
-    insight: "Un buen unboxing multiplica el valor percibido: el packaging es el primer apretón de manos de tu marca.",
-    image: "/images/services/promo-packaging.jpg",
-    waMessage: WA_MESSAGES.quote("Packaging Comercial y Promocional"),
-    minRun: "500 unidades (orientativo)",
-    turnaround: "5 – 10 días hábiles",
-    specs: [
-      "Cajas regalo con ventana, asa o compartimentos internos",
-      "Displays de piso y mostrador para retail",
-      "Acentos en hot stamping, UV selectivo y láminas metálicas",
-      "Estructuras especiales diseñadas a medida de tu producto",
-      "Kits de unboxing para campañas y e-commerce",
-    ],
-    useCases: [
-      "Ediciones especiales y lanzamientos de temporada",
-      "Cajas de regalo corporativas para fechas clave",
-      "Displays promocionales para puntos de venta",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Pueden diseñar la estructura de mi caja?",
-        a: "Sí. Nuestro equipo técnico desarrolla el troquel y el dummy físico para que valides volúmenes, resistencia y estética antes de la producción final.",
-      },
-      {
-        q: "¿Qué acabado me recomiendan para premium?",
-        a: "La combinación laminado mate + UV selectivo o hot stamping metálico genera el contraste táctil y visual más asociado a marcas de gama alta. En asesoría te mostramos muestras físicas.",
-      },
-    ],
-  },
-  {
-    id: "paper-bags",
-    title: "Paper Bags",
-    shortTitle: "Paper Bags",
-    category: "Packaging",
-    description:
-      "Bolsas de papel con asas, en gramajes resistentes y acabados de marca — la alternativa ecológica y elegante para retail.",
-    insight: "El papel kraft de 120 g en adelante soporta hasta 8 kg: eco y resistencia no están reñidos.",
-    image: "/images/services/paper-bags.jpg",
-    waMessage: WA_MESSAGES.quote("Paper Bags"),
-    minRun: "1.000 unidades (orientativo)",
-    turnaround: "7 – 10 días hábiles",
-    specs: [
-      "Papel kraft y sulfatado desde 120 g (soporta hasta 8 kg)",
-      "Asas de papel trenzado, cinta o asa troquelada integrada",
-      "Impresión a 1 a 4 tintas con tintas eco-solventes de base agua",
-      "Formatos desde boutique hasta bolsa de supermercado",
-      "Opción de fondo reforzado para mayor carga",
-    ],
-    useCases: [
-      "Bolsas para tiendas de moda, farmacias y delivery",
-      "Bolsas ecológicas para retail y supermercados",
-      "Ediciones de temporada para campañas de marca",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Las bolsas de papel son realmente más ecológicas?",
-        a: "El papel es renovable, biodegradable y reciclable; con gramajes desde 120 g logras resistencia comparable al plástico de un solo uso. Además, tu marca gana percepción de responsabilidad ambiental.",
-      },
-      {
-        q: "¿Puedo pedir varios tamaños con el mismo diseño?",
-        a: "Sí, adaptamos el arte a cada formato manteniendo la proporción de marca. Es la práctica habitual para líneas de retail con varios tipos de producto.",
-      },
-    ],
-  },
-  {
-    id: "impresos-comerciales",
-    title: "Impresos Comerciales",
-    shortTitle: "Impresos",
-    category: "Impresión Comercial",
-    description:
-      "Papelería corporativa, formularios, facturas y todo el material operativo de tu empresa con consistencia de marca total.",
-    insight: "La papelería homologada (pantones fijos) mantiene tu marca idéntica en cada tiraje, sin deriva de color.",
-    image: "/images/services/stationery.jpg",
-    waMessage: WA_MESSAGES.quote("Impresos Comerciales"),
-    featured: true,
-    minRun: "500 unidades (orientativo)",
-    turnaround: "4 – 8 días hábiles",
-    specs: [
-      "Papelería corporativa con pantones fijos homologados",
-      "Formularios continuos, facturas y documentos de seguridad",
-      "Numeración correlativa, troquelado y engrapado",
-      "Papeles bond, offset y couché de primera calidad",
-      "Control de deriva de color entre tirajes",
-    ],
-    useCases: [
-      "Hojas membretadas, sobres y tarjetas de presentación",
-      "Facturas, recibos y formularios operativos",
-      "Manuales internos y carpetas corporativas",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Por qué importa la “deriva de color” entre tirajes?",
-        a: "Si cada pedido sale con un azul distinto, tu marca se percibe descuidada. Con pantones homologados y controles de densidad, tu papelería se ve idéntica hoy, en 6 meses y en 2 años.",
-      },
-      {
-        q: "¿Pueden entregar por departamentos a nivel nacional?",
-        a: "Sí. Coordinamos entregas segmentadas a tus sucursales con empaquetado identificado por destino — un solo pedido, distribución nacional.",
-      },
-    ],
-  },
-  {
-    id: "libros",
-    title: "Libros Emblocados HotMelt/PUR",
-    shortTitle: "Libros",
-    category: "Impresión Comercial",
-    description:
-      "Encuadernación perfecta con adhesivos HotMelt y PUR: libros que se abren planos y cuyas hojas jamás se despegan.",
-    insight: "El adhesivo PUR soporta ±60 °C y humedad: las páginas aguantan miles de aperturas sin despegarse.",
-    image: "/images/services/books.jpg",
-    waMessage: WA_MESSAGES.quote("Libros Emblocados HotMelt/PUR"),
-    gallery: ["/images/services/gallery-books.jpg", "/images/services/magazines.jpg"],
-    minRun: "300 ejemplares (orientativo)",
-    turnaround: "10 – 15 días hábiles",
-    specs: [
-      "Encuadernación perfecta (tapa rústica) con adhesivo HotMelt o PUR",
-      "PUR: páginas que aguantan miles de aperturas sin despegarse",
-      "Lomo cuadrado con texto y logos en relieve opcional",
-      "Guardas, cabezadas y cintas marcadoras para ediciones premium",
-      "Formatos estándar y a medida, papel book bulk o bulk alto",
-    ],
-    useCases: [
-      "Libros de texto y educativos para colegios y universidades",
-      "Novelas, poesía y literatura general",
-      "Memorias corporativas y libros de aniversario",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Qué diferencia hay entre HotMelt y PUR?",
-        a: "El HotMelt es un adhesivo termofusible de excelente relación costo-rendimiento. El PUR es un polímero de uretano con adherencia superior: resiste ±60 °C, humedad y miles de aperturas — ideal para libros de uso intenso como los escolares.",
-      },
-      {
-        q: "¿Puedo imprimir primero una edición corta de prueba?",
-        a: "Sí. Combinamos tiraje offset con la opción digital bajo demanda para ediciones piloto; luego escalas el volumen cuando el libro despegue.",
-      },
-    ],
-  },
-  {
-    id: "revistas",
-    title: "Revistas y Catálogos",
-    shortTitle: "Revistas",
-    category: "Impresión Comercial",
-    description:
-      "Publicaciones periódicas con encuadernación a caballete, papel couché y color calibrado de portada a contraportada.",
-    insight: "El color calibrado (Fogra) hace que tu portada se vea igual en pantalla, en prueba y en el kiosco.",
-    image: "/images/services/magazines.jpg",
-    waMessage: WA_MESSAGES.quote("Revistas y Catálogos"),
-    minRun: "500 ejemplares (orientativo)",
-    turnaround: "6 – 12 días hábiles",
-    specs: [
-      "Encuadernación a caballete (grapas) o emblocado según páginas",
-      "Papel couché de 90 a 170 g con color calibrado Fogra",
-      "Portadas en cartulina de 200 a 300 g con laminado",
-      "Corte a sangre y paginación profesional",
-      "Distribución por paquetes identificados para puntos de venta",
-    ],
-    useCases: [
-      "Revistas corporativas y de membresía",
-      "Catálogos de producto para retail y ferias",
-      "Publicaciones periódicas de gremios e instituciones",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Qué es el color calibrado Fogra y por qué me importa?",
-        a: "Es un estándar internacional que fija cómo debe verse el color en impresión offset. Al calibrar contra Fogra, tu portada se ve igual en pantalla, en la prueba y en el ejemplar final — sin sorpresas.",
-      },
-      {
-        q: "¿Caballete o emblocado: cuál me conviene?",
-        a: "El caballete (grapas al centro) es económico y ideal hasta ~64 páginas. El emblocado da lomo cuadrado, más elegante y resistente, y permite más páginas. Te recomendamos según tu proyecto y presupuesto.",
-      },
-    ],
-  },
-  {
-    id: "calendarios",
-    title: "Calendarios",
-    shortTitle: "Calendarios",
-    category: "Impresión Comercial",
-    description:
-      "Calendarios corporativos de pared y escritorio que mantienen tu marca visible 365 días frente a tu cliente.",
-    insight: "Un calendario corporativo recibe en promedio 6 visitas visuales al día: publicidad que no se apaga.",
-    image: "/images/services/calendars.jpg",
-    waMessage: WA_MESSAGES.quote("Calendarios"),
-    minRun: "200 unidades (orientativo)",
-    turnaround: "5 – 8 días hábiles",
-    specs: [
-      "Calendarios de pared (tapas + 12 hojas) y de escritorio",
-      "Espiral metálico o plástico y colgador reforzado",
-      "Fechas personalizadas: días festivos y aniversarios de tu empresa",
-      "Cartulina de 200 a 300 g con laminado opcional",
-      "Formatos clásicos o a medida (base triangular para escritorio)",
-    ],
-    useCases: [
-      "Regalo corporativo de fin de año para clientes y aliados",
-      "Calendarios promocionales con imágenes de campaña",
-      "Agendas y planners corporativos de marca",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Por qué un calendario es buena inversión publicitaria?",
-        a: "Recibe en promedio 6 vistas diarias durante 365 días: cuesta centavos por contacto y mantiene tu marca en el escritorio del decisor de compra todo el año.",
-      },
-      {
-        q: "¿Pueden imprimir mis fechas importantes?",
-        a: "Sí. Además del calendario estándar, incorporamos días festivos bolivianos, aniversarios corporativos y fechas de tu industria marcadas a color.",
-      },
-    ],
-  },
-  {
-    id: "impresion-digital",
-    title: "Impresión Digital bajo Demanda",
-    shortTitle: "Digital",
-    category: "Digital",
-    description:
-      "Tirajes cortos e imprenta instantánea: imprime solo lo que necesitas, cuando lo necesitas, sin stock muerto.",
-    insight: "La impresión bajo demanda elimina el 100 % del inventario obsoleto: se imprime al ritmo de tus ventas.",
-    image: "/images/services/digital-print.jpg",
-    waMessage: WA_MESSAGES.quote("Impresión Digital bajo Demanda"),
-    featured: true,
-    minRun: "1 unidad — imprime solo lo que necesitas",
-    turnaround: "24 – 72 horas",
-    specs: [
-      "Tirajes cortos sin chapas ni films: cambios de arte al instante",
-      "Impresión digital de calidad offset para 1 a 1.000 unidades",
-      "Datos variables: nombres, códigos y numeración única por pieza",
-      "Papeles especiales, adhesivos y sintéticos disponibles",
-      "Reimpresión exacta bajo pedido: cero stock muerto",
-    ],
-    useCases: [
-      "Prototipos de packaging antes del tiraje grande",
-      "Invitaciones, credenciales y material personalizado",
-      "Reposición rápida de existencias sin sobre-stock",
-    ],
-    deepFaqs: [
-      {
-        q: "¿Cuándo conviene digital y cuándo offset?",
-        a: "Regla práctica: digital para tirajes cortos (1 a ~500 según formato) o artes con datos variables; offset para volúmenes grandes, donde el costo unitario baja y los pantones exactos son obligatorios.",
-      },
-      {
-        q: "¿Qué son los “datos variables”?",
-        a: "Es la capacidad de imprimir una pieza distinta en cada ejemplar: nombres de destinatarios, códigos QR únicos o numeración de seguridad — imposible con impresión tradicional y clave para personalización y trazabilidad.",
-      },
-    ],
-  },
-];
-
-/** ─── SECTORES ATENDIDOS ─────────────────────────────────────────── */
-export const SECTORS = [
-  { id: "alimentos", label: "Alimentos & Bebidas", detail: "Envases con certificación de grado alimentario" },
-  { id: "farmaceutica", label: "Farmacéutica", detail: "Estuches con validación técnica y braille" },
-  { id: "editorial", label: "Editorial", detail: "Libros, revistas y catálogos de gran tiraje" },
-  { id: "retail", label: "Retail & Promocional", detail: "Bolsas, cajas regalo y campañas de marca" },
-  { id: "corporativo", label: "Corporativo", detail: "Papelería y material operativo homologado" },
-  { id: "agencias", label: "Agencias de Publicidad", detail: "Producción a todo color con entregas puntuales" },
-] as const;
-
-/** ─── PROCESO (funnel educativo hacia WhatsApp) ──────────────────── */
-export const PROCESS_STEPS = [
-  {
-    id: "p1",
-    title: "Cuéntanos tu idea",
-    detail:
-      "Escríbenos por WhatsApp con tu proyecto: tipo de producto, cantidad aproximada y fecha objetivo. No necesitas saber nada de impresión — nuestro equipo te guía.",
-    tip: "Mientras más contexto compartas (uso, imagen de referencia, tiraje), más precisa será tu cotización.",
-  },
-  {
-    id: "p2",
-    title: "Asesoría y cotización a medida",
-    detail:
-      "Un asesor especializado revisa tu caso y te envía una propuesta con papel, acabados, tiempos y precio. Todo claro, sin letra chica.",
-    tip: "¿Primera vez imprimiendo? Te explicamos cada término (gramaje, pantone, troquel) en palabras simples.",
-  },
-  {
-    id: "p3",
-    title: "Producción con estándar SPC",
-    detail:
-      "Tu proyecto entra a planta con control de calidad en cada etapa: prueba de color, supervisión de máquina y verificación final antes del despacho.",
-    tip: "Trabajamos con tecnología de punta e insumos de primera calidad — los más altos estándares de la industria.",
-  },
-  {
-    id: "p4",
-    title: "Entrega puntual, donde la necesites",
-    detail:
-      "Recibes tu producción en tiempo y forma. Y si necesitas reimpresiones o ajustes, ya tienes a tu asesor a un mensaje de distancia.",
-    tip: "La puntualidad es uno de nuestros 4 pilares: tu fecha objetivo es un compromiso, no una esperanza.",
-  },
-] as const;
-
-/** ─── STATS ──────────────────────────────────────────────────────── */
-export const STATS = [
-  { value: 24, suffix: "", label: "Años de trayectoria", detail: "Desde 2001 en La Paz" },
-  { value: 9, suffix: "", label: "Líneas de producto", detail: "Del packaging al digital" },
-  { value: 4, suffix: "", label: "Pilares de garantía", detail: "Calidad · Puntualidad · Capacidad · Servicio" },
-  { value: 100, suffix: "%", label: "Compromiso", detail: "El factor humano marca la diferencia" },
-] as const;
-
-/** ─── NAV ──────────────────────────────────────────────────────────
- *  Rutas del sitio web multipágina (hash router, ver site-router.tsx)
- */
-export const NAV_LINKS = [
-  { href: "#/", label: "Inicio", page: "home" },
-  { href: "#/nosotros", label: "Nosotros", page: "nosotros" },
-  { href: "#/servicios", label: "Servicios", page: "servicios" },
-  { href: "#/proceso", label: "Proceso", page: "proceso" },
-  { href: "#/clientes", label: "Clientes", page: "clientes" },
-  { href: "#/faq", label: "Preguntas", page: "faq" },
-  { href: "#/contacto", label: "Contacto", page: "contacto" },
-] as const;
-
-/** ─── CLIENTES — marcas nacionales que imprimen con SPC ──────────────
- *  Nota: reemplaza `name`/`note` por tu cartera real si cambia.
- *  El monograma usa el color corporativo de cada marca.
- */
 export type Client = {
   id: string;
   name: string;
-  sector: "Alimentos & Bebidas" | "Farmacéutica" | "Retail & QSR" | "Editorial & Medios" | "Banca & Finanzas";
+  sector: string;
   initials: string;
   color: string;
   note: string;
   /** Logo oficial (PNG en /images/clients). Si falta, se usa el monograma. */
   logo?: string;
-  /** Logo claro sobre fondo oscuro (duplicado con fondo blanco si hace falta) */
-  logoDark?: string;
 };
 
-export const CLIENTS = [
-  { id: "cbn", name: "Cervecería Boliviana Nacional", sector: "Alimentos & Bebidas", initials: "CBN", color: "#d6001c", note: "Cajas y cartones para sus marcas Paceña y Taquiña", logo: "/images/clients/cbn.png" },
-  { id: "pil-andina", name: "Pil Andina", sector: "Alimentos & Bebidas", initials: "PA", color: "#004b93", note: "Etiquetas y envases para bebidas Pepsico" },
-  { id: "delicia", name: "Delicia", sector: "Alimentos & Bebidas", initials: "D", color: "#e30613", note: "Packaging de galletas, chocolates y confitería" },
-  { id: "arcor", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas", logo: "/images/clients/arcor.png" },
-  { id: "coripati", name: "Fideos Coripati", sector: "Alimentos & Bebidas", initials: "FC", color: "#f5a300", note: "Envases para líneas de pastas alimenticias" },
-  { id: "bago", name: "Laboratorios Bagó", sector: "Farmacéutica", initials: "B", color: "#00539f", note: "Estuches de medicamentos con validación técnica" },
-  { id: "inti", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote", logo: "/images/clients/inti.png" },
-  { id: "terbol", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica", logo: "/images/clients/terbol.png" },
-  { id: "vita", name: "Laboratorios Vita", sector: "Farmacéutica", initials: "V", color: "#009640", note: "Envases y prospectos farmacéuticos" },
-  { id: "hipermaxi", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca", logo: "/images/clients/hipermaxi.png" },
-  { id: "icnorte", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada", logo: "/images/clients/icnorte.png" },
-  { id: "copacabana", name: "Pollos Copacabana", sector: "Retail & QSR", initials: "PC", color: "#ed1c24", note: "Envases e impresos para puntos de venta", logo: "/images/clients/copacabana.png" },
-  { id: "lostiempos", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales", logo: "/images/clients/lostiempos.png" },
-  { id: "eldeber", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas", logo: "/images/clients/eldeber.png" },
-  { id: "gisbert", name: "Editorial Gisbert", sector: "Editorial & Medios", initials: "EG", color: "#8a4b2a", note: "Libros de texto emblocados HotMelt/PUR" },
-  { id: "bnb", name: "Banco Nacional de Bolivia", sector: "Banca & Finanzas", initials: "BNB", color: "#0033a0", note: "Papelería corporativa homologada y documentos", logo: "/images/clients/bnb.png" },
-] as const satisfies readonly Client[];
-
-/** ─── TESTIMONIOS de clientes ──────────────────────────────────────
- *  ⚠️ Contenido representativo: reemplaza por reseñas verificadas
- *  reales de tus clientes antes de publicar.
- */
 export type Testimonial = {
   id: string;
   name: string;
@@ -522,131 +69,673 @@ export type Testimonial = {
   service: string;
 };
 
-export const TESTIMONIALS = [
-  {
-    id: "t1",
-    name: "Marcela R.",
-    role: "Gerente de Marca",
-    company: "Cervecería Boliviana Nacional",
-    city: "La Paz",
-    stars: 5,
-    quote:
-      "Cada lanzamiento de temporada es una carrera contra el reloj y SPC nunca nos ha fallado. Las cajas llegan impecables, con el color exacto aprobado en prueba. Eso, a nuestra escala, no tiene precio.",
-    service: "Packaging de Alimentos",
-  },
-  {
-    id: "t2",
-    name: "Rodrigo M.",
-    role: "Responsable de Compras Técnicas",
-    company: "Droguería Inti",
-    city: "La Paz",
-    stars: 5,
-    quote:
-      "En farmacia no hay margen para la improvisación: braille, lotes y validación tienen que salir perfectos. SPC entiende el estándar y lo cumple tiraje tras tiraje. Llevamos años trabajando así.",
-    service: "Packaging Farmacéutico",
-  },
-  {
-    id: "t3",
-    name: "Carla S.",
-    role: "Editora General",
-    company: "Editorial Gisbert",
-    city: "La Paz",
-    stars: 5,
-    quote:
-      "Los libros escolares pasan por manos de cientos de estudiantes. Con la encuadernación PUR de SPC, en años de uso no se nos ha despegado una sola página. La puntualidad en entregas de inicio de gestión es otro nivel.",
-    service: "Libros Emblocados PUR",
-  },
-  {
-    id: "t4",
-    name: "Javier T.",
-    role: "Gerente de Marketing",
-    company: "Hipermaxi",
-    city: "Santa Cruz",
-    stars: 5,
-    quote:
-      "Pedimos bolsas de papel para toda la cadena a nivel nacional y la logística de entrega por sucursal funcionó impecable. La calidad del impreso hace que el cliente se lleve la marca puesta en la mano.",
-    service: "Paper Bags",
-  },
-  {
-    id: "t5",
-    name: "Andrea P.",
-    role: "Directora de Arte",
-    company: "Agencia de Publicidad",
-    city: "Cochabamba",
-    stars: 5,
-    quote:
-      "Como agencia, nuestra reputación se juega en cada pieza que sale a calle. El color calibrado de SPC es nuestro respaldo: lo que aprobamos en pantalla es lo que se imprime. Nuestros clientes ya lo saben.",
-    service: "Revistas y Catálogos",
-  },
-  {
-    id: "t6",
-    name: "Luis F.",
-    role: "Coordinador de Producción Editorial",
-    company: "El Deber",
-    city: "Santa Cruz",
-    stars: 5,
-    quote:
-      "Imprimimos con ellos ediciones especiales y suplementos con fechas cerradas. La capacidad de planta de SPC nos da la tranquilidad de que, pase lo que pase, el domingo sale el diario.",
-    service: "Impresión Comercial",
-  },
-] as const;
+/** Páginas del sitio (unión para tipar NAV_LINKS y el router) */
+export type NavPage =
+  | "home"
+  | "nosotros"
+  | "servicios"
+  | "servicio"
+  | "proceso"
+  | "clientes"
+  | "faq"
+  | "contacto";
 
-/** ─── FAQ GENERAL (educativa + alimenta a SPC AI) ────────────────── */
-export const GENERAL_FAQS = [
-  {
-    q: "¿Qué servicios ofrece SPC exactamente?",
-    a: "Nueve líneas de producto en tres frentes: Packaging (alimentos, farmacéutico, comercial/promocional y paper bags), Impresión Comercial (impresos corporativos, libros emblocados HotMelt/PUR, revistas y catálogos, calendarios) e Impresión Digital bajo demanda para tirajes cortos.",
-  },
-  {
-    q: "¿Cuál es el tiraje mínimo para imprimir?",
-    a: "Depende de la línea: en digital bajo demanda puedes imprimir desde 1 unidad; en offset los mínimos orientativos arrancan entre 200 y 5.000 unidades según el producto. La cotización es gratuita y sin compromiso.",
-  },
-  {
-    q: "¿Cuánto tarda un pedido?",
-    a: "Orientativamente: digital 24–72 horas, impresos comerciales 4–8 días, packaging 5–15 días según acabados y validaciones. Tu fecha objetivo se define en la cotización y la tratamos como compromiso.",
-  },
-  {
-    q: "¿Cuánto cuesta imprimir mi proyecto?",
-    a: "El precio depende de tiraje, formato, papel, tintas y acabados — por eso cotizamos a medida. Escríbenos por WhatsApp con una descripción o foto de referencia y recibirás una propuesta clara, sin letra chica.",
-  },
-  {
-    q: "¿Qué archivos debo enviar para imprimir?",
-    a: "Lo ideal: PDF en CMYK a 300 dpi con 3 mm de sangrado y fuentes convertidas a curvas. ¿No sabes qué es eso? No te preocupes: nuestro equipo revisa tu arte gratis y te guía para que salga perfecto.",
-  },
-  {
-    q: "¿Puedo ver una prueba de color antes del tiraje?",
-    a: "Sí. En offset trabajamos con pruebas de color certificadas: apruebas cómo se verá tu pieza y solo entonces entra a producción. Lo que ves en la prueba es lo que recibes.",
-  },
-  {
-    q: "¿Entregan en el interior del país?",
-    a: "Sí, despachamos a los nueve departamentos de Bolivia. Podemos segmentar la entrega por sucursal o ciudad con empaquetado identificado por destino.",
-  },
-  {
-    q: "¿Dónde están ubicados y cuál es su horario?",
-    a: "Nuestra planta y oficinas están en Av. Saavedra N.º 2411 (final), zona Miraflores, La Paz. Horario: lunes a viernes de 8:00 a 18:00. También puedes escribirnos por WhatsApp y te respondemos en minutos.",
-  },
-  {
-    q: "¿Puedo cotizar sin compromiso?",
-    a: "Claro. La asesoría y la cotización son gratuitas y sin compromiso. Cuéntanos tu idea por WhatsApp y un asesor especializado te responde con propuesta de papel, acabados, tiempos y precio.",
-  },
-  {
-    q: "¿Trabajan con agencias y diseñadores freelance?",
-    a: "Sí, somos aliados de agencias de publicidad, diseñadores y áreas de marketing. Ofrecemos atención prioritaria, pruebas certificadas y producción bajo estándar que puedes prometerle a tu cliente.",
-  },
-] as const;
+export type SiteData = {
+  BRAND: {
+    name: string;
+    shortName: string;
+    tagline: string;
+    slogan: string;
+    pillars: string[];
+    foundedYear: number;
+    city: string;
+  };
+  CONTACT: {
+    phone: string;
+    phoneHref: string;
+    whatsapp: string;
+    email: string;
+    address: string;
+    addressFull: string;
+    hours: string;
+    website: string;
+  };
+  WA_MESSAGES: {
+    general: string;
+    services: string;
+    quote: (service: string) => string;
+    process: string;
+    packaging: string;
+    commercial: string;
+    digital: string;
+    final: string;
+  };
+  SERVICES: Service[];
+  SECTORS: { id: string; label: string; detail: string }[];
+  PROCESS_STEPS: { id: string; title: string; detail: string; tip: string }[];
+  STATS: { value: number; suffix: string; label: string; detail: string }[];
+  NAV_LINKS: { href: string; label: string; page: NavPage }[];
+  CLIENTS: Client[];
+  TESTIMONIALS: Testimonial[];
+  GENERAL_FAQS: { q: string; a: string }[];
+  AI_RECEPTIONIST: {
+    name: string;
+    role: string;
+    tagline: string;
+    greeting: string;
+    quickQuestions: string[];
+    disclaimer: string;
+  };
+};
 
-/** ─── SPenCer — recepcionista inteligente (AI receptionist) ─────── */
-export const AI_RECEPTIONIST = {
-  name: "SPenCer",
-  role: "Recepcionista inteligente",
-  tagline: "Te guía de la idea al WhatsApp, 24/7",
-  greeting:
-    "¡Hola! 👋 Soy **SPenCer**, la recepcionista inteligente de SPC Impresores. Te ayudo a encontrar el servicio perfecto para tu proyecto y te conecto con un asesor por WhatsApp. Para empezar: **¿qué necesitas imprimir?**",
-  quickQuestions: [
-    "Quiero cotizar packaging",
-    "Necesito imprimir libros",
-    "Tiraje corto / urgente",
-    "¿Qué archivos debo enviar?",
+/* ─── DATOS EN ESPAÑOL ──────────────────────────────────────────── */
+
+export const SITE_ES: SiteData = {
+  BRAND: {
+    name: "SPC Impresores S.A.",
+    shortName: "SPC",
+    tagline: "Gráfica Industrial",
+    slogan: "Imprimiendo lo mejor de Bolivia",
+    pillars: ["Calidad", "Puntualidad", "Capacidad", "Servicio"],
+    foundedYear: 2001,
+    city: "La Paz, Bolivia",
+  },
+
+  CONTACT: {
+    phone: "+591 77165787",
+    phoneHref: "tel:+59177165787",
+    whatsapp: "+591 77165787",
+    email: "graficaindustrial@spc.com.bo",
+    address: "Av. Saavedra N.º 2411 (Final), Zona Miraflores",
+    addressFull: "Edificio SPC, Av. Saavedra N.º 2411, Zona Miraflores, La Paz — Bolivia",
+    hours: "Lun – Vie · 8:00 a 18:00",
+    website: "www.spc.net.bo",
+  },
+
+  WA_MESSAGES: {
+    general:
+      "¡Hola SPC Gráfica Industrial! 👋 Vi su sitio web y me gustaría cotizar un proyecto de impresión.",
+    services:
+      "¡Hola SPC! 👋 Estoy explorando sus servicios y me gustaría recibir asesoría para mi proyecto.",
+    quote: (service: string) =>
+      `¡Hola SPC! 👋 Me interesa cotizar *${service}*. ¿Podrían darme más información sobre tiempos y precios?`,
+    process:
+      "¡Hola SPC! 👋 Quiero iniciar un proyecto con ustedes. ¿Me explican cómo funciona el proceso de cotización?",
+    packaging:
+      "¡Hola SPC! 👋 Tengo un proyecto de *packaging* (alimentos / farmacéutico / promocional) y quiero asesoría técnica.",
+    commercial:
+      "¡Hola SPC! 👋 Necesito impresión comercial: libros, revistas, catálogos o material corporativo. ¿Me ayudan con una cotización?",
+    digital:
+      "¡Hola SPC! 👋 Me interesa la *impresión digital bajo demanda* para tirajes cortos. ¿Qué opciones manejan?",
+    final:
+      "¡Hola SPC! 👋 Estoy listo/a para imprimir mi próximo proyecto con ustedes. ¿Cómo empezamos?",
+  },
+
+  /* ─── 9 líneas de producto (imágenes reales SPC + marcas cliente) ─── */
+  SERVICES: [
+    {
+      id: "packaging-alimentos",
+      title: "Packaging de Alimentos",
+      shortTitle: "Alimentos",
+      category: "packaging",
+      categoryLabel: "Packaging",
+      description:
+        "Cajas y envases primarios con tintas de grado alimentario, aptos para contacto directo con alimentos y sellado de frescura.",
+      insight: "Las tintas de grado alimentario cumplen normas de migración: el color jamás pasa al producto.",
+      image: "/images/services/food-packaging.jpg",
+      waMessage: "",
+      featured: true,
+      gallery: [
+        "/images/services/gallery-food.jpg",
+        "/images/services/gallery-food-2.jpg",
+        "/images/services/gallery-food-3.jpg",
+        "/images/services/gallery-cartons.jpg",
+      ],
+      minRun: "1.000 unidades (orientativo)",
+      turnaround: "7 – 12 días hábiles según acabados",
+      specs: [
+        "Cartulinas de 250 a 450 g con barreras de grado alimentario",
+        "Tintas y barnices de base agua aptos para contacto directo con alimentos",
+        "Troquelado y hendido de precisión para envasado automático o manual",
+        "Opciones de laminado mate, brillante y soft-touch",
+        "Impresión CMYK + pantones planos de marca",
+      ],
+      useCases: [
+        "Cajas primarias para panificados, galletas y snacks",
+        "Envases para lácteos, conservas y bebidas",
+        "Sleeves y banderolas promocionales de temporada",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Qué significa “grado alimentario” en la tinta?",
+          a: "Son tintas formuladas con pigmentos de baja migración: cumplen normas internacionales que garantizan que ninguna sustancia del impreso pasa al alimento, incluso en contacto directo y a temperatura ambiente o refrigerada.",
+        },
+        {
+          q: "¿Pueden producir para mi línea de envasado automático?",
+          a: "Sí. El troquel de precisión garantiza que cada caja se doble y encaje sin variaciones, requisito para líneas de envasado de alta velocidad. Coordinamos las especificaciones de tu máquina antes de producir.",
+        },
+      ],
+    },
+    {
+      id: "packaging-farmaceutico",
+      title: "Packaging Farmacéutico",
+      shortTitle: "Farmacéutico",
+      category: "packaging",
+      categoryLabel: "Packaging",
+      description:
+        "Estuches con validación técnica para la industria farmacéutica: troquelado de precisión, códigos de lote y braille opcional.",
+      insight: "El troquel de precisión garantiza que cada estuche se doble perfecto, sin variaciones en línea.",
+      image: "/images/services/pharma-packaging.jpg",
+      waMessage: "",
+      gallery: ["/images/services/gallery-pharma.jpg", "/images/services/stationery.jpg"],
+      minRun: "5.000 unidades (orientativo)",
+      turnaround: "10 – 15 días hábiles con validación",
+      specs: [
+        "Estuches con validación técnica y control de lote incorporado",
+        "Numeración y código de serie para trazabilidad",
+        "Braille opcional conforme a normativas de accesibilidad",
+        "Cartulinas blancas de alta blancura para legibilidad médica",
+        "Proof de color certificado antes de tiraje",
+      ],
+      useCases: [
+        "Estuches para medicamentos de venta libre y controlados",
+        "Empaques para suplementos y productos hospitalarios",
+        "Insertos y prospectos informativos (IFU)",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Qué es el braille en estuches y es obligatorio?",
+          a: "El braille impreso en el estuche permite identificar el medicamento a personas con discapacidad visual. En muchos mercados es exigido por normativa farmacéutica; lo integramos en el troquel sin costo adicional de estructura.",
+        },
+        {
+          q: "¿Cómo garantizan la trazabilidad de lotes?",
+          a: "Cada tiraje se produce bajo control de lote: el número se imprime en línea y queda registrado en nuestro sistema de calidad, de modo que todo estuche sea rastreable de principio a fin.",
+        },
+      ],
+    },
+    {
+      id: "packaging-comercial",
+      title: "Packaging Comercial y Promocional",
+      shortTitle: "Comercial",
+      category: "packaging",
+      categoryLabel: "Packaging",
+      description:
+        "Cajas regalo, displays y envases promocionales que elevan la experiencia de marca en retail y campañas.",
+      insight: "Un buen unboxing multiplica el valor percibido: el packaging es el primer apretón de manos de tu marca.",
+      image: "/images/services/promo-packaging.jpg",
+      waMessage: "",
+      minRun: "500 unidades (orientativo)",
+      turnaround: "5 – 10 días hábiles",
+      specs: [
+        "Cajas regalo con ventana, asa o compartimentos internos",
+        "Displays de piso y mostrador para retail",
+        "Acentos en hot stamping, UV selectivo y láminas metálicas",
+        "Estructuras especiales diseñadas a medida de tu producto",
+        "Kits de unboxing para campañas y e-commerce",
+      ],
+      useCases: [
+        "Ediciones especiales y lanzamientos de temporada",
+        "Cajas de regalo corporativas para fechas clave",
+        "Displays promocionales para puntos de venta",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Pueden diseñar la estructura de mi caja?",
+          a: "Sí. Nuestro equipo técnico desarrolla el troquel y el dummy físico para que valides volúmenes, resistencia y estética antes de la producción final.",
+        },
+        {
+          q: "¿Qué acabado me recomiendan para premium?",
+          a: "La combinación laminado mate + UV selectivo o hot stamping metálico genera el contraste táctil y visual más asociado a marcas de gama alta. En asesoría te mostramos muestras físicas.",
+        },
+      ],
+    },
+    {
+      id: "paper-bags",
+      title: "Paper Bags",
+      shortTitle: "Paper Bags",
+      category: "packaging",
+      categoryLabel: "Packaging",
+      description:
+        "Bolsas de papel con asas, en gramajes resistentes y acabados de marca — la alternativa ecológica y elegante para retail.",
+      insight: "El papel kraft de 120 g en adelante soporta hasta 8 kg: eco y resistencia no están reñidos.",
+      image: "/images/services/paper-bags.jpg",
+      waMessage: "",
+      minRun: "1.000 unidades (orientativo)",
+      turnaround: "7 – 10 días hábiles",
+      specs: [
+        "Papel kraft y sulfatado desde 120 g (soporta hasta 8 kg)",
+        "Asas de papel trenzado, cinta o asa troquelada integrada",
+        "Impresión a 1 a 4 tintas con tintas eco-solventes de base agua",
+        "Formatos desde boutique hasta bolsa de supermercado",
+        "Opción de fondo reforzado para mayor carga",
+      ],
+      useCases: [
+        "Bolsas para tiendas de moda, farmacias y delivery",
+        "Bolsas ecológicas para retail y supermercados",
+        "Ediciones de temporada para campañas de marca",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Las bolsas de papel son realmente más ecológicas?",
+          a: "El papel es renovable, biodegradable y reciclable; con gramajes desde 120 g logras resistencia comparable al plástico de un solo uso. Además, tu marca gana percepción de responsabilidad ambiental.",
+        },
+        {
+          q: "¿Puedo pedir varios tamaños con el mismo diseño?",
+          a: "Sí, adaptamos el arte a cada formato manteniendo la proporción de marca. Es la práctica habitual para líneas de retail con varios tipos de producto.",
+        },
+      ],
+    },
+    {
+      id: "impresos-comerciales",
+      title: "Impresos Comerciales",
+      shortTitle: "Impresos",
+      category: "commercial",
+      categoryLabel: "Impresión Comercial",
+      description:
+        "Papelería corporativa, formularios, facturas y todo el material operativo de tu empresa con consistencia de marca total.",
+      insight: "La papelería homologada (pantones fijos) mantiene tu marca idéntica en cada tiraje, sin deriva de color.",
+      image: "/images/services/stationery.jpg",
+      waMessage: "",
+      featured: true,
+      minRun: "500 unidades (orientativo)",
+      turnaround: "4 – 8 días hábiles",
+      specs: [
+        "Papelería corporativa con pantones fijos homologados",
+        "Formularios continuos, facturas y documentos de seguridad",
+        "Numeración correlativa, troquelado y engrapado",
+        "Papeles bond, offset y couché de primera calidad",
+        "Control de deriva de color entre tirajes",
+      ],
+      useCases: [
+        "Hojas membretadas, sobres y tarjetas de presentación",
+        "Facturas, recibos y formularios operativos",
+        "Manuales internos y carpetas corporativas",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Por qué importa la “deriva de color” entre tirajes?",
+          a: "Si cada pedido sale con un azul distinto, tu marca se percibe descuidada. Con pantones homologados y controles de densidad, tu papelería se ve idéntica hoy, en 6 meses y en 2 años.",
+        },
+        {
+          q: "¿Pueden entregar por departamentos a nivel nacional?",
+          a: "Sí. Coordinamos entregas segmentadas a tus sucursales con empaquetado identificado por destino — un solo pedido, distribución nacional.",
+        },
+      ],
+    },
+    {
+      id: "libros",
+      title: "Libros Emblocados HotMelt/PUR",
+      shortTitle: "Libros",
+      category: "commercial",
+      categoryLabel: "Impresión Comercial",
+      description:
+        "Encuadernación perfecta con adhesivos HotMelt y PUR: libros que se abren planos y cuyas hojas jamás se despegan.",
+      insight: "El adhesivo PUR soporta ±60 °C y humedad: las páginas aguantan miles de aperturas sin despegarse.",
+      image: "/images/services/books.jpg",
+      waMessage: "",
+      gallery: ["/images/services/gallery-books.jpg", "/images/services/magazines.jpg"],
+      minRun: "300 ejemplares (orientativo)",
+      turnaround: "10 – 15 días hábiles",
+      specs: [
+        "Encuadernación perfecta (tapa rústica) con adhesivo HotMelt o PUR",
+        "PUR: páginas que aguantan miles de aperturas sin despegarse",
+        "Lomo cuadrado con texto y logos en relieve opcional",
+        "Guardas, cabezadas y cintas marcadoras para ediciones premium",
+        "Formatos estándar y a medida, papel book bulk o bulk alto",
+      ],
+      useCases: [
+        "Libros de texto y educativos para colegios y universidades",
+        "Novelas, poesía y literatura general",
+        "Memorias corporativas y libros de aniversario",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Qué diferencia hay entre HotMelt y PUR?",
+          a: "El HotMelt es un adhesivo termofusible de excelente relación costo-rendimiento. El PUR es un polímero de uretano con adherencia superior: resiste ±60 °C, humedad y miles de aperturas — ideal para libros de uso intenso como los escolares.",
+        },
+        {
+          q: "¿Puedo imprimir primero una edición corta de prueba?",
+          a: "Sí. Combinamos tiraje offset con la opción digital bajo demanda para ediciones piloto; luego escalas el volumen cuando el libro despegue.",
+        },
+      ],
+    },
+    {
+      id: "revistas",
+      title: "Revistas y Catálogos",
+      shortTitle: "Revistas",
+      category: "commercial",
+      categoryLabel: "Impresión Comercial",
+      description:
+        "Publicaciones periódicas con encuadernación a caballete, papel couché y color calibrado de portada a contraportada.",
+      insight: "El color calibrado (Fogra) hace que tu portada se vea igual en pantalla, en prueba y en el kiosco.",
+      image: "/images/services/magazines.jpg",
+      waMessage: "",
+      minRun: "500 ejemplares (orientativo)",
+      turnaround: "6 – 12 días hábiles",
+      specs: [
+        "Encuadernación a caballete (grapas) o emblocado según páginas",
+        "Papel couché de 90 a 170 g con color calibrado Fogra",
+        "Portadas en cartulina de 200 a 300 g con laminado",
+        "Corte a sangre y paginación profesional",
+        "Distribución por paquetes identificados para puntos de venta",
+      ],
+      useCases: [
+        "Revistas corporativas y de membresía",
+        "Catálogos de producto para retail y ferias",
+        "Publicaciones periódicas de gremios e instituciones",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Qué es el color calibrado Fogra y por qué me importa?",
+          a: "Es un estándar internacional que fija cómo debe verse el color en impresión offset. Al calibrar contra Fogra, tu portada se ve igual en pantalla, en la prueba y en el ejemplar final — sin sorpresas.",
+        },
+        {
+          q: "¿Caballete o emblocado: cuál me conviene?",
+          a: "El caballete (grapas al centro) es económico y ideal hasta ~64 páginas. El emblocado da lomo cuadrado, más elegante y resistente, y permite más páginas. Te recomendamos según tu proyecto y presupuesto.",
+        },
+      ],
+    },
+    {
+      id: "calendarios",
+      title: "Calendarios",
+      shortTitle: "Calendarios",
+      category: "commercial",
+      categoryLabel: "Impresión Comercial",
+      description:
+        "Calendarios corporativos de pared y escritorio que mantienen tu marca visible 365 días frente a tu cliente.",
+      insight: "Un calendario corporativo recibe en promedio 6 visitas visuales al día: publicidad que no se apaga.",
+      image: "/images/services/calendars.jpg",
+      waMessage: "",
+      minRun: "200 unidades (orientativo)",
+      turnaround: "5 – 8 días hábiles",
+      specs: [
+        "Calendarios de pared (tapas + 12 hojas) y de escritorio",
+        "Espiral metálico o plástico y colgador reforzado",
+        "Fechas personalizadas: días festivos y aniversarios de tu empresa",
+        "Cartulina de 200 a 300 g con laminado opcional",
+        "Formatos clásicos o a medida (base triangular para escritorio)",
+      ],
+      useCases: [
+        "Regalo corporativo de fin de año para clientes y aliados",
+        "Calendarios promocionales con imágenes de campaña",
+        "Agendas y planners corporativos de marca",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Por qué un calendario es buena inversión publicitaria?",
+          a: "Recibe en promedio 6 vistas diarias durante 365 días: cuesta centavos por contacto y mantiene tu marca en el escritorio del decisor de compra todo el año.",
+        },
+        {
+          q: "¿Pueden imprimir mis fechas importantes?",
+          a: "Sí. Además del calendario estándar, incorporamos días festivos bolivianos, aniversarios corporativos y fechas de tu industria marcadas a color.",
+        },
+      ],
+    },
+    {
+      id: "impresion-digital",
+      title: "Impresión Digital bajo Demanda",
+      shortTitle: "Digital",
+      category: "digital",
+      categoryLabel: "Digital",
+      description:
+        "Tirajes cortos e imprenta instantánea: imprime solo lo que necesitas, cuando lo necesitas, sin stock muerto.",
+      insight: "La impresión bajo demanda elimina el 100 % del inventario obsoleto: se imprime al ritmo de tus ventas.",
+      image: "/images/services/digital-print.jpg",
+      waMessage: "",
+      featured: true,
+      minRun: "1 unidad — imprime solo lo que necesitas",
+      turnaround: "24 – 72 horas",
+      specs: [
+        "Tirajes cortos sin chapas ni films: cambios de arte al instante",
+        "Impresión digital de calidad offset para 1 a 1.000 unidades",
+        "Datos variables: nombres, códigos y numeración única por pieza",
+        "Papeles especiales, adhesivos y sintéticos disponibles",
+        "Reimpresión exacta bajo pedido: cero stock muerto",
+      ],
+      useCases: [
+        "Prototipos de packaging antes del tiraje grande",
+        "Invitaciones, credenciales y material personalizado",
+        "Reposición rápida de existencias sin sobre-stock",
+      ],
+      deepFaqs: [
+        {
+          q: "¿Cuándo conviene digital y cuándo offset?",
+          a: "Regla práctica: digital para tirajes cortos (1 a ~500 según formato) o artes con datos variables; offset para volúmenes grandes, donde el costo unitario baja y los pantones exactos son obligatorios.",
+        },
+        {
+          q: "¿Qué son los “datos variables”?",
+          a: "Es la capacidad de imprimir una pieza distinta en cada ejemplar: nombres de destinatarios, códigos QR únicos o numeración de seguridad — imposible con impresión tradicional y clave para personalización y trazabilidad.",
+        },
+      ],
+    },
   ],
-  disclaimer: "SPenCer orienta y educa. Para cifras exactas y cerrar tu pedido, un asesor humano te espera en WhatsApp.",
-} as const;
+
+  SECTORS: [
+    { id: "alimentos", label: "Alimentos & Bebidas", detail: "Envases con certificación de grado alimentario" },
+    { id: "farmaceutica", label: "Farmacéutica", detail: "Estuches con validación técnica y braille" },
+    { id: "editorial", label: "Editorial", detail: "Libros, revistas y catálogos de gran tiraje" },
+    { id: "retail", label: "Retail & Promocional", detail: "Bolsas, cajas regalo y campañas de marca" },
+    { id: "corporativo", label: "Corporativo", detail: "Papelería y material operativo homologado" },
+    { id: "agencias", label: "Agencias de Publicidad", detail: "Producción a todo color con entregas puntuales" },
+  ],
+
+  PROCESS_STEPS: [
+    {
+      id: "p1",
+      title: "Cuéntanos tu idea",
+      detail:
+        "Escríbenos por WhatsApp con tu proyecto: tipo de producto, cantidad aproximada y fecha objetivo. No necesitas saber nada de impresión — nuestro equipo te guía.",
+      tip: "Mientras más contexto compartas (uso, imagen de referencia, tiraje), más precisa será tu cotización.",
+    },
+    {
+      id: "p2",
+      title: "Asesoría y cotización a medida",
+      detail:
+        "Un asesor especializado revisa tu caso y te envía una propuesta con papel, acabados, tiempos y precio. Todo claro, sin letra chica.",
+      tip: "¿Primera vez imprimiendo? Te explicamos cada término (gramaje, pantone, troquel) en palabras simples.",
+    },
+    {
+      id: "p3",
+      title: "Producción con estándar SPC",
+      detail:
+        "Tu proyecto entra a planta con control de calidad en cada etapa: prueba de color, supervisión de máquina y verificación final antes del despacho.",
+      tip: "Trabajamos con tecnología de punta e insumos de primera calidad — los más altos estándares de la industria.",
+    },
+    {
+      id: "p4",
+      title: "Entrega puntual, donde la necesites",
+      detail:
+        "Recibes tu producción en tiempo y forma. Y si necesitas reimpresiones o ajustes, ya tienes a tu asesor a un mensaje de distancia.",
+      tip: "La puntualidad es uno de nuestros 4 pilares: tu fecha objetivo es un compromiso, no una esperanza.",
+    },
+  ],
+
+  STATS: [
+    { value: 24, suffix: "", label: "Años de trayectoria", detail: "Desde 2001 en La Paz" },
+    { value: 9, suffix: "", label: "Líneas de producto", detail: "Del packaging al digital" },
+    { value: 16, suffix: "", label: "Marcas líderes confían", detail: "CBN, PIL, Arcor, BNB y más" },
+    { value: 100, suffix: "%", label: "Compromiso", detail: "El factor humano marca la diferencia" },
+  ],
+
+  NAV_LINKS: [
+    { href: "#/", label: "Inicio", page: "home" },
+    { href: "#/nosotros", label: "Nosotros", page: "nosotros" },
+    { href: "#/servicios", label: "Servicios", page: "servicios" },
+    { href: "#/proceso", label: "Proceso", page: "proceso" },
+    { href: "#/clientes", label: "Clientes", page: "clientes" },
+    { href: "#/faq", label: "Preguntas", page: "faq" },
+    { href: "#/contacto", label: "Contacto", page: "contacto" },
+  ],
+
+  /* ─── Clientes: marcas nacionales que imprimen con SPC ─── */
+  CLIENTS: [
+    { id: "cbn", name: "Cervecería Boliviana Nacional", sector: "Alimentos & Bebidas", initials: "CBN", color: "#d6001c", note: "Cajas y cartones para sus marcas Paceña y Taquiña", logo: "/images/clients/cbn.png" },
+    { id: "pil-andina", name: "Pil Andina", sector: "Alimentos & Bebidas", initials: "PA", color: "#004b93", note: "Etiquetas y envases para bebidas Pepsico", logo: "/images/clients/pil-andina.png" },
+    { id: "delicia", name: "Delicia", sector: "Alimentos & Bebidas", initials: "D", color: "#e30613", note: "Packaging de galletas, chocolates y confitería", logo: "/images/clients/delicia.png" },
+    { id: "arcor", name: "Arcor Bolivia", sector: "Alimentos & Bebidas", initials: "A", color: "#e2001a", note: "Estuches y displays para golosinas", logo: "/images/clients/arcor.png" },
+    { id: "coripati", name: "Fideos Coripati", sector: "Alimentos & Bebidas", initials: "FC", color: "#f5a300", note: "Envases para líneas de pastas alimenticias" },
+    { id: "bago", name: "Laboratorios Bagó", sector: "Farmacéutica", initials: "B", color: "#00539f", note: "Estuches de medicamentos con validación técnica", logo: "/images/clients/bago.png" },
+    { id: "inti", name: "Droguería Inti", sector: "Farmacéutica", initials: "DI", color: "#e94e1b", note: "Packaging farmacéutico con trazabilidad de lote", logo: "/images/clients/inti.png" },
+    { id: "terbol", name: "Laboratorios Terbol", sector: "Farmacéutica", initials: "T", color: "#00a5a8", note: "Estuches e insertos para línea médica", logo: "/images/clients/terbol.png" },
+    { id: "vita", name: "Laboratorios Vita", sector: "Farmacéutica", initials: "V", color: "#009640", note: "Envases y prospectos farmacéuticos" },
+    { id: "hipermaxi", name: "Hipermaxi", sector: "Retail & QSR", initials: "H", color: "#e2001a", note: "Bolsas de papel y material promocional de marca", logo: "/images/clients/hipermaxi.png" },
+    { id: "icnorte", name: "IC Norte", sector: "Retail & QSR", initials: "ICN", color: "#005baa", note: "Impresos corporativos y campañas de temporada", logo: "/images/clients/icnorte.png" },
+    { id: "copacabana", name: "Pollos Copacabana", sector: "Retail & QSR", initials: "PC", color: "#ed1c24", note: "Envases e impresos para puntos de venta", logo: "/images/clients/copacabana.png" },
+    { id: "lostiempos", name: "Los Tiempos", sector: "Editorial & Medios", initials: "LT", color: "#123a86", note: "Diarios, suplementos y ediciones especiales", logo: "/images/clients/lostiempos.png" },
+    { id: "eldeber", name: "El Deber", sector: "Editorial & Medios", initials: "ED", color: "#c8102e", note: "Publicaciones periódicas y revistas", logo: "/images/clients/eldeber.png" },
+    { id: "gisbert", name: "Editorial Gisbert", sector: "Editorial & Medios", initials: "EG", color: "#8a4b2a", note: "Libros de texto emblocados HotMelt/PUR" },
+    { id: "bnb", name: "Banco Nacional de Bolivia", sector: "Banca & Finanzas", initials: "BNB", color: "#0033a0", note: "Papelería corporativa homologada y documentos", logo: "/images/clients/bnb.png" },
+  ],
+
+  /* ⚠️ Contenido representativo: reemplaza por reseñas verificadas reales */
+  TESTIMONIALS: [
+    {
+      id: "t1",
+      name: "Marcela R.",
+      role: "Gerente de Marca",
+      company: "Cervecería Boliviana Nacional",
+      city: "La Paz",
+      stars: 5,
+      quote:
+        "Cada lanzamiento de temporada es una carrera contra el reloj y SPC nunca nos ha fallado. Las cajas llegan impecables, con el color exacto aprobado en prueba. Eso, a nuestra escala, no tiene precio.",
+      service: "Packaging de Alimentos",
+    },
+    {
+      id: "t2",
+      name: "Rodrigo M.",
+      role: "Responsable de Compras Técnicas",
+      company: "Droguería Inti",
+      city: "La Paz",
+      stars: 5,
+      quote:
+        "En farmacia no hay margen para la improvisación: braille, lotes y validación tienen que salir perfectos. SPC entiende el estándar y lo cumple tiraje tras tiraje. Llevamos años trabajando así.",
+      service: "Packaging Farmacéutico",
+    },
+    {
+      id: "t3",
+      name: "Carla S.",
+      role: "Editora General",
+      company: "Editorial Gisbert",
+      city: "La Paz",
+      stars: 5,
+      quote:
+        "Los libros escolares pasan por manos de cientos de estudiantes. Con la encuadernación PUR de SPC, en años de uso no se nos ha despegado una sola página. La puntualidad en entregas de inicio de gestión es otro nivel.",
+      service: "Libros Emblocados PUR",
+    },
+    {
+      id: "t4",
+      name: "Javier T.",
+      role: "Gerente de Marketing",
+      company: "Hipermaxi",
+      city: "Santa Cruz",
+      stars: 5,
+      quote:
+        "Pedimos bolsas de papel para toda la cadena a nivel nacional y la logística de entrega por sucursal funcionó impecable. La calidad del impreso hace que el cliente se lleve la marca puesta en la mano.",
+      service: "Paper Bags",
+    },
+    {
+      id: "t5",
+      name: "Andrea P.",
+      role: "Directora de Arte",
+      company: "Agencia de Publicidad",
+      city: "Cochabamba",
+      stars: 5,
+      quote:
+        "Como agencia, nuestra reputación se juega en cada pieza que sale a calle. El color calibrado de SPC es nuestro respaldo: lo que aprobamos en pantalla es lo que se imprime. Nuestros clientes ya lo saben.",
+      service: "Revistas y Catálogos",
+    },
+    {
+      id: "t6",
+      name: "Luis F.",
+      role: "Coordinador de Producción Editorial",
+      company: "El Deber",
+      city: "Santa Cruz",
+      stars: 5,
+      quote:
+        "Imprimimos con ellos ediciones especiales y suplementos con fechas cerradas. La capacidad de planta de SPC nos da la tranquilidad de que, pase lo que pase, el domingo sale el diario.",
+      service: "Impresión Comercial",
+    },
+  ],
+
+  GENERAL_FAQS: [
+    {
+      q: "¿Qué servicios ofrece SPC exactamente?",
+      a: "Nueve líneas de producto en tres frentes: Packaging (alimentos, farmacéutico, comercial/promocional y paper bags), Impresión Comercial (impresos corporativos, libros emblocados HotMelt/PUR, revistas y catálogos, calendarios) e Impresión Digital bajo demanda para tirajes cortos.",
+    },
+    {
+      q: "¿Cuál es el tiraje mínimo para imprimir?",
+      a: "Depende de la línea: en digital bajo demanda puedes imprimir desde 1 unidad; en offset los mínimos orientativos arrancan entre 200 y 5.000 unidades según el producto. La cotización es gratuita y sin compromiso.",
+    },
+    {
+      q: "¿Cuánto tarda un pedido?",
+      a: "Orientativamente: digital 24–72 horas, impresos comerciales 4–8 días, packaging 5–15 días según acabados y validaciones. Tu fecha objetivo se define en la cotización y la tratamos como compromiso.",
+    },
+    {
+      q: "¿Cuánto cuesta imprimir mi proyecto?",
+      a: "El precio depende de tiraje, formato, papel, tintas y acabados — por eso cotizamos a medida. Escríbenos por WhatsApp con una descripción o foto de referencia y recibirás una propuesta clara, sin letra chica.",
+    },
+    {
+      q: "¿Qué archivos debo enviar para imprimir?",
+      a: "Lo ideal: PDF en CMYK a 300 dpi con 3 mm de sangrado y fuentes convertidas a curvas. ¿No sabes qué es eso? No te preocupes: nuestro equipo revisa tu arte gratis y te guía para que salga perfecto.",
+    },
+    {
+      q: "¿Puedo ver una prueba de color antes del tiraje?",
+      a: "Sí. En offset trabajamos con pruebas de color certificadas: apruebas cómo se verá tu pieza y solo entonces entra a producción. Lo que ves en la prueba es lo que recibes.",
+    },
+    {
+      q: "¿Entregan en el interior del país?",
+      a: "Sí, despachamos a los nueve departamentos de Bolivia. Podemos segmentar la entrega por sucursal o ciudad con empaquetado identificado por destino.",
+    },
+    {
+      q: "¿Dónde están ubicados y cuál es su horario?",
+      a: "Nuestra planta y oficinas están en Av. Saavedra N.º 2411 (final), zona Miraflores, La Paz. Horario: lunes a viernes de 8:00 a 18:00. También puedes escribirnos por WhatsApp y te respondemos en minutos.",
+    },
+    {
+      q: "¿Puedo cotizar sin compromiso?",
+      a: "Claro. La asesoría y la cotización son gratuitas y sin compromiso. Cuéntanos tu idea por WhatsApp y un asesor especializado te responde con propuesta de papel, acabados, tiempos y precio.",
+    },
+    {
+      q: "¿Trabajan con agencias y diseñadores freelance?",
+      a: "Sí, somos aliados de agencias de publicidad, diseñadores y áreas de marketing. Ofrecemos atención prioritaria, pruebas certificadas y producción bajo estándar que puedes prometerle a tu cliente.",
+    },
+  ],
+
+  AI_RECEPTIONIST: {
+    name: "SPenCer",
+    role: "Recepcionista inteligente",
+    tagline: "Te guía de la idea al WhatsApp, 24/7",
+    greeting:
+      "¡Hola! 👋 Soy **SPenCer**, la recepcionista inteligente de SPC Impresores. Te ayudo a encontrar el servicio perfecto para tu proyecto y te conecto con un asesor por WhatsApp. Para empezar: **¿qué necesitas imprimir?**",
+    quickQuestions: [
+      "Quiero cotizar packaging",
+      "Necesito imprimir libros",
+      "Tiraje corto / urgente",
+      "¿Qué archivos debo enviar?",
+    ],
+    disclaimer: "SPenCer orienta y educa. Para cifras exactas y cerrar tu pedido, un asesor humano te espera en WhatsApp.",
+  },
+};
+
+/* Pre-carga el mensaje de WhatsApp de cada servicio (quote depende del idioma) */
+for (const s of SITE_ES.SERVICES) s.waMessage = SITE_ES.WA_MESSAGES.quote(s.title);
+
+/* ─── Estáticos auxiliares (no dependen del idioma) ─────────────── */
+
+/** IDs de servicios — para validar rutas del hash-router sin hooks */
+export const SERVICE_IDS: string[] = SITE_ES.SERVICES.map((s) => s.id);
+
+/* ─── Puente de compatibilidad (ES) mientras los componentes migran
+ *  a useSiteData(). Eliminar al completar la conversión bilingüe.
+ */
+export const SERVICES = SITE_ES.SERVICES;
+export const SECTORS = SITE_ES.SECTORS;
+export const PROCESS_STEPS = SITE_ES.PROCESS_STEPS;
+export const STATS = SITE_ES.STATS;
+export const NAV_LINKS = SITE_ES.NAV_LINKS;
+export const CLIENTS = SITE_ES.CLIENTS;
+export const TESTIMONIALS = SITE_ES.TESTIMONIALS;
+export const GENERAL_FAQS = SITE_ES.GENERAL_FAQS;
+export const AI_RECEPTIONIST = SITE_ES.AI_RECEPTIONIST;
+export const WA_MESSAGES = SITE_ES.WA_MESSAGES;
+export const CONTACT = SITE_ES.CONTACT;
+export const BRAND = SITE_ES.BRAND;

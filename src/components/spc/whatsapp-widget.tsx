@@ -11,16 +11,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, ChevronRight, CheckCheck } from "lucide-react";
-import { WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./whatsapp-cta";
-
-const QUICK_REPLIES = [
-  { id: "pack", label: "Quiero cotizar packaging", message: WA_MESSAGES.packaging },
-  { id: "com", label: "Impresión comercial (libros, revistas…)", message: WA_MESSAGES.commercial },
-  { id: "dig", label: "Impresión digital bajo demanda", message: WA_MESSAGES.digital },
-  { id: "otro", label: "Otra consulta", message: WA_MESSAGES.general },
-] as const;
 
 const now = () => {
   const d = new Date();
@@ -32,6 +26,15 @@ export function WhatsappWidget() {
   const [teaser, setTeaser] = useState(false);
   const [time] = useState(now);
   const footerInView = useRef(false);
+  const t = useT();
+  const { WA_MESSAGES } = useSiteData();
+
+  const QUICK_REPLIES = [
+    { id: "pack", label: t(L("Quiero cotizar packaging", "I want a packaging quote")), message: WA_MESSAGES.packaging },
+    { id: "com", label: t(L("Impresión comercial (libros, revistas…)", "Commercial print (books, magazines…)")), message: WA_MESSAGES.commercial },
+    { id: "dig", label: t(L("Impresión digital bajo demanda", "On-demand digital printing")), message: WA_MESSAGES.digital },
+    { id: "otro", label: t(L("Otra consulta", "Something else")), message: WA_MESSAGES.general },
+  ];
 
   // teaser aparece tras 2.6s (solo si el footer no está en pantalla) y se autodisfraza a los 14s
   useEffect(() => {
@@ -94,19 +97,19 @@ export function WhatsappWidget() {
                 closeTeaser();
               }}
               className="absolute inset-0 z-10 rounded-2xl rounded-br-md"
-              aria-label="Abrir chat de WhatsApp: ¿tienes un proyecto en mente?"
+              aria-label={t(L("Abrir chat de WhatsApp: ¿tienes un proyecto en mente?", "Open WhatsApp chat: got a project in mind?"))}
             />
             <p className="relative text-[13px] font-bold leading-snug text-spc-900">
-              ¿Tienes un proyecto en mente? 💬
+              {t(L("¿Tienes un proyecto en mente? 💬", "Got a project in mind? 💬"))}
             </p>
             <p className="relative mt-1 text-[12px] leading-snug text-spc-900/60">
-              Cotiza por WhatsApp — respondemos al instante.
+              {t(L("Cotiza por WhatsApp — respondemos al instante.", "Quote via WhatsApp — we reply instantly."))}
             </p>
             {/* cierre con área táctil ampliada (24px visual + halo = 44px) */}
             <button
               onClick={closeTeaser}
               className="absolute -right-2 -top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-spc-900 text-white shadow-md transition-transform duration-200 hover:scale-110 after:absolute after:-inset-2.5 after:content-['']"
-              aria-label="Cerrar invitación"
+              aria-label={t(L("Cerrar invitación", "Close invitation"))}
             >
               <X className="h-3 w-3" aria-hidden />
             </button>
@@ -124,7 +127,7 @@ export function WhatsappWidget() {
           closeTeaser();
         }}
         aria-expanded={open}
-        aria-label={open ? "Cerrar chat de WhatsApp" : "Abrir chat de WhatsApp"}
+        aria-label={open ? t(L("Cerrar chat de WhatsApp", "Close WhatsApp chat")) : t(L("Abrir chat de WhatsApp", "Open WhatsApp chat"))}
         className={cn(
           "fixed bottom-5 right-5 z-[60] flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] text-white shadow-[0_18px_44px_-12px_rgba(37,211,102,0.75)] transition-transform duration-300 hover:scale-105 active:scale-95 sm:right-6",
           !open && "animate-wa-pulse"
@@ -170,7 +173,7 @@ export function WhatsappWidget() {
         {open && (
           <motion.div
             role="dialog"
-            aria-label="Chat de WhatsApp con SPC"
+            aria-label={t(L("Chat de WhatsApp con SPC", "WhatsApp chat with SPC"))}
             initial={{ opacity: 0, y: 40, scale: 0.86 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 34, scale: 0.9 }}
@@ -190,16 +193,16 @@ export function WhatsappWidget() {
                 />
               </span>
               <div className="min-w-0 flex-1 leading-tight">
-                <p className="truncate text-[14.5px] font-bold text-white">SPC Gráfica Industrial</p>
+                <p className="truncate text-[14.5px] font-bold text-white">{t(L("SPC Gráfica Industrial", "SPC Industrial Printing"))}</p>
                 <p className="flex items-center gap-1.5 text-[11.5px] font-medium text-white/85">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
-                  en línea · respondemos al instante
+                  {t(L("en línea · respondemos al instante", "online · we reply instantly"))}
                 </p>
               </div>
               <button
                 onClick={() => setOpen(false)}
                 className="flex h-11 w-11 items-center justify-center rounded-full text-white/85 transition-colors hover:bg-white/15 hover:text-white"
-                aria-label="Cerrar chat"
+                aria-label={t(L("Cerrar chat", "Close chat"))}
               >
                 <X className="h-5 w-5" aria-hidden />
               </button>
@@ -224,8 +227,10 @@ export function WhatsappWidget() {
                 className="relative ml-auto w-[86%] rounded-2xl rounded-tr-sm bg-[#dcf8c6] p-3.5 shadow-[0_1px_2px_rgba(11,27,77,0.15)]"
               >
                 <p className="text-[13px] leading-relaxed text-[#111b21]">
-                  ¡Hola! 👋 Somos <strong>SPC Gráfica Industrial</strong>, líderes de la industria
-                  gráfica en Bolivia. Cuéntanos qué necesitas imprimir y te cotizamos hoy mismo.
+                  {t(L(
+                    "¡Hola! 👋 Somos",
+                    "Hi! 👋 We are",
+                  ))} <strong>SPC Gráfica Industrial</strong>{t(L(", líderes de la industria gráfica en Bolivia. Cuéntanos qué necesitas imprimir y te cotizamos hoy mismo.", ", leaders of Bolivia's printing industry. Tell us what you need to print and we'll quote you today."))}
                 </p>
                 <p className="mt-1 flex items-center justify-end gap-1 text-[10.5px] text-[#667781]">
                   {time}
@@ -240,7 +245,7 @@ export function WhatsappWidget() {
                 transition={{ delay: 0.4 }}
                 className="relative mt-5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#5b6b8c]"
               >
-                Puedes empezar con…
+                {t(L("Puedes empezar con…", "You can start with…"))}
               </motion.p>
               <div className="relative mt-3 space-y-2">
                 {QUICK_REPLIES.map((qr, i) => (
@@ -269,10 +274,10 @@ export function WhatsappWidget() {
                 className="shine flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#2fe076] via-wa to-[#1da851] py-3.5 text-[14.5px] font-bold text-white shadow-[0_10px_30px_-10px_rgba(37,211,102,0.7)] transition-all duration-300 hover:-translate-y-0.5"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-                Iniciar chat ahora
+                {t(L("Iniciar chat ahora", "Start chatting now"))}
               </button>
               <p className="mt-2 text-center text-[10.5px] font-medium text-[#5b6b8c]">
-                Se abrirá WhatsApp con tu mensaje listo para enviar
+                {t(L("Se abrirá WhatsApp con tu mensaje listo para enviar", "WhatsApp will open with your message ready to send"))}
               </p>
             </div>
           </motion.div>

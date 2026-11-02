@@ -10,7 +10,8 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star, BadgeCheck, MapPin, ShieldCheck, Truck, Factory, Sparkles, MessageSquareQuote } from "lucide-react";
-import { CLIENTS, TESTIMONIALS, type Client } from "@/lib/site-config";
+import { type Client, type Testimonial } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
 import { openSpcAi } from "./spc-ai-widget";
 import { SiteLink } from "./site-router";
@@ -79,7 +80,8 @@ function MarqueeRow({ clients, reverse = false, slow = false }: { clients: reado
 }
 
 /* ── Tarjeta de reseña ── */
-function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index: number }) {
+function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
+  const tr = useT();
   const initials = t.name
     .split(" ")
     .map((w) => w[0])
@@ -96,7 +98,7 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
           </span>
 
           {/* estrellas */}
-          <div className="flex items-center gap-1" aria-label={`${t.stars} de 5 estrellas`}>
+          <div className="flex items-center gap-1" aria-label={tr(L(`${t.stars} de 5 estrellas`, `${t.stars} of 5 stars`))}>
             {Array.from({ length: t.stars }).map((_, i) => (
               <motion.span
                 key={i}
@@ -126,7 +128,7 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
             <div className="min-w-0 flex-1">
               <p className="flex items-center gap-1.5 text-[13.5px] font-bold text-spc-900">
                 {t.name}
-                <BadgeCheck className="h-4 w-4 shrink-0 text-spc-500" aria-label="Cliente verificado" />
+                <BadgeCheck className="h-4 w-4 shrink-0 text-spc-500" aria-label={tr(L("Cliente verificado", "Verified client"))} />
               </p>
               <p className="truncate text-[11.5px] font-medium text-spc-900/55">
                 {t.role} · {t.company}
@@ -143,14 +145,16 @@ function TestimonialCard({ t, index }: { t: (typeof TESTIMONIALS)[number]; index
   );
 }
 
-/* ── Cifras de confianza ── */
-const TRUST_STATS = [
-  { icon: Truck, value: "9 / 9", label: "Departamentos con entregas" },
-  { icon: Factory, value: "+1.000", label: "Proyectos productivos al año" },
-  { icon: ShieldCheck, value: "24/7", label: "Atención vía SPenCer y WhatsApp" },
-] as const;
-
 export function Clients({ compact = false }: { compact?: boolean }) {
+  const t = useT();
+  const { CLIENTS, TESTIMONIALS, WA_MESSAGES } = useSiteData();
+
+  const TRUST_STATS = [
+    { icon: Truck, value: "9 / 9", label: t(L("Departamentos con entregas", "Departments we deliver to")) },
+    { icon: Factory, value: "+1.000", label: t(L("Proyectos productivos al año", "Production projects per year")) },
+    { icon: ShieldCheck, value: "24/7", label: t(L("Atención vía SPenCer y WhatsApp", "Support via SPenCer and WhatsApp")) },
+  ];
+
   const half = Math.ceil(CLIENTS.length / 2);
   const rowA = CLIENTS.slice(0, half);
   const rowB = CLIENTS.slice(half);
@@ -160,7 +164,7 @@ export function Clients({ compact = false }: { compact?: boolean }) {
     <section
       id="clientes"
       className="relative overflow-hidden bg-gradient-to-b from-spc-50 via-white to-white py-24 sm:py-32"
-      aria-label="Clientes y reseñas"
+      aria-label={t(L("Clientes y reseñas", "Clients and reviews"))}
     >
       {/* textura de fondo */}
       <div
@@ -171,16 +175,16 @@ export function Clients({ compact = false }: { compact?: boolean }) {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* encabezado */}
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Clientes · toda Bolivia</Eyebrow>
+          <Eyebrow>{t(L("Clientes · toda Bolivia", "Clients · all of Bolivia"))}</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="Las marcas que Bolivia consume" />{" "}
-            <WordsReveal text="imprimen con SPC." wordClassName="text-gradient-spc" delay={0.14} />
+            <WordsReveal text={t(L("Las marcas que Bolivia consume", "The brands Bolivia consumes"))} />{" "}
+            <WordsReveal text={t(L("imprimen con SPC.", "print with SPC."))} wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
             <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-              Del snacks que compras en el kiosco hasta el medicamento de tu farmacia:{" "}
+              {t(L("Del snacks que compras en el kiosco hasta el medicamento de tu farmacia:", "From the snack you buy at the kiosk to the medicine at your pharmacy:"))}{" "}
               <strong className="font-semibold text-spc-800">
-                la industria boliviana confía su imagen en nuestra planta.
+                {t(L("la industria boliviana confía su imagen en nuestra planta.", "Bolivian industry trusts its image to our plant."))}
               </strong>
             </p>
           </Reveal>
@@ -217,11 +221,13 @@ export function Clients({ compact = false }: { compact?: boolean }) {
         <div className="mt-16">
           <div className="mx-auto max-w-2xl text-center">
             <h3 className="font-display text-[clamp(1.5rem,3vw,2.1rem)] font-extrabold leading-tight tracking-tight text-spc-900">
-              Lo que dicen quienes ya imprimen con nosotros
+              {t(L("Lo que dicen quienes ya imprimen con nosotros", "What our clients say"))}
             </h3>
             <p className="mt-3 text-[14px] leading-relaxed text-spc-900/60">
-              Marcas de alimentos, farmacia, retail y editorial que repiten tiraje tras tiraje —
-              la mejor reseña de una imprenta es el pedido que vuelve.
+              {t(L(
+                "Marcas de alimentos, farmacia, retail y editorial que repiten tiraje tras tiraje — la mejor reseña de una imprenta es el pedido que vuelve.",
+                "Food, pharma, retail and publishing brands that order run after run — the best review a print shop can get is a repeat order.",
+              ))}
             </p>
           </div>
 
@@ -238,7 +244,7 @@ export function Clients({ compact = false }: { compact?: boolean }) {
                 to="clientes"
                 className="group inline-flex items-center gap-2 rounded-full border border-spc-600/20 bg-white/70 px-6 py-3 text-[13.5px] font-bold text-spc-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-spc-600/40 hover:bg-white"
               >
-                Ver todas las reseñas y marcas
+                {t(L("Ver todas las reseñas y marcas", "See all reviews and brands"))}
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-spc-600/10 transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
                   →
                 </span>
@@ -254,11 +260,13 @@ export function Clients({ compact = false }: { compact?: boolean }) {
               </span>
               <div className="flex-1">
                 <p className="font-display text-[16px] font-bold text-white">
-                  ¿Quieres ser la próxima historia de éxito?
+                  {t(L("¿Quieres ser la próxima historia de éxito?", "Want to be the next success story?"))}
                 </p>
                 <p className="mt-1 text-[13px] leading-relaxed text-white/70">
-                  Pregunta a <strong className="font-semibold text-gold-300">SPenCer</strong>, nuestra
-                  recepcionista inteligente: te guía de tu idea al WhatsApp en minutos.
+                  {t(L(
+                    "Pregunta a",
+                    "Ask",
+                  ))} <strong className="font-semibold text-gold-300">SPenCer</strong>{t(L(", nuestra recepcionista inteligente: te guía de tu idea al WhatsApp en minutos.", ", our smart receptionist: she guides you from idea to WhatsApp in minutes."))}
                 </p>
               </div>
               <button
@@ -267,7 +275,7 @@ export function Clients({ compact = false }: { compact?: boolean }) {
                 className="shine inline-flex shrink-0 items-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_30px_-8px_rgba(255,179,28,0.6)] transition-all duration-300 hover:-translate-y-0.5"
               >
                 <Sparkles className="h-4 w-4" aria-hidden />
-                Hablar con SPenCer
+                {t(L("Hablar con SPenCer", "Talk to SPenCer"))}
               </button>
             </div>
           </Reveal>

@@ -10,7 +10,8 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { MessageCircle, ClipboardList, Factory, PackageCheck, Info } from "lucide-react";
-import { PROCESS_STEPS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
@@ -32,6 +33,8 @@ function useIsDesktop() {
 
 export function Process() {
   const ref = useRef<HTMLDivElement>(null);
+  const t = useT();
+  const { PROCESS_STEPS, WA_MESSAGES } = useSiteData();
   const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.8", "end 0.45"] });
   const lineScale = useSpring(scrollYProgress, { stiffness: 90, damping: 26 });
@@ -40,7 +43,7 @@ export function Process() {
     <section
       id="proceso"
       className="relative overflow-hidden bg-white py-24 sm:py-32"
-      aria-label="Proceso de trabajo"
+      aria-label={t(L("Proceso de trabajo", "How we work"))}
     >
       <div
         aria-hidden
@@ -50,16 +53,16 @@ export function Process() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         {/* encabezado */}
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Cómo trabajamos</Eyebrow>
+          <Eyebrow>{t(L("Cómo trabajamos", "How we work"))}</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="De tu idea," />{" "}
-            <WordsReveal text="a tus manos." wordClassName="text-gradient-spc" delay={0.14} />
+            <WordsReveal text={t(L("De tu idea,", "From your idea,"))} />{" "}
+            <WordsReveal text={t(L("a tus manos.", "to your hands."))} wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
             <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-              Imprimir por primera vez puede sonar técnico. Lo hacemos simple:{" "}
-              <strong className="font-semibold text-spc-800">todo empieza con un mensaje</strong> y
-              termina con tu proyecto entregado a tiempo.
+              {t(L("Imprimir por primera vez puede sonar técnico. Lo hacemos simple:", "Printing for the first time can sound technical. We make it simple:"))}{" "}
+              <strong className="font-semibold text-spc-800">{t(L("todo empieza con un mensaje", "it all starts with a message"))}</strong>{" "}
+              {t(L("y termina con tu proyecto entregado a tiempo.", "and ends with your project delivered on time."))}
             </p>
           </Reveal>
         </div>
@@ -128,10 +131,10 @@ export function Process() {
         <Reveal delay={0.1} className="mt-16">
           <div className="mx-auto max-w-3xl text-center">
             <p className="font-display text-[clamp(1.3rem,2.4vw,1.8rem)] font-extrabold tracking-tight text-spc-900">
-              El paso 01 toma menos de un minuto.
+              {t(L("El paso 01 toma menos de un minuto.", "Step 01 takes less than a minute."))}
             </p>
             <p className="mt-2 text-[14px] text-spc-900/60">
-              Escríbenos ahora y recibe tu cotización hoy mismo.
+              {t(L("Escríbenos ahora y recibe tu cotización hoy mismo.", "Message us now and get your quote today."))}
             </p>
             <div className="mt-6">
               <a
@@ -141,7 +144,7 @@ export function Process() {
                 className="shine group inline-flex items-center gap-3 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-8 py-4 text-base font-bold text-white shadow-[0_16px_44px_-12px_rgba(37,211,102,0.7),inset_0_1px_0_rgba(255,255,255,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-14px_rgba(37,211,102,0.85)]"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-                Empezar por WhatsApp
+                {t(L("Empezar por WhatsApp", "Start on WhatsApp"))}
               </a>
             </div>
           </div>

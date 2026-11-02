@@ -10,11 +10,13 @@ import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Quote, Target, Eye, MapPin, Award } from "lucide-react";
-import { BRAND, CONTACT } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
 import { SiteLink } from "./site-router";
 
 export function About() {
+  const t = useT();
+  const { BRAND, CONTACT } = useSiteData();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -26,7 +28,7 @@ export function About() {
       id="nosotros"
       ref={ref}
       className="relative overflow-hidden bg-white py-24 sm:py-32"
-      aria-label="Quiénes somos"
+      aria-label={t(L("Quiénes somos", "About us"))}
     >
       {/* textura de fondo sutil */}
       <div
@@ -53,7 +55,7 @@ export function About() {
                 <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3.5">
                   <span className="glass-dark flex items-center gap-2 rounded-full px-4 py-2.5">
                     <MapPin className="h-4 w-4 text-gold-400" aria-hidden />
-                    <span className="text-[12.5px] font-semibold text-white">Zona Miraflores · La Paz</span>
+                    <span className="text-[12.5px] font-semibold text-white">{t(L("Zona Miraflores · La Paz", "Miraflores · La Paz"))}</span>
                   </span>
                 </div>
               </div>
@@ -70,17 +72,17 @@ export function About() {
               <div className="glossy-card rounded-[1.4rem] p-5">
                 <Quote className="depth-2 h-7 w-7 text-gold-600" aria-hidden />
                 <p className="font-display mt-2.5 text-[15.5px] font-bold leading-snug text-spc-900">
-                  El factor humano marca la diferencia
+                  {t(L("El factor humano marca la diferencia", "The human factor makes the difference"))}
                 </p>
                 <p className="mt-1.5 text-[12px] leading-relaxed text-spc-800/60">
-                  Nuestro equipo es el pilar fundamental de todo lo que imprimimos.
+                  {t(L("Nuestro equipo es el pilar fundamental de todo lo que imprimimos.", "Our team is the fundamental pillar behind everything we print."))}
                 </p>
                 <div className="mt-4 flex items-center gap-2.5 border-t border-spc-900/10 pt-3.5">
                   <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-spc-600/10">
                     <Award className="h-4 w-4 text-spc-600" aria-hidden />
                   </span>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-spc-700">
-                    Personal altamente calificado
+                    {t(L("Personal altamente calificado", "Highly qualified staff"))}
                   </p>
                 </div>
               </div>
@@ -90,11 +92,11 @@ export function About() {
 
         {/* ── Columna de contenido ── */}
         <div className="order-1 lg:order-2">
-          <Eyebrow>Quiénes somos</Eyebrow>
+          <Eyebrow>{t(L("Quiénes somos", "About us"))}</Eyebrow>
 
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="La empresa que" />{" "}
-            <WordsReveal text="imprime Bolivia" wordClassName="text-gradient-spc" delay={0.18} />
+            <WordsReveal text={t(L("La empresa que", "The company that"))} />{" "}
+            <WordsReveal text={t(L("imprime Bolivia", "prints Bolivia"))} wordClassName="text-gradient-spc" delay={0.18} />
           </h2>
 
           <Reveal delay={0.15} className="mt-6 space-y-5 text-[15.5px] leading-relaxed text-spc-900/70">
@@ -102,15 +104,17 @@ export function About() {
               <strong className="font-semibold text-spc-800">
                 {BRAND.name}
               </strong>{" "}
-              fue fundada en {BRAND.city} el año {BRAND.foundedYear}. Somos una empresa{" "}
-              <strong className="font-semibold text-spc-800">líder en la industria gráfica de Bolivia</strong>,
-              con infraestructura y tecnología de primer nivel para satisfacer las demandas del
-              mercado.
+              {t(L(
+                `fue fundada en ${BRAND.city} el año ${BRAND.foundedYear}. Somos una empresa`,
+                `was founded in ${BRAND.city} in ${BRAND.foundedYear}. We are a`,
+              ))}{" "}
+              <strong className="font-semibold text-spc-800">{t(L("líder en la industria gráfica de Bolivia", "leader in Bolivia's printing industry"))}</strong>
+              {t(L(", con infraestructura y tecnología de primer nivel para satisfacer las demandas del mercado.", ", with first-class infrastructure and technology to meet the demands of the market."))}
             </p>
             <p>
-              Cada proyecto pasa por manos de un equipo{" "}
-              <strong className="font-semibold text-spc-800">altamente calificado y capacitado</strong>,
-              con insumos de primera calidad y los más altos estándares de la industria.
+              {t(L("Cada proyecto pasa por manos de un equipo", "Every project passes through the hands of a team"))}{" "}
+              <strong className="font-semibold text-spc-800">{t(L("altamente calificado y capacitado", "that is highly qualified and trained"))}</strong>
+              {t(L(", con insumos de primera calidad y los más altos estándares de la industria.", ", with first-class supplies and the industry's highest standards."))}
             </p>
           </Reveal>
 
@@ -119,13 +123,19 @@ export function About() {
             {[
               {
                 icon: Target,
-                title: "Misión",
-                body: "Brindar servicios integrales en impresión comercial y packaging, orientados a las necesidades de nuestros clientes.",
+                title: t(L("Misión", "Mission")),
+                body: t(L(
+                  "Brindar servicios integrales en impresión comercial y packaging, orientados a las necesidades de nuestros clientes.",
+                  "Deliver comprehensive commercial printing and packaging services, oriented to our clients' needs.",
+                )),
               },
               {
                 icon: Eye,
-                title: "Visión",
-                body: "Fortalecer el liderazgo en la industria gráfica, consolidando el sector y promoviendo solo lo mejor.",
+                title: t(L("Visión", "Vision")),
+                body: t(L(
+                  "Fortalecer el liderazgo en la industria gráfica, consolidando el sector y promoviendo solo lo mejor.",
+                  "Strengthen our leadership in the printing industry, consolidating the sector and promoting only the best.",
+                )),
               },
             ].map((item, i) => (
               <Reveal key={item.title} delay={0.2 + i * 0.12} y={32}>
@@ -153,7 +163,7 @@ export function About() {
                 to="nosotros"
                 className="group inline-flex items-center gap-2 rounded-full bg-spc-600/10 px-5 py-2.5 text-[12.5px] font-bold text-spc-700 ring-1 ring-spc-600/20 transition-all duration-300 hover:bg-spc-600 hover:text-white hover:ring-spc-600"
               >
-                Conoce la planta y el equipo
+                {t(L("Conoce la planta y el equipo", "Explore the plant and team"))}
                 <span className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>→</span>
               </SiteLink>
             </div>

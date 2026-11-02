@@ -10,28 +10,32 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock3, Quote, ShieldCheck, Zap, Timer } from "lucide-react";
-import { BRAND, CONTACT, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
-/* Filas de contacto: los valores largos (correo, dirección) ocupan fila
-   completa para que el email nunca se parta a media palabra. */
-const CONTACT_ROWS = [
-  { icon: Phone, label: "Teléfono", value: CONTACT.phone, href: CONTACT.phoneHref, wide: false },
-  { icon: Clock3, label: "Horario de atención", value: CONTACT.hours, href: undefined, wide: false },
-  { icon: Mail, label: "Correo", value: CONTACT.email, href: `mailto:${CONTACT.email}`, wide: true },
-  { icon: MapPin, label: "Planta y oficinas", value: CONTACT.addressFull, href: undefined, wide: true },
-] as const;
-
-const ASSURANCES = [
-  { icon: Zap, text: "Respuesta en minutos" },
-  { icon: Timer, text: "Cotización el mismo día" },
-  { icon: ShieldCheck, text: "Asesoría sin costo" },
-] as const;
-
 export function FinalCta() {
+  const t = useT();
+  const { BRAND, CONTACT, WA_MESSAGES } = useSiteData();
+
+  /* Filas de contacto: los valores largos (correo, dirección) ocupan fila
+     completa para que el email nunca se parta a media palabra. */
+  const CONTACT_ROWS = [
+    { icon: Phone, label: t(L("Teléfono", "Phone")), value: CONTACT.phone, href: CONTACT.phoneHref, wide: false },
+    { icon: Clock3, label: t(L("Horario de atención", "Business hours")), value: CONTACT.hours, href: undefined, wide: false },
+    { icon: Mail, label: t(L("Correo", "Email")), value: CONTACT.email, href: `mailto:${CONTACT.email}`, wide: true },
+    { icon: MapPin, label: t(L("Planta y oficinas", "Plant and offices")), value: CONTACT.addressFull, href: undefined, wide: true },
+  ];
+
+  const ASSURANCES = [
+    { icon: Zap, text: t(L("Respuesta en minutos", "Reply in minutes")) },
+    { icon: Timer, text: t(L("Cotización el mismo día", "Same-day quote")) },
+    { icon: ShieldCheck, text: t(L("Asesoría sin costo", "Free advice")) },
+  ];
+
   return (
-    <section id="contacto" className="relative bg-white pb-24 pt-4 sm:pb-32" aria-label="Contacto y cotización">
+    <section id="contacto" className="relative bg-white pb-24 pt-4 sm:pb-32" aria-label={t(L("Contacto y cotización", "Contact and quote"))}>
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal y={50}>
           <div className="grain relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-spc-900 via-spc-800 to-spc-950 shadow-[0_60px_120px_-50px_rgba(6,15,46,0.7)]">
@@ -42,17 +46,16 @@ export function FinalCta() {
             <div className="relative grid gap-0 lg:grid-cols-[1.15fr_1fr]">
               {/* ── Contenido ── */}
               <div className="p-8 sm:p-12 lg:p-14">
-                <Eyebrow dark>Da el paso 01 ahora</Eyebrow>
+                <Eyebrow dark>{t(L("Da el paso 01 ahora", "Take step 01 now"))}</Eyebrow>
                 <h2 className="font-display mt-5 text-[clamp(1.9rem,4vw,3rem)] font-extrabold leading-[1.06] tracking-tight text-white">
-                  <WordsReveal text="¿Listo para imprimir" />{" "}
-                  <WordsReveal text="tu próximo proyecto?" wordClassName="text-gradient-gold" delay={0.14} />
+                  <WordsReveal text={t(L("¿Listo para imprimir", "Ready to print"))} />{" "}
+                  <WordsReveal text={t(L("tu próximo proyecto?", "your next project?"))} wordClassName="text-gradient-gold" delay={0.14} />
                 </h2>
                 <Reveal delay={0.2}>
                   <p className="mt-5 max-w-lg text-[15.5px] leading-relaxed text-white/70">
-                    Escríbenos por WhatsApp y en minutos tendrás a un asesor real respondiendo tus
-                    preguntas. Sin formularios eternos, sin llamadas en espera:{" "}
+                    {t(L("Escríbenos por WhatsApp y en minutos tendrás a un asesor real respondiendo tus preguntas. Sin formularios eternos, sin llamadas en espera:", "Message us on WhatsApp and within minutes a real advisor will be answering your questions. No endless forms, no hold music:"))}{" "}
                     <strong className="font-semibold text-gold-300">
-                      directo a lo que importa, tu proyecto.
+                      {t(L("directo a lo que importa, tu proyecto.", "straight to what matters — your project."))}
                     </strong>
                   </p>
                 </Reveal>
@@ -88,10 +91,10 @@ export function FinalCta() {
                       </span>
                       <span className="text-left">
                         <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-white/80">
-                          Respuesta inmediata
+                          {t(L("Respuesta inmediata", "Instant reply"))}
                         </span>
                         <span className="font-display block text-[17px] font-extrabold leading-tight">
-                          Abrir WhatsApp y cotizar
+                          {t(L("Abrir WhatsApp y cotizar", "Open WhatsApp and quote"))}
                         </span>
                       </span>
                     </motion.a>
@@ -164,11 +167,10 @@ export function FinalCta() {
                   <div className="glass-dark rounded-[1.5rem] p-5 sm:p-6">
                     <Quote className="h-6 w-6 text-gold-400" aria-hidden />
                     <p className="font-display mt-2.5 text-[15.5px] font-bold leading-snug text-white">
-                      Al otro lado del chat hay una persona que conoce la planta, las máquinas y
-                      tu proyecto.
+                      {t(L("Al otro lado del chat hay una persona que conoce la planta, las máquinas y tu proyecto.", "On the other side of the chat is a person who knows the plant, the machines and your project."))}
                     </p>
                     <p className="mt-2 text-[12px] font-medium text-white/60">
-                      Equipo {BRAND.name} — {BRAND.city}
+                      {t(L("Equipo", "Team"))} {BRAND.name} — {BRAND.city}
                     </p>
                   </div>
                 </motion.div>

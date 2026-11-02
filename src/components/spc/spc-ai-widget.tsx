@@ -11,7 +11,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, RotateCcw, SendHorizontal, User, X } from "lucide-react";
-import { AI_RECEPTIONIST, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, useLang, L } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
@@ -21,9 +22,6 @@ export function openSpcAi() {
 }
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
-
-/* Pasos del funnel que se iluminan bajo el header del chat */
-const FUNNEL_STEPS = ["Proyecto", "Detalles", "Listo", "WhatsApp"] as const;
 
 /** Mini-markdown: **negritas**, listas con “- ” y saltos de línea */
 function renderRich(text: string) {
@@ -68,6 +66,17 @@ export function SpcAiWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const footerInView = useRef(false);
+  const t = useT();
+  const { lang } = useLang();
+  const { AI_RECEPTIONIST, WA_MESSAGES } = useSiteData();
+
+  /* Pasos del funnel que se iluminan bajo el header del chat */
+  const FUNNEL_STEPS = [
+    t(L("Proyecto", "Project")),
+    t(L("Detalles", "Details")),
+    t(L("Listo", "Ready")),
+    "WhatsApp",
+  ];
 
   const started = messages.length > 0;
 
@@ -148,7 +157,7 @@ export function SpcAiWidget() {
         const res = await fetch("/api/spc-ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: next }),
+          body: JSON.stringify({ messages: next, lang }),
         });
         const data = (await res.json()) as { reply?: string; error?: string };
         if (!res.ok || !data.reply) throw new Error(data.error ?? "Sin respuesta");
@@ -158,15 +167,17 @@ export function SpcAiWidget() {
           ...next,
           {
             role: "assistant",
-            content:
+            content: t(L(
               "Perdón, tuve un problema técnico de conexión. 😅 Mientras lo reviso, mi colega humano te responde al instante por **WhatsApp** — o puedes intentar tu pregunta otra vez en unos segundos.",
+              "Sorry, I hit a technical connection issue. 😅 While I check it, my human colleague will reply instantly on **WhatsApp** — or you can try your question again in a few seconds.",
+            )),
           },
         ]);
       } finally {
         setLoading(false);
       }
     },
-    [messages, loading]
+    [messages, loading, lang, t]
   );
 
   const reset = useCallback(() => {
@@ -186,10 +197,12 @@ export function SpcAiWidget() {
     }
     const query = last.replace(/\s+/g, " ").trim().slice(0, 200);
     const message = query
-      ? `¡Hola! 🤖 Vengo del chat con ${AI_RECEPTIONIST.name}. Mi consulta: "${query}"`
+      ? lang === "es"
+        ? `¡Hola! 🤖 Vengo del chat con ${AI_RECEPTIONIST.name}. Mi consulta: "${query}"`
+        : `Hi! 🤖 I'm coming from the chat with ${AI_RECEPTIONIST.name}. My question: "${query}"`
       : WA_MESSAGES.general;
     window.open(waLink(message), "_blank", "noopener,noreferrer");
-  }, [messages]);
+  }, [messages, lang, AI_RECEPTIONIST.name, WA_MESSAGES.general]);
 
   return (
     <>
@@ -205,8 +218,8 @@ export function SpcAiWidget() {
         aria-expanded={open}
         aria-label={
           open
-            ? `Cerrar ${AI_RECEPTIONIST.name}`
-            : `Hablar con ${AI_RECEPTIONIST.name}, recepcionista inteligente`
+            ? t(L(`Cerrar ${AI_RECEPTIONIST.name}`, `Close ${AI_RECEPTIONIST.name}`))
+            : t(L(`Hablar con ${AI_RECEPTIONIST.name}, recepcionista inteligente`, `Talk to ${AI_RECEPTIONIST.name}, smart receptionist`))
         }
         className={cn(
           "group fixed bottom-[calc(5.5rem+max(0px,env(safe-area-inset-bottom)))] right-5 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-spc-900 shadow-[0_16px_40px_-10px_rgba(255,179,28,0.8)] transition-transform duration-300 hover:scale-105 active:scale-95 sm:right-6",
@@ -268,21 +281,20 @@ export function SpcAiWidget() {
                 setTeaser(false);
               }}
               className="absolute inset-0 z-10 rounded-2xl rounded-br-md"
-              aria-label={`Abrir el chat de ${AI_RECEPTIONIST.name}`}
+              aria-label={t(L(`Abrir el chat de ${AI_RECEPTIONIST.name}`, `Open the ${AI_RECEPTIONIST.name} chat`))}
             />
             <p className="relative text-[13px] font-bold leading-snug text-white">
-              👋 ¡Hola! Soy <span className="text-gold-300">{AI_RECEPTIONIST.name}</span>, ¿qué necesitas
-              imprimir hoy?
+              {t(L("👋 ¡Hola! Soy", "👋 Hi! I'm"))} <span className="text-gold-300">{AI_RECEPTIONIST.name}</span>{t(L(", ¿qué necesitas imprimir hoy?", ", what do you need to print today?"))}
             </p>
             <p className="relative mt-1 text-[12px] leading-snug text-white/60">
-              Te asesoro al instante — tu cotización gratis, hoy mismo.
+              {t(L("Te asesoro al instante — tu cotización gratis, hoy mismo.", "Instant guidance — your free quote, today."))}
             </p>
             {/* cierre con área táctil ampliada (24px visual + halo = 44px) */}
             <button
               type="button"
               onClick={() => setTeaser(false)}
               className="absolute -right-2 -top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-spc-900 shadow-md transition-transform duration-200 hover:scale-110 after:absolute after:-inset-2.5 after:content-['']"
-              aria-label={`Cerrar invitación de ${AI_RECEPTIONIST.name}`}
+              aria-label={t(L(`Cerrar invitación de ${AI_RECEPTIONIST.name}`, `Close ${AI_RECEPTIONIST.name} invitation`))}
             >
               <X className="h-3 w-3" aria-hidden />
             </button>
@@ -295,7 +307,7 @@ export function SpcAiWidget() {
         {open && (
           <motion.div
             role="dialog"
-            aria-label={`Chat con ${AI_RECEPTIONIST.name}, recepcionista inteligente`}
+            aria-label={t(L(`Chat con ${AI_RECEPTIONIST.name}, recepcionista inteligente`, `Chat with ${AI_RECEPTIONIST.name}, smart receptionist`))}
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.92 }}
@@ -321,14 +333,14 @@ export function SpcAiWidget() {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-400 opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold-400" />
                   </span>
-                  {AI_RECEPTIONIST.role} · Responde al instante
+                  {AI_RECEPTIONIST.role} · {t(L("Responde al instante", "Replies instantly"))}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={reset}
                 className="relative flex h-10 w-10 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label="Reiniciar conversación"
+                aria-label={t(L("Reiniciar conversación", "Restart conversation"))}
               >
                 <RotateCcw className="h-4.5 w-4.5" aria-hidden />
               </button>
@@ -336,7 +348,7 @@ export function SpcAiWidget() {
                 type="button"
                 onClick={() => setOpen(false)}
                 className="relative flex h-10 w-10 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label={`Cerrar chat de ${AI_RECEPTIONIST.name}`}
+                aria-label={t(L(`Cerrar chat de ${AI_RECEPTIONIST.name}`, `Close ${AI_RECEPTIONIST.name} chat`))}
               >
                 <X className="h-5 w-5" aria-hidden />
               </button>
@@ -396,7 +408,7 @@ export function SpcAiWidget() {
                         type="button"
                         onClick={handoff}
                         className="flex items-center gap-1.5 rounded-full py-0.5 pr-1 transition-transform duration-300 hover:scale-105"
-                        aria-label="Continuar en WhatsApp con tu consulta"
+                        aria-label={t(L("Continuar en WhatsApp con tu consulta", "Continue on WhatsApp with your question"))}
                       >
                         {chip}
                       </button>
@@ -502,7 +514,7 @@ export function SpcAiWidget() {
                       />
                     ))}
                     <span className="ml-1.5 text-[11px] font-medium text-white/60">
-                      {AI_RECEPTIONIST.name} está escribiendo…
+                      {t(L(`${AI_RECEPTIONIST.name} está escribiendo…`, `${AI_RECEPTIONIST.name} is typing…`))}
                     </span>
                   </div>
                 </motion.div>
@@ -512,7 +524,7 @@ export function SpcAiWidget() {
               {!started && !loading && (
                 <div className="space-y-2 pl-11">
                   <p className="text-[10.5px] font-bold uppercase tracking-[0.18em] text-gold-300/80">
-                    Puedes preguntarme…
+                    {t(L("Puedes preguntarme…", "You can ask me…"))}
                   </p>
                   {AI_RECEPTIONIST.quickQuestions.map((q, i) => (
                     <motion.button
@@ -547,7 +559,7 @@ export function SpcAiWidget() {
                     className="shine group flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#2fe076] via-wa to-[#1da851] py-3 text-[13.5px] font-bold text-white shadow-[0_10px_26px_-10px_rgba(37,211,102,0.65)] transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
                   >
                     <WhatsAppIcon className="h-4.5 w-4.5" />
-                    Continuar en WhatsApp
+                    {t(L("Continuar en WhatsApp", "Continue on WhatsApp"))}
                     <span
                       aria-hidden
                       className="transition-transform duration-300 group-hover:translate-x-0.5"
@@ -556,7 +568,7 @@ export function SpcAiWidget() {
                     </span>
                   </button>
                   <p className="py-2 text-center text-[10px] font-medium leading-tight text-white/45">
-                    Cotización gratuita el mismo día · se abre WhatsApp con tu consulta lista
+                    {t(L("Cotización gratuita el mismo día · se abre WhatsApp con tu consulta lista", "Free same-day quote · WhatsApp opens with your question ready"))}
                   </p>
                 </motion.div>
               )}
@@ -572,14 +584,14 @@ export function SpcAiWidget() {
             >
               <div className="flex items-center gap-2.5">
                 <label htmlFor="spc-ai-input" className="sr-only">
-                  Escribe tu mensaje a {AI_RECEPTIONIST.name}
+                  {t(L(`Escribe tu mensaje a ${AI_RECEPTIONIST.name}`, `Write your message to ${AI_RECEPTIONIST.name}`))}
                 </label>
                 <input
                   ref={inputRef}
                   id="spc-ai-input"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Cuéntame qué necesitas imprimir…"
+                  placeholder={t(L("Cuéntame qué necesitas imprimir…", "Tell me what you need to print…"))}
                   autoComplete="off"
                   maxLength={500}
                   className="h-12 min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-5 text-[13.5px] text-white placeholder:text-white/40 focus:border-gold-500/60 focus:outline-none focus:ring-2 focus:ring-gold-500/25"
@@ -587,7 +599,7 @@ export function SpcAiWidget() {
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  aria-label="Enviar mensaje"
+                  aria-label={t(L("Enviar mensaje", "Send message"))}
                   className="shine flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 text-spc-900 shadow-[0_8px_22px_-6px_rgba(255,179,28,0.7)] transition-all duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
                 >
                   <SendHorizontal className="h-5 w-5" aria-hidden />

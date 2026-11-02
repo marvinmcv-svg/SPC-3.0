@@ -8,31 +8,35 @@
 
 import { motion } from "framer-motion";
 import { UtensilsCrossed, Pill, BookOpen, ShoppingBag, Building2, Megaphone } from "lucide-react";
-import { SECTORS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow, TiltCard } from "./motion-primitives";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
 const ICONS = [UtensilsCrossed, Pill, BookOpen, ShoppingBag, Building2, Megaphone] as const;
 
 export function Sectors() {
+  const t = useT();
+  const { SECTORS, WA_MESSAGES } = useSiteData();
+
   return (
     <section
       id="sectores"
       className="relative overflow-hidden bg-spc-50 py-24 sm:py-32"
-      aria-label="Sectores que atendemos"
+      aria-label={t(L("Sectores que atendemos", "Industries we serve"))}
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Sectores</Eyebrow>
+          <Eyebrow>{t(L("Sectores", "Industries"))}</Eyebrow>
           <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-spc-900">
-            <WordsReveal text="Industrias que" />{" "}
-            <WordsReveal text="imprimimos todos los días" wordClassName="text-gradient-spc" delay={0.14} />
+            <WordsReveal text={t(L("Industrias que", "Industries we"))} />{" "}
+            <WordsReveal text={t(L("imprimimos todos los días", "print for every day"))} wordClassName="text-gradient-spc" delay={0.14} />
           </h2>
           <Reveal delay={0.25}>
             <p className="mt-5 text-[15.5px] leading-relaxed text-spc-900/65">
-              Cada sector tiene normas distintas. Nosotros ya las conocemos:{" "}
+              {t(L("Cada sector tiene normas distintas. Nosotros ya las conocemos:", "Every industry has its own standards. We already know them:"))}{" "}
               <strong className="font-semibold text-spc-800">
-                cuéntanos a qué industria perteneces y llegamos con la solución correcta.
+                {t(L("cuéntanos a qué industria perteneces y llegamos con la solución correcta.", "tell us your industry and we arrive with the right solution."))}
               </strong>
             </p>
           </Reveal>
@@ -70,7 +74,7 @@ export function Sectors() {
         {/* línea de funnel */}
         <Reveal delay={0.15} className="mt-12">
           <p className="mx-auto max-w-xl text-center text-[14px] leading-relaxed text-spc-900/60">
-            ¿Tu industria no está en la lista? Igual podemos imprimirlo.{" "}
+            {t(L("¿Tu industria no está en la lista? Igual podemos imprimirlo.", "Your industry isn't listed? We can still print it."))}{" "}
             <a
               href={waLink(WA_MESSAGES.services)}
               target="_blank"
@@ -78,7 +82,7 @@ export function Sectors() {
               className="group inline-flex items-center gap-1.5 rounded-full py-1.5 font-bold text-spc-600 underline decoration-gold-500/60 decoration-2 underline-offset-4 transition-colors hover:text-spc-800"
             >
               <WhatsAppIcon className="h-4 w-4" />
-              Cuéntanos tu caso
+              {t(L("Cuéntanos tu caso", "Tell us about it"))}
             </a>
           </p>
         </Reveal>

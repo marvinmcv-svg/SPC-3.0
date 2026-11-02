@@ -12,35 +12,38 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { useRef } from "react";
 import { CheckCircle2, Cpu, Droplets, Ruler, Palette } from "lucide-react";
 import { Reveal, WordsReveal, Eyebrow } from "./motion-primitives";
-import { WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
-const MARKS = [
-  {
-    icon: Palette,
-    title: "Color calibrado",
-    body: "Pruebas de color certificadas: lo que ves en la aprobación es lo que recibes en tiraje.",
-  },
-  {
-    icon: Droplets,
-    title: "Tintas de grado alimentario",
-    body: "Insumos de primera calidad, aptos para envases en contacto directo con alimentos.",
-  },
-  {
-    icon: Ruler,
-    title: "Troquel de precisión",
-    body: "Cortes exactos en cada estuche: plegado perfecto, sin variaciones en línea de producción.",
-  },
-  {
-    icon: Cpu,
-    title: "Planta de punta",
-    body: "Maquinaria offset y digital de última generación, con capacidad para tirajes de cualquier escala.",
-  },
-] as const;
-
 export function Technology() {
+  const t = useT();
+  const { WA_MESSAGES } = useSiteData();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+
+  const MARKS = [
+    {
+      icon: Palette,
+      title: t(L("Color calibrado", "Calibrated color")),
+      body: t(L("Pruebas de color certificadas: lo que ves en la aprobación es lo que recibes en tiraje.", "Certified color proofs: what you approve is what you get in the print run.")),
+    },
+    {
+      icon: Droplets,
+      title: t(L("Tintas de grado alimentario", "Food-grade inks")),
+      body: t(L("Insumos de primera calidad, aptos para envases en contacto directo con alimentos.", "First-class supplies, suitable for packaging in direct contact with food.")),
+    },
+    {
+      icon: Ruler,
+      title: t(L("Troquel de precisión", "Precision die-cutting")),
+      body: t(L("Cortes exactos en cada estuche: plegado perfecto, sin variaciones en línea de producción.", "Exact cuts on every carton: perfect folding, zero variation on the production line.")),
+    },
+    {
+      icon: Cpu,
+      title: t(L("Planta de punta", "State-of-the-art plant")),
+      body: t(L("Maquinaria offset y digital de última generación, con capacidad para tirajes de cualquier escala.", "Latest-generation offset and digital machinery, with capacity for runs of any scale.")),
+    },
+  ];
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const yA = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : 60, reduce ? 0 : -60]);
   const yB = useTransform(scrollYProgress, [0, 1], [reduce ? 0 : 110, reduce ? 0 : -40]);
@@ -50,7 +53,7 @@ export function Technology() {
       id="tecnologia"
       ref={ref}
       className="grain relative overflow-hidden bg-spc-950 py-24 sm:py-32"
-      aria-label="Tecnología y calidad"
+      aria-label={t(L("Tecnología y calidad", "Technology and quality"))}
     >
       {/* halos de color */}
       <div aria-hidden className="pointer-events-none absolute -left-48 top-0 h-[560px] w-[560px] rounded-full bg-spc-800/40 blur-3xl" />
@@ -103,7 +106,7 @@ export function Technology() {
                   <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
                 </span>
                 <p className="text-[12.5px] font-bold text-white">
-                  Producción en curso <span className="font-medium text-white/60">· La Paz</span>
+                  {t(L("Producción en curso", "Production in progress"))} <span className="font-medium text-white/60">· La Paz</span>
                 </p>
               </div>
             </motion.div>
@@ -111,16 +114,15 @@ export function Technology() {
 
           {/* ── Contenido ── */}
           <div className="order-1 lg:order-2">
-            <Eyebrow dark>Tecnología & Calidad</Eyebrow>
+            <Eyebrow dark>{t(L("Tecnología & Calidad", "Technology & Quality"))}</Eyebrow>
             <h2 className="font-display mt-5 text-[clamp(2rem,4.4vw,3.2rem)] font-extrabold leading-[1.08] tracking-tight text-white">
-              <WordsReveal text="Lo que no se ve" />{" "}
-              <WordsReveal text="se nota." wordClassName="text-gradient-gold" delay={0.14} />
+              <WordsReveal text={t(L("Lo que no se ve", "What you can't see"))} />{" "}
+              <WordsReveal text={t(L("se nota.", "shows."))} wordClassName="text-gradient-gold" delay={0.14} />
             </h2>
             <Reveal delay={0.2}>
               <p className="mt-5 text-[15.5px] leading-relaxed text-white/65">
-                Detrás de cada caja, libro o revista hay decisiones técnicas que definen el
-                resultado. Estas son las cuatro garantías que aplicamos a{" "}
-                <strong className="font-semibold text-gold-300">todos los proyectos, sin excepción</strong>:
+                {t(L("Detrás de cada caja, libro o revista hay decisiones técnicas que definen el resultado. Estas son las cuatro garantías que aplicamos a", "Behind every box, book or magazine there are technical decisions that define the result. These are the four guarantees we apply to"))}{" "}
+                <strong className="font-semibold text-gold-300">{t(L("todos los proyectos, sin excepción", "every project, no exceptions"))}:</strong>
               </p>
             </Reveal>
 
@@ -154,7 +156,7 @@ export function Technology() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-wa/15 ring-1 ring-wa/40 transition-all duration-300 group-hover:bg-wa group-hover:ring-wa/60">
                   <WhatsAppIcon className="h-4.5 w-4.5 text-wa transition-colors group-hover:text-white" />
                 </span>
-                ¿Preguntas técnicas? Pregúntanos lo que quieras
+                {t(L("¿Preguntas técnicas? Pregúntanos lo que quieras", "Technical questions? Ask us anything"))}
               </a>
             </Reveal>
           </div>

@@ -13,7 +13,8 @@ import Image from "next/image";
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Menu, X, Phone, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BRAND, CONTACT, NAV_LINKS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L, LangToggle } from "@/lib/i18n";
 import { WhatsappCta, WhatsAppIcon } from "./whatsapp-cta";
 import { openSpcAi } from "./spc-ai-widget";
 import { useRoute } from "./site-router";
@@ -23,6 +24,8 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const route = useRoute();
   const isHome = route.page === "home";
+  const { BRAND, CONTACT, NAV_LINKS, WA_MESSAGES } = useSiteData();
+  const t = useT();
 
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
@@ -85,7 +88,7 @@ export function Navbar() {
                 SPC <span className="sr-only">Impresores S.A.</span>
               </span>
               <span className={cn("text-[10px] font-semibold uppercase tracking-[0.24em] transition-colors", solid ? "text-gold-700" : "text-gold-300")}>
-                Gráfica Industrial
+                {BRAND.tagline}
               </span>
             </span>
           </a>
@@ -122,16 +125,17 @@ export function Navbar() {
 
           {/* CTA + acciones */}
           <div className="flex items-center gap-2">
+            <LangToggle solid={solid} />
             <button
               type="button"
               onClick={openSpcAi}
               className={cn(
-                "group hidden h-11 items-center gap-2 rounded-full pl-1.5 pr-4 text-[13px] font-bold transition-all duration-300 sm:flex",
+                "group hidden h-11 items-center gap-2 rounded-full pl-1.5 pr-4 text-[13px] font-bold transition-all duration-300 lg:flex",
                 solid
                   ? "bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 text-spc-900 shadow-[0_6px_20px_-6px_rgba(255,179,28,0.6)] hover:-translate-y-0.5"
                   : "bg-white/12 text-white ring-1 ring-white/30 backdrop-blur-md hover:bg-white/20"
               )}
-              aria-label="Hablar con SPenCer, la recepcionista inteligente"
+              aria-label={t(L("Hablar con SPenCer, la recepcionista inteligente", "Talk to SPenCer, the smart receptionist"))}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 via-gold-500 to-gold-700 text-spc-900">
                 <Bot className="h-4 w-4" aria-hidden />
@@ -156,7 +160,7 @@ export function Navbar() {
               size="sm"
               className="hidden sm:inline-flex"
             >
-              Cotizar por WhatsApp
+              {t(L("Cotizar por WhatsApp", "Quote via WhatsApp"))}
             </WhatsappCta>
             <button
               onClick={() => setOpen(!open)}
@@ -166,7 +170,7 @@ export function Navbar() {
               )}
               aria-expanded={open}
               aria-controls="menu-movil"
-              aria-label={open ? "Cerrar menú" : "Abrir menú"}
+              aria-label={open ? t(L("Cerrar menú", "Close menu")) : t(L("Abrir menú", "Open menu"))}
             >
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -185,6 +189,9 @@ export function Navbar() {
               id="menu-movil"
             >
               <ul className="space-y-1 px-6 pb-6 pt-2">
+                <li className="pb-2">
+                  <LangToggle compact />
+                </li>
                 {NAV_LINKS.map((link, i) => (
                   <motion.li
                     key={link.href}
@@ -212,12 +219,12 @@ export function Navbar() {
                     className="flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-gold-400 via-gold-500 to-gold-600 px-6 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_28px_-8px_rgba(255,179,28,0.6)]"
                   >
                     <Bot className="h-4.5 w-4.5" aria-hidden />
-                    Preguntar a SPenCer
+                    {t(L("Preguntar a SPenCer", "Ask SPenCer"))}
                   </button>
                 </li>
                 <li className="pt-3">
                   <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="md" className="w-full">
-                    Cotizar por WhatsApp
+                    {t(L("Cotizar por WhatsApp", "Quote via WhatsApp"))}
                   </WhatsappCta>
                 </li>
               </ul>

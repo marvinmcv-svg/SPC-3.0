@@ -7,15 +7,21 @@
  */
 
 import { Sparkle } from "lucide-react";
-
-const ITEMS = ["Calidad", "Puntualidad", "Capacidad", "Servicio"];
-const PHRASE =
-  "Imprimiendo lo mejor de Bolivia — Calidad · Puntualidad · Capacidad · Servicio — Líderes de la industria gráfica desde 2001 — ";
+import { useSiteData, useLang } from "@/lib/i18n";
 
 function Row() {
+  const { BRAND } = useSiteData();
+  const { lang } = useLang();
+  const items = BRAND.pillars;
+  const phrase =
+    BRAND.slogan + " — " + BRAND.pillars.join(" · ") + " — " +
+    (lang === "es"
+      ? `Líderes de la industria gráfica desde ${BRAND.foundedYear} — `
+      : `Leaders of the printing industry since ${BRAND.foundedYear} — `);
+
   return (
     <span className="flex shrink-0 items-center" aria-hidden>
-      {ITEMS.map((item) => (
+      {items.map((item) => (
         <span key={item} className="flex items-center">
           <span className="font-display px-7 text-[15px] font-bold uppercase tracking-[0.28em] text-spc-50 sm:text-lg">
             {item}
@@ -24,7 +30,7 @@ function Row() {
         </span>
       ))}
       <span className="font-display px-7 text-[15px] font-semibold uppercase tracking-[0.2em] text-gold-200/80 sm:text-base">
-        {PHRASE}
+        {phrase}
       </span>
     </span>
   );

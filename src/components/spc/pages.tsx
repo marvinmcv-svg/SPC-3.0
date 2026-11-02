@@ -13,7 +13,8 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
-import { BRAND, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { Reveal, WordsReveal, Eyebrow, Counter } from "./motion-primitives";
 import { SiteLink, Breadcrumb, useRoute, PageTransition, type Route } from "./site-router";
 import { Hero } from "./hero";
@@ -88,15 +89,11 @@ function PageHeader({
    PAGE CTA — cierre de funnel compartido por páginas internas
    ════════════════════════════════════════════════════════════════ */
 
-function PageCta({
-  title = "¿Imprimimos algo juntos?",
-  body = "Cuéntanos tu proyecto: la asesoría es gratuita y la cotización llega el mismo día.",
-}: {
-  title?: string;
-  body?: string;
-}) {
+function PageCta() {
+  const t = useT();
+  const { WA_MESSAGES } = useSiteData();
   return (
-    <section className="relative bg-white py-20 sm:py-24" aria-label="Llamado a la acción">
+    <section className="relative bg-white py-20 sm:py-24" aria-label={t(L("Llamado a la acción", "Call to action"))}>
       <div className="mx-auto max-w-5xl px-5 sm:px-8">
         <Reveal y={40}>
           <div className="grain relative overflow-hidden rounded-[2.2rem] bg-gradient-to-br from-spc-900 via-spc-800 to-spc-950 p-8 text-center shadow-[0_50px_110px_-45px_rgba(6,15,46,0.7)] sm:p-14">
@@ -104,10 +101,10 @@ function PageCta({
             <div aria-hidden className="pointer-events-none absolute -bottom-28 -right-20 h-72 w-72 rounded-full bg-spc-500/25 blur-3xl" />
 
             <h2 className="font-display relative text-[clamp(1.7rem,3.6vw,2.6rem)] font-extrabold leading-tight tracking-tight text-white">
-              {title}
+              {t(L("¿Imprimimos algo juntos?", "Shall we print something together?"))}
             </h2>
             <p className="relative mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
-              {body}
+              {t(L("Cuéntanos tu proyecto: la asesoría es gratuita y la cotización llega el mismo día.", "Tell us about your project: advice is free and the quote arrives the same day."))}
             </p>
             <div className="relative mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <motion.a
@@ -119,14 +116,14 @@ function PageCta({
                 className="shine inline-flex items-center gap-3 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-7 py-4 text-[15px] font-bold text-white shadow-[0_16px_44px_-12px_rgba(37,211,102,0.7)]"
               >
                 <WhatsAppIcon className="h-5 w-5" />
-                Cotizar por WhatsApp
+                {t(L("Cotizar por WhatsApp", "Quote via WhatsApp"))}
               </motion.a>
               <SiteLink
                 to="contacto"
                 className="inline-flex items-center gap-2.5 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-[15px] font-bold text-white backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/20"
               >
                 <Sparkles className="h-4.5 w-4.5 text-gold-300" aria-hidden />
-                Llenar el formulario
+                {t(L("Llenar el formulario", "Fill in the form"))}
                 <ArrowUpRight className="h-4 w-4" aria-hidden />
               </SiteLink>
             </div>
@@ -142,6 +139,7 @@ function PageCta({
    ════════════════════════════════════════════════════════════════ */
 
 function StatsBand() {
+  const { STATS } = useSiteData();
   return (
     <section className="relative overflow-hidden bg-spc-50 py-16 sm:py-20" aria-label="Cifras de la empresa">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -189,23 +187,25 @@ export function HomePage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function NosotrosPage() {
+  const t = useT();
+  const { BRAND } = useSiteData();
   return (
     <>
       <PageHeader
-        eyebrow="Nosotros · desde 2001"
-        title="La empresa que"
-        highlight="imprime Bolivia."
-        subtitle={`${BRAND.name} — líder de la industria gráfica nacional. Conoce nuestra historia, la tecnología de nuestra planta y el equipo humano detrás de cada tiraje.`}
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Nosotros" }]}
+        eyebrow={t(L("Nosotros · desde 2001", "About us · since 2001"))}
+        title={t(L("La empresa que", "The company that"))}
+        highlight={t(L("imprime Bolivia.", "prints Bolivia."))}
+        subtitle={t(L(
+          `${BRAND.name} — líder de la industria gráfica nacional. Conoce nuestra historia, la tecnología de nuestra planta y el equipo humano detrás de cada tiraje.`,
+          `${BRAND.name} — leader of the national printing industry. Discover our story, our plant's technology and the human team behind every print run.`,
+        ))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Nosotros", "About us")) }]}
       />
       <About />
       <StatsBand />
       <Technology />
       <Sectors />
-      <PageCta
-        title="¿Quieres conocernos en persona?"
-        body="Visítanos en nuestra planta de Miraflores o escríbenos: te mostramos qué podemos imprimir para tu marca."
-      />
+      <PageCta />
     </>
   );
 }
@@ -215,14 +215,15 @@ export function NosotrosPage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function ServiciosPage() {
+  const t = useT();
   return (
     <>
       <PageHeader
-        eyebrow="Servicios · 9 líneas de producto"
-        title="Todo lo que"
-        highlight="sabemos imprimir."
-        subtitle="Packaging, impresión comercial y digital bajo demanda. Cada línea con sus especificaciones, tiempos y respuestas — y cotización por WhatsApp en un clic."
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Servicios" }]}
+        eyebrow={t(L("Servicios · 9 líneas de producto", "Services · 9 product lines"))}
+        title={t(L("Todo lo que", "Everything we"))}
+        highlight={t(L("sabemos imprimir.", "know how to print."))}
+        subtitle={t(L("Packaging, impresión comercial y digital bajo demanda. Cada línea con sus especificaciones, tiempos y respuestas — y cotización por WhatsApp en un clic.", "Packaging, commercial print and on-demand digital. Every line with its specs, timelines and answers — plus a WhatsApp quote in one click."))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Servicios", "Services")) }]}
       />
       <Services variant="full" />
       <Sectors />
@@ -236,21 +237,19 @@ export function ServiciosPage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function ProcesoPage() {
+  const t = useT();
   return (
     <>
       <PageHeader
-        eyebrow="Proceso · de la idea a tu puerta"
-        title="Así imprimimos"
-        highlight="tu proyecto."
-        subtitle="Cuatro pasos, cero sorpresas: cuéntanos tu idea, recibe una cotización a medida, sigue tu producción con estándar SPC y recibe la entrega donde la necesites."
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Proceso" }]}
+        eyebrow={t(L("Proceso · de la idea a tu puerta", "Process · from idea to your door"))}
+        title={t(L("Así imprimimos", "This is how we print"))}
+        highlight={t(L("tu proyecto.", "your project."))}
+        subtitle={t(L("Cuatro pasos, cero sorpresas: cuéntanos tu idea, recibe una cotización a medida, sigue tu producción con estándar SPC y recibe la entrega donde la necesites.", "Four steps, zero surprises: tell us your idea, receive a tailored quote, follow your production with the SPC standard and get the delivery wherever you need it."))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Proceso", "Process")) }]}
       />
       <Process />
       <Technology />
-      <PageCta
-        title="Empecemos con el paso 01"
-        body="Cuéntanos qué necesitas imprimir: un asesor especializado te responde hoy mismo con propuesta de papel, acabados, tiempos y precio."
-      />
+      <PageCta />
     </>
   );
 }
@@ -260,20 +259,18 @@ export function ProcesoPage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function ClientesPage() {
+  const t = useT();
   return (
     <>
       <PageHeader
-        eyebrow="Clientes · toda Bolivia"
-        title="Las marcas que el país"
-        highlight="consume, imprimen con SPC."
-        subtitle="Del snack del kiosco al medicamento de tu farmacia: empresas de alimentos, farmacéutica, retail, editorial y banca confían su imagen a nuestra planta."
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Clientes" }]}
+        eyebrow={t(L("Clientes · toda Bolivia", "Clients · all of Bolivia"))}
+        title={t(L("Las marcas que el país", "The brands the country"))}
+        highlight={t(L("consume, imprimen con SPC.", "consumes, print with SPC."))}
+        subtitle={t(L("Del snack del kiosco al medicamento de tu farmacia: empresas de alimentos, farmacéutica, retail, editorial y banca confían su imagen a nuestra planta.", "From the kiosk snack to the pharmacy medicine: food, pharma, retail, publishing and banking companies trust their image to our plant."))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Clientes", "Clients")) }]}
       />
       <Clients />
-      <PageCta
-        title="Súmate a las marcas que ya imprimen con SPC"
-        body="Tu marca merece el mismo estándar: cotización gratuita y entrega puntual en los 9 departamentos."
-      />
+      <PageCta />
     </>
   );
 }
@@ -283,14 +280,15 @@ export function ClientesPage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function FaqPage() {
+  const t = useT();
   return (
     <>
       <PageHeader
-        eyebrow="Preguntas frecuentes"
-        title="Todo lo que necesitas saber"
-        highlight="antes de imprimir."
-        subtitle="Tirajes, archivos, pruebas de color, plazos y entregas: respuestas claras para imprimir por primera vez — o para expertos que quieren el detalle fino."
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Preguntas" }]}
+        eyebrow={t(L("Preguntas frecuentes", "Frequently asked questions"))}
+        title={t(L("Todo lo que necesitas saber", "Everything you need to know"))}
+        highlight={t(L("antes de imprimir.", "before you print."))}
+        subtitle={t(L("Tirajes, archivos, pruebas de color, plazos y entregas: respuestas claras para imprimir por primera vez — o para expertos que quieren el detalle fino.", "Run sizes, files, color proofs, deadlines and deliveries: clear answers for first-time printers — or experts who want the fine detail."))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Preguntas", "FAQ")) }]}
       />
       <Faq />
     </>
@@ -302,14 +300,15 @@ export function FaqPage() {
    ════════════════════════════════════════════════════════════════ */
 
 export function ContactoPage() {
+  const t = useT();
   return (
     <>
       <PageHeader
-        eyebrow="Contacto · respuesta el mismo día"
-        title="Hablemos de"
-        highlight="tu proyecto."
-        subtitle="Completa el formulario y mira en vivo el mensaje que recibirá nuestro equipo por WhatsApp — o usa los canales directos de la planta."
-        breadcrumb={[{ label: "Inicio", to: "/" }, { label: "Contacto" }]}
+        eyebrow={t(L("Contacto · respuesta el mismo día", "Contact · same-day reply"))}
+        title={t(L("Hablemos de", "Let's talk about"))}
+        highlight={t(L("tu proyecto.", "your project."))}
+        subtitle={t(L("Completa el formulario y mira en vivo el mensaje que recibirá nuestro equipo por WhatsApp — o usa los canales directos de la planta.", "Fill in the form and watch live the message our team will receive on WhatsApp — or use the plant's direct channels."))}
+        breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Contacto", "Contact")) }]}
       />
       <QuoteFunnel compact />
     </>

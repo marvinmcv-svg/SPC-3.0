@@ -12,27 +12,30 @@ import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { BadgeCheck, Clock3, Gauge, Handshake, Sparkles, MoveHorizontal } from "lucide-react";
-import { BRAND, SERVICES, STATS, WA_MESSAGES, waLink } from "@/lib/site-config";
+import { waLink } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { WhatsappCta } from "./whatsapp-cta";
 import { Counter, Magnetic, RingCarousel } from "./motion-primitives";
 import { openServiceDetail } from "./service-detail";
 
-const PILLARS = [
-  { icon: BadgeCheck, label: "Calidad", detail: "Estándares de la industria" },
-  { icon: Clock3, label: "Puntualidad", detail: "Tu fecha, compromiso" },
-  { icon: Gauge, label: "Capacidad", detail: "Tecnología de punta" },
-  { icon: Handshake, label: "Servicio", detail: "El factor humano" },
-] as const;
-
-/* Items del carrusel: una tarjeta por línea de producto */
-const CAROUSEL_ITEMS = SERVICES.map((s) => ({
-  id: s.id,
-  title: s.title,
-  badge: s.category,
-  image: s.image,
-}));
-
 export function Hero() {
+  const t = useT();
+  const { BRAND, SERVICES, STATS, WA_MESSAGES } = useSiteData();
+
+  const PILLARS = [
+    { icon: BadgeCheck, label: t(L("Calidad", "Quality")), detail: t(L("Estándares de la industria", "Industry standards")) },
+    { icon: Clock3, label: t(L("Puntualidad", "On-time")), detail: t(L("Tu fecha, compromiso", "Your date, guaranteed")) },
+    { icon: Gauge, label: t(L("Capacidad", "Capacity")), detail: t(L("Tecnología de punta", "Cutting-edge technology")) },
+    { icon: Handshake, label: t(L("Servicio", "Service")), detail: t(L("El factor humano", "The human factor")) },
+  ];
+
+  /* Items del carrusel: una tarjeta por línea de producto */
+  const CAROUSEL_ITEMS = SERVICES.map((s) => ({
+    id: s.id,
+    title: s.title,
+    badge: s.categoryLabel,
+    image: s.image,
+  }));
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -47,7 +50,7 @@ export function Hero() {
       id="inicio"
       ref={ref}
       className="grain relative flex min-h-[100svh] flex-col overflow-hidden bg-spc-950"
-      aria-label="Presentación de SPC"
+      aria-label={t(L("Presentación de SPC", "SPC presentation"))}
     >
       {/* ── Fondo cinematográfico: parallax de scroll + Ken Burns lento ── */}
       <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
@@ -99,7 +102,7 @@ export function Hero() {
           >
             <Sparkles className="h-4 w-4 text-gold-400" aria-hidden />
             <span className="text-[12px] font-semibold uppercase tracking-[0.22em] text-white/90">
-              Líderes de la industria gráfica · desde {BRAND.foundedYear}
+              {t(L("Líderes de la industria gráfica · desde", "Leaders of the printing industry · since"))} {BRAND.foundedYear}
             </span>
           </motion.div>
 
@@ -112,7 +115,7 @@ export function Hero() {
                 animate={{ y: "0%" }}
                 transition={{ duration: 1, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
               >
-                Imprimiendo
+                {t(L("Imprimiendo", "Printing"))}
               </motion.span>
             </span>
             <span className="block overflow-hidden">
@@ -122,7 +125,7 @@ export function Hero() {
                 animate={{ y: "0%" }}
                 transition={{ duration: 1, delay: 0.58, ease: [0.22, 1, 0.36, 1] }}
               >
-                lo mejor de
+                {t(L("lo mejor de", "the best of"))}
               </motion.span>
             </span>
             <span className="block overflow-hidden pb-2">
@@ -132,7 +135,7 @@ export function Hero() {
                 animate={{ y: "0%", filter: "blur(0px)" }}
                 transition={{ duration: 1.05, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}
               >
-                Bolivia.
+                {t(L("Bolivia.", "Bolivia."))}
               </motion.span>
             </span>
           </h1>
@@ -144,10 +147,15 @@ export function Hero() {
             transition={{ duration: 0.9, delay: 0.95, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 max-w-[52ch] text-[clamp(1rem,1.6vw,1.2rem)] leading-relaxed text-white/75"
           >
-            Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y
-            soluciones digitales bajo demanda.{" "}
+            {t(L(
+              "Packaging para alimentos y farmacia, impresión comercial de libros y revistas, y soluciones digitales bajo demanda.",
+              "Packaging for food and pharma, commercial printing of books and magazines, and on-demand digital solutions.",
+            ))}{" "}
             <span className="font-semibold text-gold-300">
-              Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.
+              {t(L(
+                "Tú nos cuentas tu idea — nosotros la imprimimos con la calidad de siempre.",
+                "You tell us your idea — we print it with the quality you expect.",
+              ))}
             </span>
           </motion.p>
 
@@ -160,11 +168,11 @@ export function Hero() {
           >
             <Magnetic>
               <WhatsappCta href={waLink(WA_MESSAGES.general)} variant="gold" size="lg" arrow>
-                Cotiza por WhatsApp
+                {t(L("Cotiza por WhatsApp", "Quote via WhatsApp"))}
               </WhatsappCta>
             </Magnetic>
             <WhatsappCta href="#/servicios" variant="ghost-dark" size="lg" icon={false} className="px-8 py-4">
-              Explorar servicios
+              {t(L("Explorar servicios", "Explore services"))}
             </WhatsappCta>
           </motion.div>
 
@@ -175,7 +183,10 @@ export function Hero() {
             transition={{ duration: 1, delay: 1.5 }}
             className="mt-5 text-[13px] font-medium text-white/60"
           >
-            Respuesta en minutos dentro del horario laboral · Asesoría sin costo
+            {t(L(
+              "Respuesta en minutos dentro del horario laboral · Asesoría sin costo",
+              "Reply within minutes during business hours · Free advice",
+            ))}
           </motion.p>
         </div>
 
@@ -190,7 +201,7 @@ export function Hero() {
           <div className="mb-1 flex items-center justify-center gap-2.5">
             <MoveHorizontal className="h-4 w-4 text-gold-400" aria-hidden />
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold-300/90">
-              Nuestras 9 líneas · gíralas
+              {t(L("Nuestras 9 líneas · gíralas", "Our 9 lines · spin them"))}
             </p>
           </div>
 

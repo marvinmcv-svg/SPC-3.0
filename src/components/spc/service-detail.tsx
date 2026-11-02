@@ -33,7 +33,8 @@ import {
   Sparkles,
   Timer,
 } from "lucide-react";
-import { SERVICES, waLink, type Service } from "@/lib/site-config";
+import { waLink, type Service, type ServiceCategory } from "@/lib/site-config";
+import { useSiteData, useT, L } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Eyebrow, Reveal, TiltCard, WordsReveal } from "./motion-primitives";
 import { Breadcrumb, SiteLink, navigate } from "./site-router";
@@ -44,17 +45,19 @@ export function openServiceDetail(serviceId: string) {
   navigate(`servicios/${serviceId}`);
 }
 
-/* ─── Colores de chip por categoría ─────────────────────────────── */
+/* ─── Colores de chip por categoría ────────────────────────────── */
 
-const CATEGORY_STYLES: Record<Service["category"], string> = {
-  Packaging: "bg-spc-600/10 text-spc-600 ring-spc-600/15",
-  "Impresión Comercial": "bg-gold-100/70 text-[#856629] ring-gold-600/20",
-  Digital: "bg-emerald-600/10 text-emerald-700 ring-emerald-600/20",
+const CATEGORY_STYLES: Record<ServiceCategory, string> = {
+  packaging: "bg-spc-600/10 text-spc-600 ring-spc-600/15",
+  commercial: "bg-gold-100/70 text-[#856629] ring-gold-600/20",
+  digital: "bg-emerald-600/10 text-emerald-700 ring-emerald-600/20",
 };
 
 /* ═══ Página completa del servicio ════════════════════════════════ */
 
 export function ServicePage({ serviceId }: { serviceId: string }) {
+  const t = useT();
+  const { SERVICES } = useSiteData();
   const service = SERVICES.find((s) => s.id === serviceId);
 
   /* id inválido → fallback amable (nunca crashea) */
@@ -66,13 +69,13 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
   ).slice(0, 3);
 
   return (
-    <article aria-label={`Detalle del servicio ${service.title}`}>
+    <article aria-label={t(L(`Detalle del servicio ${service.title}`, `Service details: ${service.title}`))}>
       {/* ── 1· Hero cinematográfico ── */}
       <ServiceHero service={service} />
 
       {/* ── 2· Chips operativos + 3· dato educativo ── */}
       <section
-        aria-label="Datos operativos del servicio"
+        aria-label={t(L("Datos operativos del servicio", "Service operational data"))}
         className="mx-auto w-full max-w-7xl px-5 pt-14 sm:px-8 sm:pt-20"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -83,7 +86,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
               </span>
               <div className="min-w-0">
                 <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-spc-500">
-                  Tiraje mínimo
+                  {t(L("Tiraje mínimo", "Minimum run"))}
                 </p>
                 <p className="mt-1 text-[14.5px] font-semibold text-spc-900">
                   {service.minRun}
@@ -98,7 +101,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
               </span>
               <div className="min-w-0">
                 <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-[#856629]">
-                  Tiempo de producción
+                  {t(L("Tiempo de producción", "Production time"))}
                 </p>
                 <p className="mt-1 text-[14.5px] font-semibold text-spc-900">
                   {service.turnaround}
@@ -116,7 +119,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
             </span>
             <div>
               <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-gold-300">
-                ¿Sabías que…?
+                {t(L("¿Sabías que…?", "Did you know?"))}
               </p>
               <p className="mt-2 text-[14.5px] leading-relaxed text-white/85">
                 {service.insight}
@@ -132,19 +135,18 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
         className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24"
       >
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Detalle técnico</Eyebrow>
+          <Eyebrow>{t(L("Detalle técnico", "Technical detail"))}</Eyebrow>
           <Reveal delay={0.1}>
             <h2
               id="specs-heading"
               className="font-display mt-5 text-[clamp(1.8rem,3.6vw,2.6rem)] font-extrabold leading-[1.1] tracking-tight text-spc-900"
             >
-              Especificaciones y casos de uso
+              {t(L("Especificaciones y casos de uso", "Specifications and use cases"))}
             </h2>
           </Reveal>
           <Reveal delay={0.18}>
             <p className="mt-4 text-[14.5px] leading-relaxed text-spc-900/65">
-              Parámetros, materiales y acabados que manejamos de rutina en esta
-              línea — explicados sin tecnicismos innecesarios.
+              {t(L("Parámetros, materiales y acabados que manejamos de rutina en esta línea — explicados sin tecnicismos innecesarios.", "Parameters, materials and finishes we routinely handle in this line — explained without unnecessary jargon."))}
             </p>
           </Reveal>
         </div>
@@ -154,7 +156,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
           <div>
             <h3 className="flex items-center gap-2.5 font-display text-[16px] font-bold text-spc-900">
               <Layers className="h-4.5 w-4.5 text-spc-600" aria-hidden />
-              Especificaciones técnicas
+              {t(L("Especificaciones técnicas", "Technical specifications"))}
             </h3>
             <ul className="mt-5 space-y-3">
               {service.specs.map((spec, i) => (
@@ -177,7 +179,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
           <div>
             <h3 className="flex items-center gap-2.5 font-display text-[16px] font-bold text-spc-900">
               <PackageCheck className="h-4.5 w-4.5 text-spc-600" aria-hidden />
-              ¿Para qué se usa?
+              {t(L("¿Para qué se usa?", "What is it used for?"))}
             </h3>
             <ul className="mt-5 space-y-3">
               {service.useCases.map((uc, i) => (
@@ -199,11 +201,11 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
               href={waLink(service.waMessage)}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`Cotizar ${service.title} por WhatsApp`}
+              aria-label={t(L(`Cotizar ${service.title} por WhatsApp`, `Quote ${service.title} on WhatsApp`))}
               className="shine group mt-6 flex w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-6 py-3.5 text-[14px] font-bold text-white shadow-[0_12px_34px_-10px_rgba(37,211,102,0.6)] transition-all duration-300 hover:-translate-y-0.5"
             >
               <WhatsAppIcon className="h-4.5 w-4.5" />
-              Cotizar {service.shortTitle.toLowerCase()} por WhatsApp
+              {t(L(`Cotizar ${service.shortTitle.toLowerCase()} por WhatsApp`, `Quote ${service.shortTitle.toLowerCase()} on WhatsApp`))}
               <ArrowUpRight
                 className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 aria-hidden
@@ -221,19 +223,18 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
         >
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <Eyebrow>Galería</Eyebrow>
+              <Eyebrow>{t(L("Galería", "Gallery"))}</Eyebrow>
               <Reveal delay={0.1}>
                 <h2
                   id="gallery-heading"
                   className="font-display mt-5 text-[clamp(1.8rem,3.6vw,2.6rem)] font-extrabold leading-[1.1] tracking-tight text-spc-900"
                 >
-                  Producción real de esta línea
+                  {t(L("Producción real de esta línea", "Real production from this line"))}
                 </h2>
               </Reveal>
               <Reveal delay={0.18}>
                 <p className="mt-4 text-[14.5px] leading-relaxed text-spc-900/65">
-                  Piezas que salieron de nuestras prensas — el mismo estándar de
-                  calidad que recibirá tu proyecto.
+                  {t(L("Piezas que salieron de nuestras prensas — el mismo estándar de calidad que recibirá tu proyecto.", "Pieces that came off our presses — the same quality standard your project will receive."))}
                 </p>
               </Reveal>
             </div>
@@ -245,7 +246,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                     <figure className="glossy-card group relative aspect-[4/3] overflow-hidden rounded-2xl">
                       <Image
                         src={src}
-                        alt={`${service.title} — producción real de SPC (foto ${i + 1})`}
+                        alt={t(L(`${service.title} — producción real de SPC (foto ${i + 1})`, `${service.title} — real SPC production (photo ${i + 1})`))}
                         fill
                         sizes="(max-width: 640px) 100vw, 50vw"
                         className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
@@ -270,13 +271,13 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
         className="mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-24"
       >
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Resolvemos tus dudas</Eyebrow>
+          <Eyebrow>{t(L("Resolvemos tus dudas", "We answer your questions"))}</Eyebrow>
           <Reveal delay={0.1}>
             <h2
               id="faq-heading"
               className="font-display mt-5 text-[clamp(1.8rem,3.6vw,2.6rem)] font-extrabold leading-[1.1] tracking-tight text-spc-900"
             >
-              Preguntas frecuentes de este servicio
+              {t(L("Preguntas frecuentes de este servicio", "FAQs about this service"))}
             </h2>
           </Reveal>
         </div>
@@ -309,13 +310,13 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
         >
           <div className="mx-auto w-full max-w-7xl px-5 sm:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <Eyebrow>Sigue explorando</Eyebrow>
+              <Eyebrow>{t(L("Sigue explorando", "Keep exploring"))}</Eyebrow>
               <Reveal delay={0.1}>
                 <h2
                   id="related-heading"
                   className="font-display mt-5 text-[clamp(1.8rem,3.6vw,2.6rem)] font-extrabold leading-[1.1] tracking-tight text-spc-900"
                 >
-                  Otros servicios de {service.category}
+                  {t(L(`Otros servicios de ${service.categoryLabel}`, `Other ${service.categoryLabel} services`))}
                 </h2>
               </Reveal>
             </div>
@@ -327,7 +328,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                     <button
                       type="button"
                       onClick={() => openServiceDetail(other.id)}
-                      aria-label={`Ver detalle de ${other.title}`}
+                      aria-label={t(L(`Ver detalle de ${other.title}`, `View details for ${other.title}`))}
                       className="glossy-card group relative flex h-full w-full cursor-pointer flex-col rounded-[1.6rem] p-6 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-spc-600 sm:p-7"
                     >
                       <span
@@ -336,7 +337,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                           CATEGORY_STYLES[other.category],
                         )}
                       >
-                        {other.category}
+                        {other.categoryLabel}
                       </span>
                       <h3 className="font-display mt-4 text-[18px] font-bold leading-tight tracking-tight text-spc-900">
                         {other.title}
@@ -345,7 +346,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                         {other.description}
                       </p>
                       <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-bold text-spc-600 transition-colors duration-300 group-hover:text-spc-800">
-                        Ver detalle
+                        {t(L("Ver detalle", "View details"))}
                         <ArrowUpRight
                           className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                           aria-hidden
@@ -362,7 +363,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
 
       {/* ── 8· Banda final de conversión ── */}
       <section
-        aria-label="Cotización de este servicio"
+        aria-label={t(L("Cotización de este servicio", "Quote this service"))}
         className="mx-auto w-full max-w-7xl px-5 pb-20 pt-6 sm:px-8 sm:pb-24"
       >
         <Reveal y={30}>
@@ -375,14 +376,13 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
             <div className="relative flex flex-col items-start gap-8 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-xl">
                 <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-gold-300">
-                  Cotiza {service.shortTitle.toLowerCase()}
+                  {t(L(`Cotiza ${service.shortTitle.toLowerCase()}`, `Quote ${service.shortTitle.toLowerCase()}`))}
                 </p>
                 <h2 className="font-display mt-3 text-[clamp(1.5rem,2.9vw,2.2rem)] font-extrabold leading-tight">
-                  ¿Te imaginaste tu proyecto en esta línea?
+                  {t(L("¿Te imaginaste tu proyecto en esta línea?", "Can you picture your project in this line?"))}
                 </h2>
                 <p className="mt-3 text-[14px] leading-relaxed text-white/70">
-                  Cuéntanos tiraje, formato y acabados — un asesor especializado
-                  te responde hoy mismo con una cotización clara, sin compromiso.
+                  {t(L("Cuéntanos tiraje, formato y acabados — un asesor especializado te responde hoy mismo con una cotización clara, sin compromiso.", "Tell us run size, format and finishes — a specialized advisor replies today with a clear, commitment-free quote."))}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-3.5 sm:w-auto sm:flex-row lg:flex-col">
@@ -390,19 +390,19 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                   href={waLink(service.waMessage)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Cotizar ${service.title} por WhatsApp`}
+                  aria-label={t(L(`Cotizar ${service.title} por WhatsApp`, `Quote ${service.title} on WhatsApp`))}
                   className="shine inline-flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-[#2fe076] via-wa to-[#1da851] px-7 py-3.5 text-[14px] font-bold text-white shadow-[0_12px_34px_-10px_rgba(37,211,102,0.6)] transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <WhatsAppIcon className="h-4.5 w-4.5" />
-                  Cotizar por WhatsApp
+                  {t(L("Cotizar por WhatsApp", "Quote via WhatsApp"))}
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </a>
                 <SiteLink
                   to="contacto"
-                  aria-label="Cotizar en el formulario de contacto"
+                  aria-label={t(L("Cotizar en el formulario de contacto", "Quote via the contact form"))}
                   className="shine inline-flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-gold-600 px-7 py-3.5 text-[14px] font-bold text-spc-900 shadow-[0_10px_30px_-8px_rgba(255,179,28,0.55)] transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  Cotizar en el formulario
+                  {t(L("Cotizar en el formulario", "Quote via the form"))}
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </SiteLink>
               </div>
@@ -417,6 +417,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
 /* ═══ Hero cinematográfico con parallax + Ken Burns ═══════════════ */
 
 function ServiceHero({ service }: { service: Service }) {
+  const t = useT();
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
@@ -432,7 +433,7 @@ function ServiceHero({ service }: { service: Service }) {
   return (
     <section
       ref={ref}
-      aria-label={`Presentación de ${service.title}`}
+      aria-label={t(L(`Presentación de ${service.title}`, `${service.title} presentation`))}
       className="grain relative flex min-h-[44svh] items-end overflow-hidden bg-spc-950 pb-12 pt-28 sm:pb-16 sm:pt-32"
     >
       {/* fondo: parallax de scroll + Ken Burns lento */}
@@ -450,7 +451,7 @@ function ServiceHero({ service }: { service: Service }) {
         >
           <Image
             src={service.image}
-            alt={`${service.title} — producción de SPC`}
+            alt={t(L(`${service.title} — producción de SPC`, `${service.title} — SPC production`))}
             fill
             priority
             sizes="100vw"
@@ -486,8 +487,8 @@ function ServiceHero({ service }: { service: Service }) {
         >
           <Breadcrumb
             items={[
-              { label: "Inicio", to: "/" },
-              { label: "Servicios", to: "servicios" },
+              { label: t(L("Inicio", "Home")), to: "/" },
+              { label: t(L("Servicios", "Services")), to: "servicios" },
               { label: service.title },
             ]}
           />
@@ -501,7 +502,7 @@ function ServiceHero({ service }: { service: Service }) {
         >
           <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-gold-300 ring-1 ring-white/25 backdrop-blur-md">
             <Sparkles className="h-3 w-3" aria-hidden />
-            {service.category}
+            {service.categoryLabel}
           </span>
         </motion.div>
 
@@ -535,9 +536,10 @@ function ServiceHero({ service }: { service: Service }) {
 /* ═══ Fallback amable para ids inválidos ══════════════════════════ */
 
 function ServiceNotFound() {
+  const t = useT();
   return (
     <section
-      aria-label="Servicio no encontrado"
+      aria-label={t(L("Servicio no encontrado", "Service not found"))}
       className="mx-auto flex min-h-[62svh] w-full max-w-7xl flex-col items-center justify-center px-5 py-24 sm:px-8"
     >
       <Reveal>
@@ -547,20 +549,18 @@ function ServiceNotFound() {
             <FileQuestion className="h-8 w-8" aria-hidden />
           </span>
           <h1 className="font-display mt-6 text-[clamp(1.6rem,3.4vw,2.3rem)] font-extrabold tracking-tight text-spc-900">
-            Servicio no encontrado
+            {t(L("Servicio no encontrado", "Service not found"))}
           </h1>
           <p className="mt-3 text-[14.5px] leading-relaxed text-spc-900/65">
-            El servicio que buscas no existe o cambió de dirección. Explora
-            nuestras 9 líneas de impresión y encuentra la indicada para tu
-            proyecto.
+            {t(L("El servicio que buscas no existe o cambió de dirección. Explora nuestras 9 líneas de impresión y encuentra la indicada para tu proyecto.", "The service you're looking for doesn't exist or has moved. Explore our 9 printing lines and find the right one for your project."))}
           </p>
           <SiteLink
             to="servicios"
-            aria-label="Volver al listado de servicios"
+            aria-label={t(L("Volver al listado de servicios", "Back to the services list"))}
             className="shine mt-8 inline-flex items-center gap-2.5 rounded-full bg-gradient-to-br from-spc-600 to-spc-800 px-7 py-3.5 text-[14px] font-bold text-white shadow-[0_12px_32px_-10px_rgba(0,60,141,0.55)] transition-all duration-300 hover:-translate-y-0.5"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
-            Ver todos los servicios
+            {t(L("Ver todos los servicios", "See all services"))}
           </SiteLink>
         </div>
       </Reveal>

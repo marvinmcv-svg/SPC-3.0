@@ -28,19 +28,11 @@ import {
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { SERVICES } from "@/lib/site-config";
+import { SERVICE_IDS, type NavPage } from "@/lib/site-config";
 
 /* ─── Tipos de ruta ──────────────────────────────────────────────── */
 
-export type PageId =
-  | "home"
-  | "nosotros"
-  | "servicios"
-  | "servicio"
-  | "proceso"
-  | "clientes"
-  | "faq"
-  | "contacto";
+export type PageId = NavPage;
 
 export type Route = {
   page: PageId;
@@ -63,7 +55,7 @@ export function parseHash(hash: string): Route {
     case "nosotros":
       return { page: "nosotros", key: "nosotros" };
     case "servicios":
-      if (sub && SERVICES.some((s) => s.id === sub)) {
+      if (sub && SERVICE_IDS.includes(sub)) {
         return { page: "servicio", serviceId: sub, key: `servicio-${sub}` };
       }
       return { page: "servicios", key: "servicios" };
