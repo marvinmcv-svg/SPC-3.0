@@ -246,7 +246,7 @@ export function ServicePage({ serviceId }: { serviceId: string }) {
                     <figure className="glossy-card group relative aspect-[4/3] overflow-hidden rounded-2xl">
                       <Image
                         src={src}
-                        alt={t(L(`${service.title} — producción real de SPC (foto ${i + 1})`, `${service.title} — real SPC production (photo ${i + 1})`))}
+                        alt={t(L(`${service.title} — producción real (foto ${i + 1})`, `${service.title} — real production (photo ${i + 1})`))}
                         fill
                         sizes="(max-width: 640px) 100vw, 50vw"
                         className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
@@ -451,7 +451,7 @@ function ServiceHero({ service }: { service: Service }) {
         >
           <Image
             src={service.image}
-            alt={t(L(`${service.title} — producción de SPC`, `${service.title} — SPC production`))}
+            alt={t(L(`${service.title} — ejemplo de producción real`, `${service.title} — real production example`))}
             fill
             priority
             sizes="100vw"

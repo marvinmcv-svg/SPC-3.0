@@ -35,7 +35,7 @@ export function FinalCta() {
   ];
 
   return (
-    <section id="contacto" className="relative bg-white pb-24 pt-4 sm:pb-32" aria-label={t(L("Contacto y cotización", "Contact and quote"))}>
+    <section id="contacto-directo" className="relative bg-white pb-24 pt-4 sm:pb-32" aria-label={t(L("Contacto y cotización", "Contact and quote"))}>
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <Reveal y={50}>
           <div className="grain relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-spc-900 via-spc-800 to-spc-950 shadow-[0_60px_120px_-50px_rgba(6,15,46,0.7)]">
@@ -147,7 +147,7 @@ export function FinalCta() {
               <div className="relative min-h-[320px] lg:min-h-full">
                 <Image
                   src="/images/site/qc-human.jpg"
-                  alt="Especialista de control de calidad de SPC revisando una prueba de impresión"
+                  alt="Especialista de control de calidad revisando una prueba de impresión en mesa luminosa"
                   fill
                   sizes="(max-width: 1024px) 100vw, 45vw"
                   className="object-cover object-[50%_20%]"

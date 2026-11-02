@@ -62,7 +62,7 @@ export function Hero() {
         >
           <Image
             src="/images/site/hero-press.jpg"
-            alt="Planta industrial de impresión de SPC con prensa offset"
+            alt="Prensa offset multicolor de última generación en planta de impresión industrial"
             fill
             priority
             sizes="100vw"

@@ -68,7 +68,7 @@ export function Technology() {
                 <div className="overflow-hidden rounded-[2rem] shadow-[0_50px_100px_-40px_rgba(0,0,0,0.8)] ring-1 ring-white/15">
                   <Image
                     src="/images/site/tech-rollers.jpg"
-                    alt="Placas y rodillos de la prensa offset de SPC en plena producción"
+                    alt="Operario ajustando las placas de impresión en el interior de una prensa offset"
                     width={1344}
                     height={768}
                     className="h-[320px] w-full object-cover sm:h-[380px]"

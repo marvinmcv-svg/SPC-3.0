@@ -54,8 +54,8 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
             <Image
               src={service.image}
               alt={t(L(
-                `${service.title} — producción real de SPC`,
-                `${service.title} — real SPC production`,
+                `${service.title} — ejemplo real de producción`,
+                `${service.title} — real production example`,
               ))}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

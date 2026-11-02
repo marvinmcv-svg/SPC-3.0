@@ -27,6 +27,7 @@ import { Sectors } from "./sectors";
 import { Clients } from "./clients";
 import { Faq } from "./faq";
 import { QuoteFunnel } from "./quote-funnel";
+import { FinalCta } from "./final-cta";
 import { ServicePage } from "./service-detail";
 import { WhatsAppIcon } from "./whatsapp-cta";
 
@@ -311,6 +312,7 @@ export function ContactoPage() {
         breadcrumb={[{ label: t(L("Inicio", "Home")), to: "/" }, { label: t(L("Contacto", "Contact")) }]}
       />
       <QuoteFunnel compact />
+      <FinalCta />
     </>
   );
 }
