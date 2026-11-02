@@ -60,3 +60,11 @@ upload/
 logo_*.json
 fetch_logos*.py
 download_wiki_logos.py
+
+# research artifacts & scratch downloads (tool-results/ already ignored)
+download/
+*.log
+logo_candidates.json
+logo_deep_candidates.json
+fetch_logos*.py
+download_wiki_logos.py
